@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F832F12E-DDDB-46A0-995A-D1D899B1B659}</ProjectGuid>
+    <RootNamespace>gui4reces</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
+    <EmbedManifest>true</EmbedManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)..\bin\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(SolutionDir)\obj\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>version.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>version.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AboutDialog.cpp" />
+    <ClCompile Include="CompressTab.cpp" />
+    <ClCompile Include="ExtractTab.cpp" />
+    <ClCompile Include="FileListView.cpp" />
+    <ClCompile Include="FilterTab.cpp" />
+    <ClCompile Include="gui4reces.cpp" />
+    <ClCompile Include="MainDialog.cpp" />
+    <ClCompile Include="OtherTab.cpp" />
+    <ClCompile Include="OutputTab.cpp" />
+    <ClCompile Include="PasswordTab.cpp" />
+    <ClCompile Include="PrivateProfile.cpp" />
+    <ClCompile Include="RemoveSourceTab.cpp" />
+    <ClCompile Include="SplitTab.cpp" />
+    <ClCompile Include="sslib\CfgFile.cpp" />
+    <ClCompile Include="sslib\CommandArgument.cpp" />
+    <ClCompile Include="sslib\Dialog.cpp" />
+    <ClCompile Include="sslib\DialogApp.cpp" />
+    <ClCompile Include="sslib\EnvironmentVariable.cpp" />
+    <ClCompile Include="sslib\File.cpp" />
+    <ClCompile Include="sslib\FileDialog.cpp" />
+    <ClCompile Include="sslib\FileOperation.cpp" />
+    <ClCompile Include="sslib\FileSearch.cpp" />
+    <ClCompile Include="sslib\FolderDialog.cpp" />
+    <ClCompile Include="sslib\gui\Control.cpp" />
+    <ClCompile Include="sslib\gui\CtrlAHook.cpp" />
+    <ClCompile Include="sslib\gui\DropFiles.cpp" />
+    <ClCompile Include="sslib\gui\ListView.cpp" />
+    <ClCompile Include="sslib\gui\Tab.cpp" />
+    <ClCompile Include="sslib\Misc.cpp" />
+    <ClCompile Include="sslib\Path.cpp" />
+    <ClCompile Include="sslib\String.cpp" />
+    <ClCompile Include="sslib\VariableArgument.cpp" />
+    <ClCompile Include="TabBase.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AboutDialog.h" />
+    <ClInclude Include="CompressTab.h" />
+    <ClInclude Include="ExtractTab.h" />
+    <ClInclude Include="FileListView.h" />
+    <ClInclude Include="FilterTab.h" />
+    <ClInclude Include="gui4reces.h" />
+    <ClInclude Include="MainDialog.h" />
+    <ClInclude Include="OtherTab.h" />
+    <ClInclude Include="OutputTab.h" />
+    <ClInclude Include="PasswordTab.h" />
+    <ClInclude Include="PrivateProfile.h" />
+    <ClInclude Include="RemoveSourceTab.h" />
+    <ClInclude Include="resources\resource.h" />
+    <ClInclude Include="SplitTab.h" />
+    <ClInclude Include="sslib\CfgFile.h" />
+    <ClInclude Include="sslib\CommandArgument.h" />
+    <ClInclude Include="sslib\Dialog.h" />
+    <ClInclude Include="sslib\DialogApp.h" />
+    <ClInclude Include="sslib\EnvironmentVariable.h" />
+    <ClInclude Include="sslib\File.h" />
+    <ClInclude Include="sslib\FileDialog.h" />
+    <ClInclude Include="sslib\FileOperation.h" />
+    <ClInclude Include="sslib\FileSearch.h" />
+    <ClInclude Include="sslib\FolderDialog.h" />
+    <ClInclude Include="sslib\gui\Control.h" />
+    <ClInclude Include="sslib\gui\CtrlAHook.h" />
+    <ClInclude Include="sslib\gui\DropFiles.h" />
+    <ClInclude Include="sslib\gui\ListView.h" />
+    <ClInclude Include="sslib\gui\Tab.h" />
+    <ClInclude Include="sslib\Misc.h" />
+    <ClInclude Include="sslib\Path.h" />
+    <ClInclude Include="sslib\sslib.h" />
+    <ClInclude Include="sslib\String.h" />
+    <ClInclude Include="sslib\VariableArgument.h" />
+    <ClInclude Include="StdAfx.h" />
+    <ClInclude Include="TabBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\gui4reces.ico" />
+    <None Include="resources\manifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\resource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

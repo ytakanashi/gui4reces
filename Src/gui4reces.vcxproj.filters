@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\sslib">
+      <UniqueIdentifier>{9db0ba3a-a3b3-41ff-8eee-0bc102610aff}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\sslib">
+      <UniqueIdentifier>{44d0dfe3-3c04-4f25-9675-daff7a7a00bd}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\sslib\gui">
+      <UniqueIdentifier>{288dfde6-cf91-40a3-960c-40114e937023}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\sslib\gui">
+      <UniqueIdentifier>{4d204874-d61d-4a15-8b19-e15351228d0f}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CompressTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtractTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FileListView.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="gui4reces.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="MainDialog.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PasswordTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PrivateProfile.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="RemoveSourceTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="SplitTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="TabBase.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\CfgFile.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\CommandArgument.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\Dialog.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\File.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\FileDialog.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\FileOperation.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\FileSearch.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\FolderDialog.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\Misc.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\Path.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\String.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\VariableArgument.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\gui\Control.cpp">
+      <Filter>ソース ファイル\sslib\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\gui\CtrlAHook.cpp">
+      <Filter>ソース ファイル\sslib\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\gui\DropFiles.cpp">
+      <Filter>ソース ファイル\sslib\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\gui\ListView.cpp">
+      <Filter>ソース ファイル\sslib\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\gui\Tab.cpp">
+      <Filter>ソース ファイル\sslib\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\DialogApp.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="OtherTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="AboutDialog.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\EnvironmentVariable.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CompressTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="ExtractTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FileListView.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="gui4reces.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="MainDialog.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PasswordTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PrivateProfile.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="RemoveSourceTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SplitTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TabBase.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\CfgFile.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\CommandArgument.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\Dialog.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\File.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\FileDialog.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\FileOperation.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\FileSearch.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\FolderDialog.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\Misc.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\Path.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\String.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\VariableArgument.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\gui\Control.h">
+      <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\gui\CtrlAHook.h">
+      <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\gui\DropFiles.h">
+      <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\gui\ListView.h">
+      <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\gui\Tab.h">
+      <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resource.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\DialogApp.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\sslib.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="OtherTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="AboutDialog.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputTab.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\EnvironmentVariable.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="resources\gui4reces.ico">
+      <Filter>リソース ファイル</Filter>
+    </None>
+    <None Include="resources\manifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\resource.rc">
+      <Filter>リソース ファイル</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
