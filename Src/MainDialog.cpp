@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.0.9 by x@rgs
+//            gui4reces Ver.0.0.1.0 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -70,19 +70,27 @@ namespace{
 
 		if(::CreateProcess(NULL,&cmd_[0],NULL,NULL,true,DETACHED_PROCESS,NULL,NULL,&startup_info,&process_info)){
 			DWORD wait_result=0;
+			std::vector<TCHAR> buffer(12,'\0');
 
 			while((wait_result=::WaitForSingleObject(process_info.hProcess,0))!=WAIT_ABANDONED){
 				DWORD avail_bytes=0;
-				std::vector<TCHAR> buffer(1024*16);
 
 				if(::PeekNamedPipe(read_handle,NULL,0,NULL,&avail_bytes,NULL)&&
 				   avail_bytes){
-
 					DWORD read=0;
+
+					buffer.assign(avail_bytes,'\0');
 
 					if(::ReadFile(read_handle,&buffer[0],buffer.size(),&read,NULL)){
 						result->append(&buffer[0]);
 					}
+				}
+
+				MSG msg;
+
+				if(::PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
+					::TranslateMessage(&msg);
+					::DispatchMessage(&msg);
 				}
 
 				if(wait_result==WAIT_OBJECT_0){
@@ -97,6 +105,18 @@ namespace{
 		}
 		return true;
 	}
+
+	class DeferPos{
+		public:
+		DeferPos(int num=1):m_hdwp(NULL){m_hdwp=::BeginDeferWindowPos(num);}
+		virtual ~DeferPos(){::EndDeferWindowPos(m_hdwp);}
+		private:
+			HDWP m_hdwp;
+		public:
+			bool move(HWND wnd,HWND insert_after,int x,int y,int cx,int cy,UINT flags){
+				return NULL!=(m_hdwp=::DeferWindowPos(m_hdwp,wnd,insert_after,x,y,cx,cy,flags));
+			}
+	};
 }
 
 void MainDialog::setCurrentSettings(){
@@ -269,6 +289,12 @@ bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 	RECT rc={0};
 
+	::GetWindowRect(handle(),&rc);
+
+	//onGetMinMaxInfo()用
+	m_wnd_width=rc.right-rc.left;
+	m_wnd_height=rc.bottom-rc.top;
+
 	::GetWindowRect(m_listview->handle(),&rc);
 	//リストビューにカラムを追加
 	m_listview->insertColumn(0,
@@ -282,6 +308,16 @@ bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 							 LVS_EX_FULLROWSELECT|
 							//LVS_EX_GRIDLINES(罫線表示)
 							 LVS_EX_GRIDLINES);
+
+	::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T("処理対象: 全てのファイル"));
+
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_LIST1)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_GROUP_COMPLETE)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_RECES)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_GUI4RECES)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_VERSION)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_HELP)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_RUN)));
 
 	//設定をコントロールに適用
 	setCurrentSettings();
@@ -708,6 +744,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				for(std::list<tstring>::iterator ite=file_list.begin(),end=file_list.end();ite!=end;++ite){
 					m_listview->insertItem(ite->c_str());
 				}
+				::SetFocus(m_listview->handle());
 			}
 			return true;
 		}
@@ -727,6 +764,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 		case IDC_BUTTON_CLEAR:
 			//クリア
 			ListView_DeleteAllItems(m_listview->handle());
+			::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T("処理対象: 全てのファイル"));
 			return true;
 
 
@@ -1010,6 +1048,10 @@ bool MainDialog::onNotify(WPARAM wparam,LPARAM lparam){
 					break;
 			}//switch(((LPNMHDR)lparam)->code)
 			break;
+		case IDC_LIST1:
+			//子へ投げる
+			SendMessage(m_listview->handle(),WM_NOTIFY,wparam,lparam);
+			break;
 		default:
 			break;
 	}//switch(((LPNMHDR)lparam)->idFrom)
@@ -1026,8 +1068,43 @@ bool MainDialog::onDropFiles(HDROP drop_handle){
 	return true;
 }
 
+bool MainDialog::onSize(WPARAM wparam,LPARAM lparam){
+	if(!m_wnd_size_list.size())return false;
+
+	DeferPos defer_pos(m_wnd_size_list.size());
+
+	for(size_t i=0,list_size=m_wnd_size_list.size();i<list_size;i++){
+		if(i==0){
+			defer_pos.move(m_wnd_size_list[i].wnd,
+						   NULL,
+						   0,0,
+						   LOWORD(lparam)-m_wnd_size_list[i].width_diff,
+						   HIWORD(lparam)-m_wnd_size_list[i].height_diff,
+						   SWP_NOMOVE|SWP_NOZORDER);
+		}else{
+			defer_pos.move(m_wnd_size_list[i].wnd,
+						   NULL,
+						   m_wnd_size_list[i].pt.x,
+						   (HIWORD(lparam)-(m_wnd_size_list[i].parent_rect.bottom-m_wnd_size_list[i].parent_rect.top))+m_wnd_size_list[i].pt.y,
+						   0,0,
+						   SWP_NOSIZE|SWP_NOZORDER);
+		}
+	}
+	return false;
+}
+
+bool MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
+	LPMINMAXINFO info=reinterpret_cast<LPMINMAXINFO>(lparam);
+
+	info->ptMinTrackSize.x=info->ptMaxTrackSize.x=m_wnd_width;
+	info->ptMinTrackSize.y=m_wnd_height;
+	return true;
+}
+
 bool MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
+		case WM_GETMINMAXINFO:
+			return onGetMinMaxInfo(wparam,lparam);
 		case WM_SETFOCUS:
 			::SetFocus(m_listview->handle());
 			return true;

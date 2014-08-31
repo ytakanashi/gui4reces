@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.0.9 by x@rgs
+//            gui4reces Ver.0.0.1.0 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -36,7 +36,9 @@ public:
 		m_create_shortcut_sub_menu(NULL),
 		m_add_item_menu(NULL),
 		m_add_item_sub_menu(NULL),
-		m_temp_dir(){
+		m_temp_dir(),
+		m_wnd_height(0),
+		m_wnd_width(0){
 			m_config_list.push_back(new Config());
 		}
 	~MainDialog(){
@@ -74,6 +76,35 @@ private:
 		TAB_OTHER,
 	};
 
+	struct SIZE_INFO{
+		HWND wnd;
+		int width_diff;
+		int height_diff;
+		RECT parent_rect;
+		RECT rect;
+		POINT pt;
+		SIZE_INFO(HWND parent_handle,HWND wnd_handle):
+				wnd(NULL),
+				width_diff(0),
+				height_diff(0),
+				parent_rect(),
+				rect(),
+				pt(){
+			wnd=wnd_handle;
+
+			::GetClientRect(parent_handle,&parent_rect);
+
+			::GetWindowRect(wnd_handle,&rect);
+
+			pt.x=rect.left;
+			pt.y=rect.top;
+			::ScreenToClient(parent_handle,&pt);
+
+			width_diff=abs((parent_rect.right-parent_rect.left)-(rect.right-rect.left));
+			height_diff=abs((parent_rect.bottom-parent_rect.top)-(rect.bottom-rect.top));
+		}
+	};
+
 	std::vector<Config*> m_config_list;
 
 	sslib::Tab* m_tab;
@@ -87,6 +118,12 @@ private:
 	//リストファイル用一時ディレクトリ
 	tstring m_temp_dir;
 
+	//リストビューより下に存在するコントロール対象
+	std::vector<SIZE_INFO> m_wnd_size_list;
+
+	int m_wnd_width;
+	int m_wnd_height;
+
 private:
 	void setCurrentSettings();
 	//メッセージハンドラ
@@ -96,6 +133,8 @@ private:
 	bool onNotify(WPARAM wparam,LPARAM lparam);
 	bool onOk();
 	bool onDropFiles(HDROP drop_handle);
+	bool onSize(WPARAM wparam,LPARAM lparam);
+	bool onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
 	bool onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 };
 

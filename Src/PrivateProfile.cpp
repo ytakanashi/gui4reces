@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.0.9 by x@rgs
+//            gui4reces Ver.0.0.1.0 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -89,7 +89,7 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Compress"),_T("OutputFile"),m_cfg.compress.output_file.c_str(),true);
 	//gui4recesでは必ず有効に
 	//'/of'以下の引数をそのまま使用
-//	write(_T("Compress"),_T("RawFileName"),true,true);
+	//write(_T("Compress"),_T("RawFileName"),true,true);
 
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目

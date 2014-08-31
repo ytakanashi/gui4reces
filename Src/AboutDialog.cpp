@@ -2,7 +2,7 @@
 //バージョン情報ダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.0.9 by x@rgs
+//            gui4reces Ver.0.0.1.0 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -14,28 +14,35 @@ using namespace sslib;
 
 
 
-namespace{
-	bool setClipboardText(HWND wnd_handle,const tstring& text){
-		bool result=false;
-		int buffer_size=0;
 
-		if(!::OpenClipboard(wnd_handle))return false;
+LRESULT AboutDialog::Edit::onGetDlgCode(WPARAM wparam,LPARAM lparam){
+	//ダイアログ表示時、エディットボックス内文字列が全選択されるのを防ぐ
+	return ::CallWindowProc(default_proc(),handle(),WM_GETDLGCODE,wparam,lparam)&~DLGC_HASSETSEL;
+}
 
-		buffer_size=text.size()*sizeof(TCHAR)+sizeof(TCHAR);
-		HGLOBAL hg=::GlobalAlloc(GMEM_MOVEABLE,buffer_size);
-		if(hg!=NULL){
-			memcpy(::GlobalLock(hg),text.c_str(),buffer_size);
-			::GlobalUnlock(hg);
-			::EmptyClipboard();
-#ifdef UNICODE
-			if(::SetClipboardData(CF_UNICODETEXT,hg))result=true;
-#else
-			if(::SetClipboardData(CF_TEXT,hg))result=true;
-#endif
-		}
-		::CloseClipboard();
-		return result;
+LRESULT AboutDialog::Edit::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+	switch(message){
+		case WM_GETDLGCODE:
+			return onGetDlgCode(wparam,lparam);
+		default:
+			break;
 	}
+	return ::CallWindowProc(default_proc(),handle(),message,wparam,lparam);
+}
+
+LRESULT AboutDialog::Link::onSetCursor(WPARAM wparam,LPARAM lparam){
+	::SetCursor(m_hand_cursor);
+	return true;
+}
+
+LRESULT AboutDialog::Link::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+	switch(message){
+		case WM_SETCURSOR:
+			return onSetCursor(wparam,lparam);
+		default:
+			break;
+	}
+	return ::CallWindowProc(default_proc(),handle(),message,wparam,lparam);
 }
 
 bool AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
@@ -48,54 +55,85 @@ bool AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 										  IMAGE_ICON,
 										  256,256,
 										  LR_SHARED));
+	if(m_icon==NULL){
+		m_xp_mode=true;
+		m_icon=static_cast<HICON>(::LoadImage(inst(),
+											  MAKEINTRESOURCE(IDI_ICON1),
+											  IMAGE_ICON,
+											  48,48,
+											  LR_SHARED));
+	}
 
 	//gui4recesのバージョンを書き込む
 	::SetWindowText(getDlgItem(IDC_STATIC_VERSION),(tstring(_T("gui4reces Ver."))+SOFTWARE_VERSION).c_str());
 
+	m_edit=new Edit(handle(),IDC_EDIT_VERSION,true);
+	m_link=new Link(handle(),IDC_STATIC_URL,true);
+
 	//各ライブラリの情報を追加
 	if(param()){
 		std::list<tstring>* library_list=reinterpret_cast<std::list<tstring>*>(param());
+		HWND edit=getDlgItem(IDC_EDIT_VERSION);
 
 		for(std::list<tstring>::iterator ite=library_list->begin(),
 			end=library_list->end();
 			ite!=end;
 			++ite){
-			::SendMessage(getDlgItem(IDC_LIST_VERSION),LB_ADDSTRING,0,reinterpret_cast<LPARAM>(ite->c_str()));
+			int length=::GetWindowTextLength(edit);
+			::SetFocus(edit);
+			SendMessage(edit,EM_SETSEL,static_cast<WPARAM>(length),static_cast<LPARAM>(length));
+			SendMessage(edit,EM_REPLACESEL,0,reinterpret_cast<LPARAM>(ite->c_str()));
+			SendMessage(edit,EM_REPLACESEL,0,reinterpret_cast<LPARAM>(_T("\r\n")));
 		}
 	}
 
-	sendItemMessage(IDC_LIST_VERSION,LB_SETCURSEL,0,0);
+	RECT wnd_rect={},edit_rect={};
 
-	RECT wnd_rect={},list_rect={};
-	//ウインドウサイズ取得
-	::GetClientRect(handle(),&wnd_rect);
-	//リストボックスサイズ取得
-	::GetWindowRect(getDlgItem(IDC_LIST_VERSION),&list_rect);
-	m_width_dist=(wnd_rect.right-wnd_rect.left)-(list_rect.right-list_rect.left);
-	m_height_dist=(wnd_rect.bottom-wnd_rect.top)-(list_rect.bottom-list_rect.top);
+	if(m_xp_mode){
+		::GetWindowRect(getDlgItem(IDC_EDIT_VERSION),&edit_rect);
+		::GetClientRect(handle(),&wnd_rect);
+
+		POINT pt={edit_rect.left,edit_rect.top};
+		::ScreenToClient(handle(),&pt);
+
+		::SetWindowPos(getDlgItem(IDC_EDIT_VERSION),
+					   NULL,
+					   10,pt.y,
+					   wnd_rect.right-20,
+					   edit_rect.bottom-edit_rect.top,
+					   SWP_NOZORDER);
+	}
+
+	::GetWindowRect(handle(),&wnd_rect);
 
 	//onGetMinMaxInfo()用
-	::GetWindowRect(handle(),&wnd_rect);
 	m_wnd_width=wnd_rect.right-wnd_rect.left;
 	m_wnd_height=wnd_rect.bottom-wnd_rect.top;
 
+	//ウインドウサイズ取得
+	::GetClientRect(handle(),&wnd_rect);
+
+	//リストボックスサイズ取得
+	::GetWindowRect(getDlgItem(IDC_EDIT_VERSION),&edit_rect);
+
+	m_width_diff=(wnd_rect.right-wnd_rect.left)-(edit_rect.right-edit_rect.left);
+	m_height_diff=(wnd_rect.bottom-wnd_rect.top)-(edit_rect.bottom-edit_rect.top);
 	return true;
 }
 
-bool AboutDialog::onCommand(WPARAM wparam,LPARAM){
+bool AboutDialog::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
-		case IDC_BUTTON_VERSION_COPY:{
-			//コピー
-			int index=sendItemMessage(IDC_LIST_VERSION,LB_GETCURSEL,0,0);
-			std::vector<TCHAR> buffer(sendItemMessage(IDC_LIST_VERSION,
-													  LB_GETTEXTLEN,
-													  index,
-													  0)+1);
-
-			sendItemMessage(IDC_LIST_VERSION,LB_GETTEXT,index,(LPARAM)&buffer[0]);
-			setClipboardText(handle(),&buffer[0]);
+		case IDC_STATIC_URL:
+			if(HIWORD(wparam)==STN_CLICKED){
+				//ホームページへ
+				std::vector<TCHAR> url(256);
+				::GetWindowText(getDlgItem(LOWORD(wparam)),&url[0],url.size());
+				::ShellExecute(NULL,_T("open"),&url[0],NULL,NULL,SW_SHOWNORMAL);
+				return true;
+			}
 			break;
-		}
+		default:
+			break;
 	}
 	return true;
 }
@@ -105,17 +143,21 @@ bool AboutDialog::onPaint(){
 	HDC dc=::BeginPaint(handle(),&ps);
 
 	//アイコン描画
-	::DrawIconEx(dc,0,8,m_icon,256,256,0,NULL,DI_NORMAL);
+	if(!m_xp_mode){
+		::DrawIconEx(dc,0,8,m_icon,256,256,0,NULL,DI_NORMAL);
+	}else{
+		::DrawIconEx(dc,200,13,m_icon,48,48,0,NULL,DI_NORMAL);
+	}
 	::EndPaint(handle(),&ps);
 	return true;
 }
 
 bool AboutDialog::onSize(WPARAM wparam,LPARAM lparam){
-	::SetWindowPos(getDlgItem(IDC_LIST_VERSION),
+	::SetWindowPos(getDlgItem(IDC_EDIT_VERSION),
 				   NULL,
 				   0,0,
-				   LOWORD(lparam)-m_width_dist,
-				   HIWORD(lparam)-m_height_dist,
+				   LOWORD(lparam)-m_width_diff,
+				   HIWORD(lparam)-m_height_diff,
 				   SWP_NOMOVE|SWP_NOZORDER);
 	return false;
 }

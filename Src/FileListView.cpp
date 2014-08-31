@@ -2,7 +2,7 @@
 //ファイルリストビュー
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.0.9 by x@rgs
+//            gui4reces Ver.0.0.1.0 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -16,6 +16,25 @@ using namespace sslib;
 
 
 
+LRESULT FileListView::onNotify(WPARAM wparam,LPARAM lparam){
+	switch(((LPNMLISTVIEW)lparam)->hdr.code){
+		case LVN_INSERTITEM:
+		case LVN_DELETEITEM:
+		case LVN_ITEMCHANGED:{
+			int cnt=ListView_GetSelectedCount(handle());
+			int all=ListView_GetItemCount(handle());
+			VariableArgument va(_T("処理対象: 選択中の %d 個のファイル\n"),cnt);
+			::SetWindowText(::GetDlgItem(::GetParent(handle()),IDC_STATIC_LIST),
+							(cnt&&cnt!=all)?va.get():_T("処理対象: 全てのファイル"));
+			ListView_SetColumnWidth(handle(),0,LVSCW_AUTOSIZE_USEHEADER);
+			break;
+		}
+
+		default:
+			break;
+	}
+	return ::CallWindowProc(default_proc(),handle(),WM_NOTIFY,wparam,lparam);
+}
 
 LRESULT FileListView::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
@@ -57,5 +76,5 @@ LRESULT FileListView::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 		default:
 			break;
 	}
-	return 0;
+	return ::CallWindowProc(default_proc(),handle(),message,wparam,lparam);
 }
