@@ -1,7 +1,7 @@
 ﻿//PasswordTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -18,7 +18,9 @@
 class PasswordTab:public TabBase{
 public:
 	PasswordTab(std::vector<Config*>& config_list):
-		TabBase(IDD_TAB_PASSWORD,config_list){}
+		TabBase(IDD_TAB_PASSWORD,config_list),
+		m_write_password_list_menu(NULL),
+		m_write_password_list_sub_menu(NULL){}
 	~PasswordTab(){}
 private:
 	HMENU m_write_password_list_menu,m_write_password_list_sub_menu;

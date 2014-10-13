@@ -2,7 +2,7 @@
 //再圧縮/圧縮タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -62,6 +62,64 @@ namespace{
 		RUN_COMMAND_INTERACTIVE,
 		RUN_COMMAND_BATCH
 	};
+
+	struct COMPRESS_CONFIG{
+		//圧縮形式
+		tstring type;
+		//パスワード
+		bool password;
+		//ヘッダ暗号化
+		bool header_encryption;
+		//自己解凍
+		bool sfx;
+		COMPRESS_CONFIG():
+			type(),password(false),header_encryption(false),sfx(false){}
+		enum{
+			NO_PASSWORD=1<<0,
+			NO_HEADER_ENCRYPTION=1<<1,
+			NO_SFX=1<<2
+		};
+		tstring getType()const{
+			return type;
+		}
+		tstring getOptions(int filter=0)const{
+			return tstring(((password&&!header_encryption&&!(filter&NO_PASSWORD))?_T("pw"):_T("")))+
+				tstring(((header_encryption&&!(filter&NO_HEADER_ENCRYPTION))?_T("he"):_T("")))+
+					tstring(((sfx&&!(filter&NO_SFX))?_T("sfx"):_T("")));
+		}
+		void setType(const tstring& type_){
+			type=type_;
+			//パスワード
+			tstring::size_type pos=type.find(_T("pw"));
+
+			if(pos!=tstring::npos){
+				password=true;
+				type.erase(pos,2);
+			}else{
+				password=false;
+			}
+
+			//ヘッダ暗号化
+			pos=type.find(_T("he"));
+
+			if(pos!=tstring::npos){
+				header_encryption=true;
+				type.erase(pos,2);
+			}else{
+				header_encryption=false;
+			}
+
+			//自己解凍
+			pos=type.find(_T("sfx"));
+
+			if(pos!=tstring::npos){
+				sfx=true;
+				type.erase(pos,3);
+			}else{
+				sfx=false;
+			}
+		}
+	}compress_config;
 }
 
 
@@ -96,19 +154,19 @@ bool CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_CHECKBOX_COMPRESS_PASSWORD:
 			//パスワード
-			m_private_config.password=getCheck(LOWORD(wparam));
+			compress_config.password=getCheck(LOWORD(wparam));
 			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,CBN_SELCHANGE),0);
 			return true;
 
 		case IDC_CHECKBOX_COMPRESS_HEADER_ENCRYPTION:
 			//ヘッダ暗号化
-			m_private_config.header_encryption=getCheck(LOWORD(wparam));
+			compress_config.header_encryption=getCheck(LOWORD(wparam));
 			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,CBN_SELCHANGE),0);
 			return true;
 
 		case IDC_CHECKBOX_COMPRESS_SFX:
 			//自己解凍
-			m_private_config.sfx=getCheck(LOWORD(wparam));
+			compress_config.sfx=getCheck(LOWORD(wparam));
 			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,CBN_SELCHANGE),0);
 			return true;
 
@@ -158,32 +216,32 @@ bool CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 					tstring compression_type(&combo_string[0]);
 
 					if(compression_type==_T("入力と同じ")){
-						m_private_config.type.assign(_T("@"));
+						compress_config.type.assign(_T("@"));
 					}else{
-						m_private_config.type.assign(compression_type.c_str());
+						compress_config.type.assign(compression_type.c_str());
 					}
 
-					if(m_private_config.type==_T("@")||
-					   m_private_config.type==_T("7z")){
+					if(compress_config.type==_T("@")||
+					   compress_config.type==_T("7z")){
 						::EnableWindow(getDlgItem(IDC_CHECKBOX_COMPRESS_PASSWORD),true);
 						::EnableWindow(getDlgItem(IDC_CHECKBOX_COMPRESS_HEADER_ENCRYPTION),true);
 						::EnableWindow(getDlgItem(IDC_CHECKBOX_COMPRESS_SFX),true);
-					}else if(m_private_config.type==_T("zip")){
+					}else if(compress_config.type==_T("zip")){
 						//ヘッダ暗号化,sfxを無効に
-						options_filter|=PRIVATE_CONFIG::NO_HEADER_ENCRYPTION|PRIVATE_CONFIG::NO_SFX;
+						options_filter|=COMPRESS_CONFIG::NO_HEADER_ENCRYPTION|COMPRESS_CONFIG::NO_SFX;
 						::EnableWindow(getDlgItem(IDC_CHECKBOX_COMPRESS_PASSWORD),true);
-					}else if(m_private_config.type==_T("lzh")){
+					}else if(compress_config.type==_T("lzh")){
 						//パスワード,ヘッダ暗号化を無効に
-						options_filter|=PRIVATE_CONFIG::NO_PASSWORD|PRIVATE_CONFIG::NO_HEADER_ENCRYPTION;
+						options_filter|=COMPRESS_CONFIG::NO_PASSWORD|COMPRESS_CONFIG::NO_HEADER_ENCRYPTION;
 						::EnableWindow(getDlgItem(IDC_CHECKBOX_COMPRESS_SFX),true);
 					}else{
 						//オプションを全て無効に
-						options_filter|=PRIVATE_CONFIG::NO_PASSWORD|PRIVATE_CONFIG::NO_HEADER_ENCRYPTION|PRIVATE_CONFIG::NO_SFX;
+						options_filter|=COMPRESS_CONFIG::NO_PASSWORD|COMPRESS_CONFIG::NO_HEADER_ENCRYPTION|COMPRESS_CONFIG::NO_SFX;
 					}
 
 					m_config_list[0]->cfg().compress.compression_type=
-						getCompressionType()+
-						getCompressionTypeOptions(options_filter);
+						compress_config.getType()+
+						compress_config.getOptions(options_filter);
 					return true;
 				}
 
@@ -263,8 +321,8 @@ bool CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 }
 
 void CompressTab::setCurrentSettings(){
-	m_private_config.setType(m_config_list[0]->cfg().compress.compression_type);
-	if(getCompressionType()==_T("@")){
+	compress_config.setType(m_config_list[0]->cfg().compress.compression_type);
+	if(compress_config.getType()==_T("@")){
 		sendItemMessage(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,
 						CB_SETCURSEL,
 						(WPARAM)0,
@@ -272,7 +330,7 @@ void CompressTab::setCurrentSettings(){
 						);
 	}else{
 		for(size_t i=0;i<ARRAY_SIZEOF(combo_compression_list);i++){
-			if(getCompressionType()==combo_compression_list[i].type){
+			if(compress_config.getType()==combo_compression_list[i].type){
 				sendItemMessage(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,
 								CB_SETCURSEL,
 								(WPARAM)i,
@@ -284,13 +342,13 @@ void CompressTab::setCurrentSettings(){
 	}
 
 	//パスワード
-	setCheck(IDC_CHECKBOX_COMPRESS_PASSWORD,m_private_config.password);
+	setCheck(IDC_CHECKBOX_COMPRESS_PASSWORD,compress_config.password);
 
 	//ヘッダ暗号化
-	setCheck(IDC_CHECKBOX_COMPRESS_HEADER_ENCRYPTION,m_private_config.header_encryption);
+	setCheck(IDC_CHECKBOX_COMPRESS_HEADER_ENCRYPTION,compress_config.header_encryption);
 
 	//自己解凍
-	setCheck(IDC_CHECKBOX_COMPRESS_SFX,m_private_config.sfx);
+	setCheck(IDC_CHECKBOX_COMPRESS_SFX,compress_config.sfx);
 
 	sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,CBN_SELCHANGE),0);
 
@@ -360,8 +418,8 @@ void CompressTab::setCurrentSettings(){
 
 tstring CompressTab::getExtension(){
 	for(size_t i=0;i<ARRAY_SIZEOF(combo_compression_list);i++){
-		if(getCompressionType()==combo_compression_list[i].type){
-			if(getCompressionTypeOptions(PRIVATE_CONFIG::NO_PASSWORD|PRIVATE_CONFIG::NO_HEADER_ENCRYPTION)==_T("sfx")){
+		if(compress_config.getType()==combo_compression_list[i].type){
+			if(compress_config.getOptions(COMPRESS_CONFIG::NO_PASSWORD|COMPRESS_CONFIG::NO_HEADER_ENCRYPTION)==_T("sfx")){
 				return _T(".exe");
 			}
 			return combo_compression_list[i].ext;

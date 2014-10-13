@@ -2,7 +2,7 @@
 //除外フィルタタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -20,6 +20,9 @@ namespace{
 		_T("処理対象"),
 		_T("処理対象外")
 	};
+	fileinfo::FILEFILTER* filter_ptr;
+	int filter_type=0;
+	inline bool include_filter(){return filter_type==0;}
 
 	const TCHAR dtp_format[]=_T("yyyyMMddHHmm");
 
@@ -43,38 +46,40 @@ namespace{
 		{IDM_SIZE_GB,_T("GB")},
 		{IDM_SIZE_TB,_T("TB")}
 	};
-}
 
-bool FilterTab::longlong2SYSTEMTIME(SYSTEMTIME* result_st,const long long date_time){
-	if(result_st&&date_time>str::min_date&&date_time<str::max_date){
-		result_st->wYear=static_cast<WORD>(date_time/10000000000);
-		result_st->wMonth=static_cast<WORD>((date_time/100000000)%100);
-		result_st->wDay=static_cast<WORD>((date_time/1000000)%100);
-		result_st->wHour=static_cast<WORD>((date_time/10000)%100);
-		result_st->wMinute=static_cast<WORD>((date_time/100)%100);
-		result_st->wSecond=static_cast<WORD>(date_time%100);
+	bool longlong2SYSTEMTIME(SYSTEMTIME* result_st,const long long date_time){
+		if(result_st&&date_time>str::min_date&&date_time<str::max_date){
+			result_st->wYear=static_cast<WORD>(date_time/10000000000);
+			result_st->wMonth=static_cast<WORD>((date_time/100000000)%100);
+			result_st->wDay=static_cast<WORD>((date_time/1000000)%100);
+			result_st->wHour=static_cast<WORD>((date_time/10000)%100);
+			result_st->wMinute=static_cast<WORD>((date_time/100)%100);
+			result_st->wSecond=static_cast<WORD>(date_time%100);
 
-		if(!result_st->wMonth)result_st->wMonth=1;
-		if(!result_st->wDay)result_st->wDay=1;
-		return true;
+			if(!result_st->wMonth)result_st->wMonth=1;
+			if(!result_st->wDay)result_st->wDay=1;
+			return true;
+		}
+		return false;
 	}
-	return false;
-}
 
-long long FilterTab::SYSTEMTIME2longlong(const SYSTEMTIME st){
-	long long result=0;
+	long long SYSTEMTIME2longlong(const SYSTEMTIME st){
+		long long result=0;
 
-	result=st.wYear*10000000000;
-	result+=st.wMonth*100000000;
-	result+=st.wDay*1000000;
-	result+=st.wHour*10000;
-	result+=st.wMinute*100;
-	result+=st.wSecond;
-	return result;
+		result=st.wYear*10000000000;
+		result+=st.wMonth*100000000;
+		result+=st.wDay*1000000;
+		result+=st.wHour*10000;
+		result+=st.wMinute*100;
+		result+=st.wSecond;
+		return result;
+	}
 }
 
 bool FilterTab::onInitDialog(WPARAM wparam,LPARAM lparam){
-	::SetWindowText(getDlgItem(IDC_BUTTON_FILTER),filter_type_list[m_filter_type]);
+	filter_ptr=NULL;
+	filter_type=0;
+	::SetWindowText(getDlgItem(IDC_BUTTON_FILTER),filter_type_list[filter_type]);
 
 	//日付のフォーマットを変更
 	sendItemMessage(IDC_DATETIMEPICKER_FILTER_FROM,
@@ -113,9 +118,9 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_FILTER:
 			//フィルタの種類
-			m_filter_type^=1;
-			::SetWindowText(getDlgItem(IDC_BUTTON_FILTER),filter_type_list[m_filter_type]);
-			m_filter_ptr=(include_filter())?
+			filter_type^=1;
+			::SetWindowText(getDlgItem(IDC_BUTTON_FILTER),filter_type_list[filter_type]);
+			filter_ptr=(include_filter())?
 				&m_config_list[0]->cfg().general.filefilter:
 				&m_config_list[0]->cfg().general.file_ex_filter;
 			setCurrentSettings();
@@ -128,7 +133,7 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_EDIT_FILTER_STRING,EN_CHANGE),0);
 			}else{
-				m_filter_ptr->pattern_list.clear();
+				filter_ptr->pattern_list.clear();
 			}
 			break;
 
@@ -141,7 +146,7 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_EMPTYDIR),sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0));
 
 			if(!sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
-				m_filter_ptr->attr=
+				filter_ptr->attr=
 					(include_filter())?
 						m_def_filefilter.attr:
 						m_def_file_ex_filter.attr;
@@ -156,9 +161,9 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			for(int i=0;attr_table[i].id!=0;i++){
 				if(LOWORD(wparam)==attr_table[i].id){
 					if(sendItemMessage(attr_table[i].id,BM_GETCHECK,0,0)){
-						m_filter_ptr->attr|=attr_table[i].attr;
+						filter_ptr->attr|=attr_table[i].attr;
 					}else{
-						m_filter_ptr->attr&=~attr_table[i].attr;
+						filter_ptr->attr&=~attr_table[i].attr;
 					}
 					break;
 				}
@@ -185,10 +190,10 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				date_time=SYSTEMTIME2longlong(st);
 
 				if(date_time>=str::min_date&&date_time<=str::max_date){
-					m_filter_ptr->oldest_date=date_time;
+					filter_ptr->oldest_date=date_time;
 				}
 			}else{
-				m_filter_ptr->oldest_date=
+				filter_ptr->oldest_date=
 					(include_filter())?
 						m_def_filefilter.oldest_date:
 						m_def_file_ex_filter.oldest_date;
@@ -208,10 +213,10 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				date_time=SYSTEMTIME2longlong(st);
 
 				if(date_time>=str::min_date&&date_time<=str::max_date){
-					m_filter_ptr->newest_date=date_time;
+					filter_ptr->newest_date=date_time;
 				}
 			}else{
-				m_filter_ptr->newest_date=
+				filter_ptr->newest_date=
 					(include_filter())?
 						m_def_filefilter.newest_date:
 						m_def_file_ex_filter.newest_date;
@@ -228,7 +233,7 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_EDIT_FILTER_SIZE_FROM,EN_CHANGE),0);
 			}else{
-				m_filter_ptr->min_size=
+				filter_ptr->min_size=
 				(include_filter())?
 					m_def_filefilter.min_size:
 					m_def_file_ex_filter.min_size;
@@ -245,7 +250,7 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_EDIT_FILTER_SIZE_TO,EN_CHANGE),0);
 			}else{
-				m_filter_ptr->max_size=
+				filter_ptr->max_size=
 					(include_filter())?
 						m_def_filefilter.max_size:
 						m_def_file_ex_filter.max_size;
@@ -283,8 +288,8 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 								buffer.size());
 				if(buffer.size()){
 					((LOWORD(wparam)==IDC_BUTTON_FILTER_SIZE_FROM)?
-					 m_filter_ptr->min_size:
-					 m_filter_ptr->max_size)=
+					 filter_ptr->min_size:
+					 filter_ptr->max_size)=
 						str::filesize2longlong((tstring(&buffer[0])+size_units_table[i].units).c_str());
 				}
 			}
@@ -304,12 +309,12 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 					::GetWindowText(getDlgItem(LOWORD(wparam)),&buffer[0],buffer.size());
 					if(!tstring(&buffer[0]).empty()){
-						m_filter_ptr->pattern_list.clear();
+						filter_ptr->pattern_list.clear();
 						//';'で分割
-						str::splitString(&m_filter_ptr->pattern_list,&buffer[0],';');
+						str::splitString(&filter_ptr->pattern_list,&buffer[0],';');
 						//重複を削除
-						m_filter_ptr->pattern_list.sort();
-						m_filter_ptr->pattern_list.unique();
+						filter_ptr->pattern_list.sort();
+						filter_ptr->pattern_list.unique();
 					}
 					break;
 				}
@@ -328,8 +333,8 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 					if(size.size()){
 						((LOWORD(wparam)==IDC_EDIT_FILTER_SIZE_FROM)?
-						 m_filter_ptr->min_size:
-						 m_filter_ptr->max_size)=
+						 filter_ptr->min_size:
+						 filter_ptr->max_size)=
 							str::filesize2longlong((tstring(&size[0])+tstring(&unit[0])).c_str());
 					}
 					break;
@@ -358,14 +363,18 @@ bool FilterTab::onNotify(WPARAM wparam,LPARAM lparam){
 }
 
 void FilterTab::setCurrentSettings(){
+	filter_ptr=(include_filter())?
+		&m_config_list[0]->cfg().general.filefilter:
+		&m_config_list[0]->cfg().general.file_ex_filter;
+
 	//文字列
 	tstring pattern;
 
-	for(std::list<tstring>::iterator ite=m_filter_ptr->pattern_list.begin(),
-		end=m_filter_ptr->pattern_list.end();
+	for(std::list<tstring>::iterator ite=filter_ptr->pattern_list.begin(),
+		end=filter_ptr->pattern_list.end();
 		ite!=end;
 		++ite){
-		if(ite!=m_filter_ptr->pattern_list.begin()){
+		if(ite!=filter_ptr->pattern_list.begin()){
 			pattern+=_T(";");
 		}
 		pattern+=*ite;
@@ -376,11 +385,11 @@ void FilterTab::setCurrentSettings(){
 	::EnableWindow(getDlgItem(IDC_EDIT_FILTER_STRING),sendItemMessage(IDC_CHECKBOX_FILTER_STRING,BM_GETCHECK,0,0));
 
 	//属性
-	setCheck(IDC_CHECKBOX_FILTER_READONLY,m_filter_ptr->attr&FILE_ATTRIBUTE_READONLY);
-	setCheck(IDC_CHECKBOX_FILTER_SYSTEM,m_filter_ptr->attr&FILE_ATTRIBUTE_SYSTEM);
-	setCheck(IDC_CHECKBOX_FILTER_HIDDEN,m_filter_ptr->attr&FILE_ATTRIBUTE_HIDDEN);
-	setCheck(IDC_CHECKBOX_FILTER_DIRECTORY,m_filter_ptr->attr&FILE_ATTRIBUTE_DIRECTORY);
-	if(m_filter_ptr->attr!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).attr||
+	setCheck(IDC_CHECKBOX_FILTER_READONLY,filter_ptr->attr&FILE_ATTRIBUTE_READONLY);
+	setCheck(IDC_CHECKBOX_FILTER_SYSTEM,filter_ptr->attr&FILE_ATTRIBUTE_SYSTEM);
+	setCheck(IDC_CHECKBOX_FILTER_HIDDEN,filter_ptr->attr&FILE_ATTRIBUTE_HIDDEN);
+	setCheck(IDC_CHECKBOX_FILTER_DIRECTORY,filter_ptr->attr&FILE_ATTRIBUTE_DIRECTORY);
+	if(filter_ptr->attr!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).attr||
 	   (!include_filter()&&
 	   m_config_list[0]->cfg().general.file_ex_filter.include_empty_dir!=
 	   m_def_file_ex_filter.include_empty_dir)){
@@ -398,8 +407,8 @@ void FilterTab::setCurrentSettings(){
 	//日付
 	SYSTEMTIME st={};
 
-	if(m_filter_ptr->oldest_date!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).oldest_date){
-		longlong2SYSTEMTIME(&st,m_filter_ptr->oldest_date);
+	if(filter_ptr->oldest_date!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).oldest_date){
+		longlong2SYSTEMTIME(&st,filter_ptr->oldest_date);
 		setCheck(IDC_CHECKBOX_FILTER_DATE_FROM,true);
 	}else{
 		::GetLocalTime(&st);
@@ -408,8 +417,8 @@ void FilterTab::setCurrentSettings(){
 	sendItemMessage(IDC_DATETIMEPICKER_FILTER_FROM,DTM_SETSYSTEMTIME,(WPARAM)GDT_VALID,(LPARAM)&st);
 	::EnableWindow(getDlgItem(IDC_DATETIMEPICKER_FILTER_FROM),sendItemMessage(IDC_CHECKBOX_FILTER_DATE_FROM,BM_GETCHECK,0,0));
 
-	if(m_filter_ptr->newest_date!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).newest_date){
-		longlong2SYSTEMTIME(&st,m_filter_ptr->newest_date);
+	if(filter_ptr->newest_date!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).newest_date){
+		longlong2SYSTEMTIME(&st,filter_ptr->newest_date);
 		setCheck(IDC_CHECKBOX_FILTER_DATE_TO,true);
 	}else{
 		::GetLocalTime(&st);
@@ -419,8 +428,8 @@ void FilterTab::setCurrentSettings(){
 	::EnableWindow(getDlgItem(IDC_DATETIMEPICKER_FILTER_TO),sendItemMessage(IDC_CHECKBOX_FILTER_DATE_TO,BM_GETCHECK,0,0));
 
 	//サイズ
-	if(m_filter_ptr->min_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).min_size){
-		tstring size_str(str::longlong2filesize(m_filter_ptr->min_size));
+	if(filter_ptr->min_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).min_size){
+		tstring size_str(str::longlong2filesize(filter_ptr->min_size));
 		size_t size_index=0;
 
 		while(size_index<size_str.length()&&
@@ -447,8 +456,8 @@ void FilterTab::setCurrentSettings(){
 	::EnableWindow(getDlgItem(IDC_EDIT_FILTER_SIZE_FROM),sendItemMessage(IDC_CHECKBOX_FILTER_SIZE_FROM,BM_GETCHECK,0,0));
 	::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_SIZE_FROM),sendItemMessage(IDC_CHECKBOX_FILTER_SIZE_FROM,BM_GETCHECK,0,0));
 
-	if(m_filter_ptr->max_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).max_size){
-		tstring size_str(str::longlong2filesize(m_filter_ptr->max_size));
+	if(filter_ptr->max_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).max_size){
+		tstring size_str(str::longlong2filesize(filter_ptr->max_size));
 		size_t size_index=0;
 
 		while(size_index<size_str.length()&&

@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -29,7 +29,7 @@ namespace{
 	private:
 		tstring& m_name;
 		bool & m_is_default;
-		//メッセージハンドラ
+	private:
 		bool onInitDialog(WPARAM wparam,LPARAM lparam){
 			if(!m_name.empty()){
 				::SetWindowText(getDlgItem(IDC_EDIT_PROFILE_NAME),m_name.c_str());
@@ -45,6 +45,85 @@ namespace{
 			::GetWindowText(getDlgItem(IDC_EDIT_PROFILE_NAME),&cfg_name[0],cfg_name.size());
 			m_name.assign(&cfg_name[0]);
 			m_is_default=sendItemMessage(IDC_CHECKBOX_PROFILE_DEFAULT,BM_GETCHECK,0,0)!=0;
+			return true;
+		}
+	};
+
+	namespace shortcut{
+		struct{
+			const TCHAR* type;
+			const int cmd;
+		}const show_cmd_list[]={
+			{_T("通常のウインドウ"),SW_SHOWNORMAL},
+			{_T("最小化"),SW_SHOWMINNOACTIVE},
+			{_T("最大化"),SW_SHOWMAXIMIZED},
+		};
+	}
+	class CreateShortcutDialog:public Dialog{
+	public:
+		CreateShortcutDialog(bool& exec_reces,int& show_cmd,tstring& link_path,tstring& description):
+		Dialog(IDD_DIALOG_CREATE_SHORTCUT),
+		m_exec_reces(exec_reces),
+		m_link_path(link_path),
+		m_show_cmd(show_cmd),
+		m_description(description){}
+	private:
+		bool& m_exec_reces;
+		tstring& m_link_path;
+		int& m_show_cmd;
+		tstring& m_description;
+	private:
+		bool onInitDialog(WPARAM wparam,LPARAM lparam){
+			sendItemMessage((!m_exec_reces)?IDC_RADIO_SHORTCUT_GUI4RECES:IDC_RADIO_SHORTCUT_RECES,
+							BM_SETCHECK,
+							(WPARAM)BST_CHECKED,
+							0);
+			::SetWindowText(getDlgItem(IDC_EDIT_SHORTCUT_LINKPATH),m_link_path.c_str());
+			for(size_t i=0;i<ARRAY_SIZEOF(shortcut::show_cmd_list);++i){
+				sendItemMessage(IDC_COMBO_SHORTCUT_SHOWCMD,CB_ADDSTRING,0,(LPARAM)shortcut::show_cmd_list[i].type);
+			}
+			sendItemMessage(IDC_COMBO_SHORTCUT_SHOWCMD,CB_SETCURSEL,(WPARAM)0,0);
+			::SetWindowText(getDlgItem(IDC_EDIT_SHORTCUT_DESCRIPTION),m_description.c_str());
+			return true;
+		}
+		bool onCommand(WPARAM wparam,LPARAM lparam){
+			switch(LOWORD(wparam)){
+				case IDC_RADIO_SHORTCUT_GUI4RECES:{
+					m_exec_reces=false;
+					return true;
+				}
+				case IDC_RADIO_SHORTCUT_RECES:{
+					m_exec_reces=true;
+					return true;
+				}
+				default:
+					break;
+			}
+			switch(HIWORD(wparam)){
+				case EN_CHANGE:{
+					std::vector<TCHAR> buffer(MAX_PATHW);
+
+					switch(LOWORD(wparam)){
+						case IDC_EDIT_SHORTCUT_LINKPATH:
+							::GetWindowText(getDlgItem(LOWORD(wparam)),
+											&buffer[0],
+											buffer.size());
+							m_link_path.assign(&buffer[0]);
+							return true;
+						case IDC_EDIT_SHORTCUT_DESCRIPTION:
+							::GetWindowText(getDlgItem(LOWORD(wparam)),
+											&buffer[0],
+											buffer.size());
+							m_description.assign(&buffer[0]);
+							return true;
+					}
+					return false;
+				}
+			}
+			return false;
+		}
+		bool onOk(){
+			m_show_cmd=shortcut::show_cmd_list[sendItemMessage(IDC_COMBO_SHORTCUT_SHOWCMD,CB_GETCURSEL,0,0)].cmd;
 			return true;
 		}
 	};
@@ -201,10 +280,17 @@ void MainDialog::setCurrentSettings(){
 			m_tab->select(TAB_COMPRESS);
 			break;
 	}
-	//ディレクトリ構造を無視する
+	//ディレクトリ階層を無視する
 	sendItemMessage(IDC_CHECKBOX_MODE_IGNORE_DIRECTORY_STRUCTURES,
 					BM_SETCHECK,
 					(WPARAM)(m_config_list[0]->cfg().general.ignore_directory_structures)?BST_CHECKED:BST_UNCHECKED,
+					0
+					);
+
+	//バックグラウンドで動作
+	sendItemMessage(IDC_CHECKBOX_MODE_BACKGROUND,
+					BM_SETCHECK,
+					(WPARAM)(m_config_list[0]->cfg().general.background_mode)?BST_CHECKED:BST_UNCHECKED,
 					0
 					);
 
@@ -425,7 +511,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			}else if(!cfg_name.empty()){
 				if(path::isBadName(cfg_name.c_str())){
 					MessageBox(handle(),_T("ファイル名に次の文字は使えません。\n\t\\ / : , ; * ? \" < > |"),_T("プロファイルの追加"),MB_ICONSTOP);
-				}else if(sendItemMessage(IDC_COMBO_PROFILE,CB_FINDSTRINGEXACT,0,(LPARAM)cfg_name.c_str())==CB_ERR){
+				}else if(sendItemMessage(IDC_COMBO_PROFILE,CB_FINDSTRINGEXACT,0,(LPARAM)cfg_name.c_str())!=CB_ERR){
 					MessageBox(handle(),_T("その名前は既に登録されています。"),_T("プロファイルの追加"),MB_ICONSTOP);
 				}
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_PROFILE_ADD,0),0);
@@ -547,7 +633,6 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_PROFILE_SHORTCUT:{
 			//ショートカット
-
 			RECT rc={0};
 
 			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
@@ -590,7 +675,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 								return true;
 							}
 						}
-						exe_path.assign(path::getParentDirectory(exe_path)+_T("\\")+_T("reces.exe"));
+						exe_path.assign(path::addTailSlash(path::getParentDirectory(exe_path))+=_T("reces.exe"));
 					}
 
 
@@ -601,14 +686,42 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 						 path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath())))+
 							_T(".lnk");
 
+					int show_cmd=SW_SHOWNORMAL;
+					tstring description(path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath())));
+
+					CreateShortcutDialog shortcut_dialog(exec_reces,show_cmd,link_path,description);
+					if(IDCANCEL==shortcut_dialog.doModal(handle()))return true;
+
+					exe_path.assign(path::addTailSlash(path::getParentDirectory(exe_path))+=((!exec_reces)?_T("gui4reces.exe"):_T("reces.exe")));
+
+					if(exec_reces){
+						current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+
+						if(current_sel==CB_ERR){
+							//新規作成
+							sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_PROFILE_ADD,0),0);
+							if((current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0))==CB_ERR){
+								return true;
+							}
+						}
+					}
+
+					tstring arg((!exec_reces)?_T("/profile:"):_T("/{"));
+					const tstring& profile((!exec_reces)?
+										   path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath())):
+										   m_config_list[current_sel+1]->filepath());
+
+					if(str::containsWhiteSpace(profile))arg+=_T("\"");
+					arg+=profile;
+					if(str::containsWhiteSpace(profile))arg+=_T("\"");
+
 					fileoperation::createShortcut(link_path.c_str(),
 												  exe_path.c_str(),
 												  ((current_sel==CB_ERR)?
 												   NULL:
-												   ((!exec_reces)?
-													((_T("/profile:\"")+path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath()))+_T("\"")).c_str()):
-													((_T("/{\"")+m_config_list[current_sel+1]->filepath()+_T("\"")).c_str()))),
-												  NULL,
+												   arg.c_str()),
+												  show_cmd,
+												  description.c_str(),
 												  NULL);
 				}
 			}
@@ -686,8 +799,13 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			return true;
 
 		case IDC_CHECKBOX_MODE_IGNORE_DIRECTORY_STRUCTURES:
-			//ディレクトリ構造を無視する
+			//ディレクトリ階層を無視する
 			m_config_list[0]->cfg().general.ignore_directory_structures=getCheck(LOWORD(wparam));
+			return true;
+
+		case IDC_CHECKBOX_MODE_BACKGROUND:
+			//バックグラウンドで動作
+			m_config_list[0]->cfg().general.background_mode=getCheck(LOWORD(wparam));
 			return true;
 
 
@@ -790,6 +908,12 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
 					   path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
 					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""));
+			}
+			if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
+				va.add(_T("/Dw%s%s%s "),
+					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
+					   path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
+					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""));
 			}
 			va.add(_T("/mv"));
 

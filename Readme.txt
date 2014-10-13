@@ -1,6 +1,6 @@
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.0
+【バージョン】　0.0.1.1
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
@@ -18,7 +18,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●説明
  「gui4reces」はウインドウにドラッグ&ドロップするだけで、
  様々な書庫の「再圧縮」「圧縮」「解凍」を行うソフトウェアです。
- 統合アーカイバライブラリの他、書庫用Susie Plug-inにも対応しています。
+ 統合アーカイバライブラリの他、書庫用Susie Plug-inやTotal Commander Pluginにも対応しています。
  ...その実態は初心者向け再圧縮ソフトを装った、recesのGUIフロントエンドです。
 
 
@@ -26,12 +26,14 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●特徴
  [対応書庫]
  ・zip、rar、7z、lzhファイルなど主要な書庫をサポート。
- ・Susie Plug-inで様々な書庫に対応可能。
+ ・Susie Plug-in(*.spi)で様々な書庫に対応可能。
+ ・Total Commander Plugin(*.wcx)で更に多くの書庫に対応可能。
  ・UNICODE文字、4GB以上のファイルに対応。 *1
  ・ヘッダ暗号化(ファイル名暗号化)の7zやrarをサポート。
 
  [書庫処理]
  ・LMZIP32.dllを使用することで、不正な書庫でファイル名の文字化けが起きにくい。
+ ・zip.wcxを使用することで、UTF-8-MACで格納された書庫も文字化けしない。
  ・プログレスバーを自前で表示し、無駄なウインドウを表示させない。
  ・ディレクトリのタイムスタンプ復元が可能。 *2
  ・ファイルの分割/結合が出来る。
@@ -47,8 +49,8 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
     *1 書庫Dllが対応している場合に限ります。
-    *2 勿論タイムスタンプが保持されている場合に限ります。
-      保持されていない場合、配下のディレクトリやファイルから取得します。(reces Ver.0.00r16以上が必要)
+    *2 タイムスタンプが保持され、かつ取得出来る場合に限ります。
+       出来ない場合、配下のディレクトリやファイルから取得します。(r16より)
     *3 ライブラリ側が使用する場合もありますのでご注意下さい。
 
 
@@ -60,16 +62,15 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  gui4recesHelp.chm       ----- gui4recesヘルプファイル
  NYSL_withfaq.TXT        ----- ライセンスファイル
  Readme.txt              ----- このファイル
- reces.exe               ----- reces Ver.0.00r21
+ reces.exe               ----- reces Ver.0.00r23
  Src.7z                  ----- gui4recesソースファイル
  unrar32.dll             ----- RuRuRu氏によるunrar32.dll x64/ユニコード対応版
 
 
 
-
 ●インストール
- 1.「gui4reces0010.zip」を適当なディレクトリに解凍して下さい。
- 2.以下の各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
+ 1.「gui4reces0011.zip」を適当なディレクトリに解凍して下さい。
+ 2.以下の内、必要な各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
 
    7-zip32.dll(再圧縮、圧縮、解凍)
    tar32.dll(再圧縮、圧縮、解凍)
@@ -77,11 +78,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    unrar.dll,unrar32.dll(解凍)
    UnIso32.dll(解凍)
    XacRett.dll(解凍)
-   b2e32.dll(直接操作のみ)
    LMZIP32.dll(解凍)
    amzip.spi(解凍)
    ax7z_s.spi+7z.dll(解凍)
    その他*.spi(解凍)
+   zip.wcx(解凍)
+   その他*.wcx(解凍)
 
    XacRett.dllとLMZIP32.dll以外の統合アーカイバライブラリは、
       統合アーカイバプロジェクト(http://www.csdinc.co.jp/archiver/)
@@ -97,10 +99,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
       amzip - Yet Another ZIP Extract Plug-in for Susie32(http://www.nk2.org/amzip/)
    ax7z_s.spi+7zは、
       物置(http://yak3.myhome.cx:8080/junks/)
+   zip.wcx(Double Commander付属、doublecmd\plugins\wcx\zip\にあります)は、
+      Double Commander home page(http://doublecmd.sourceforge.net/)
    よりダウンロードすることが出来ます。
 
    上記ライブラリをすべて導入すると、以下の拡張子に対応することが出来ます。
-   (Susie Plug-inの導入により更に対応させることが出来ます。)
+   (Susie Plug-inやTotal Commander Pluginの導入により更に対応させることが出来ます。)
      lzh,lha,lzs
      rar
      zip,7z,jar
@@ -134,7 +138,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  memory:4096MB RAM
  compiler:Microsoft Visual C++ 2010 Express/gcc version 4.7.1 (tdm-1)
  debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
- editor:xyzzy version 0.2.2.235/ResEdit 1.6.2 Unicode build.
+ editor:xyzzy version 0.2.2.235/ResEdit 1.6.3 Unicode build.
 
  [Sub]
  OS:Microsoft Windows XP Home Edition Build 2600 SP3
@@ -142,7 +146,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  memory:1016MB
  compiler:Microsoft Visual C++ 2010 Express/gcc version 4.7.1 (tdm-1)
  debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
- editor:xyzzy version 0.2.2.235/ResEdit 1.5.11 Unicode build.
+ editor:xyzzy version 0.2.2.235/ResEdit 1.6.3 Unicode build.
 
 
 ●謝辞
@@ -160,7 +164,8 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
    N.Yanagi氏(LMZIP32.dll)
    Nobuyuki Honda氏(amzip.spi)
-   Yak!氏(ax7z_s.spi,7z.dll)
+   Yak!氏(ax7z_s.spi,改変版7z.dll)
+   Alexander Koblov氏ほか(Double Commander,zip.wcx)
  ...他多数!!!
  大変可愛らしいアイコンを提供していただいた「なつだ」氏、
  そしてユーザの皆様方に、
@@ -187,6 +192,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発履歴
+ 〇Ver.0.0.1.1 - 2014/10/13
+ ・reces Ver.0.00r23に対応。
+ ・バージョン情報ダイアログにスクロールバーを表示するように。
+ ・「バックグラウンド」オプション追加。
+ ・ショートカット作成で、ウインドウ最大化・最小化の選択ができるように。
+
  〇Ver.0.0.1.0 - 2014/08/31
  ・reces Ver.0.00r22に対応。
  ・リストビューで選択中のファイル数を表示するように。その他、リストビューに関する幾つかの修正。

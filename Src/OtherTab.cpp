@@ -2,7 +2,7 @@
 //その他タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -27,7 +27,16 @@ namespace{
 		_T("XacRett.dll"),
 		_T("amzip.spi"),
 		_T("ax7z_s.spi"),
+		_T("zip.wcx"),
 	};
+
+	const TCHAR* plugin_type_list[]={
+		_T("SPI"),
+		_T("WCX")
+	};
+	tstring* plugin_dir_ptr=NULL;
+	int plugin_type=0;
+	inline bool susie_plugin(){return plugin_type==0;}
 }
 
 
@@ -38,6 +47,10 @@ bool OtherTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 						0,
 						(LPARAM)library_name_list[i]);
 	}
+
+	plugin_dir_ptr=NULL;
+	plugin_type=0;
+	::SetWindowText(getDlgItem(IDC_BUTTON_PLUGIN_DIR),plugin_type_list[plugin_type]);
 
 	setCurrentSettings();
 	return true;
@@ -65,6 +78,13 @@ bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 							(str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""));
 				}
 
+				if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
+					cmd.add(_T(" /Dw%s%s%s"),
+							(str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
+							path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
+							(str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""));
+				}
+
 				TCHAR* cmd_buffer=new TCHAR[lstrlen(cmd.get())+1];
 
 				lstrcpy(cmd_buffer,cmd.get());
@@ -82,29 +102,41 @@ bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 			return true;
 		}
 
-		case IDC_CHECKBOX_OTHER_SPI_DIR:{
-			//Susie Plug-inのあるディレクトリ
+		case IDC_CHECKBOX_OTHER_PLUGIN_DIR:{
+			//プラグインディレクトリ
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
 				FolderDialog folder_dialog;
 
 				std::vector<TCHAR> old_dir(MAX_PATHW);
-				::GetWindowText(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),&old_dir[0],old_dir.size());
+				::GetWindowText(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),&old_dir[0],old_dir.size());
 
-				if(folder_dialog.doModalOpen(&m_config_list[0]->cfg().general.spi_dir,
+				if(folder_dialog.doModalOpen(plugin_dir_ptr,
 											 handle(),
 											 _T("全てのディレクトリ (*.:)\0*.:\0\0"),
-											 _T("Susie Plug-inのあるディレクトリを選択してください"),
+											 (susie_plugin())?
+											 _T("Susie Plug-inのあるディレクトリを選択してください"):
+											 _T("Total Commander Pluginのあるディレクトリを選択してください"),
 											 &old_dir[0])){
-					::SetWindowText(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),m_config_list[0]->cfg().general.spi_dir.c_str());
-					::EnableWindow(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),true);
+					::SetWindowText(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),plugin_dir_ptr->c_str());
+					::EnableWindow(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),true);
 					return true;
 				}
 			}
-			setCheck(IDC_CHECKBOX_OTHER_SPI_DIR,false);
-			m_config_list[0]->cfg().general.spi_dir.clear();
-			::EnableWindow(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),false);
+			setCheck(IDC_CHECKBOX_OTHER_PLUGIN_DIR,false);
+			plugin_dir_ptr->clear();
+			::EnableWindow(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),false);
 			return true;
 		}
+
+		case IDC_BUTTON_PLUGIN_DIR:
+			//プラグインの種類
+			plugin_type^=1;
+			::SetWindowText(getDlgItem(IDC_BUTTON_PLUGIN_DIR),plugin_type_list[plugin_type]);
+			plugin_dir_ptr=(susie_plugin())?
+				&m_config_list[0]->cfg().general.spi_dir:
+				&m_config_list[0]->cfg().general.wcx_dir;
+			setCurrentSettings();
+			break;
 
 		case IDC_CHECKBOX_OTHER_CUSTOM_PARAM:{
 			//追加するパラメータ
@@ -177,14 +209,14 @@ bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case EN_CHANGE:
 			switch(LOWORD(wparam)){
-				case IDC_EDIT_OTHER_SPI_DIR:{
-					//Susie Plug-inのあるディレクトリ
+				case IDC_EDIT_OTHER_PLUGIN_DIR:{
+					//プラグインディレクトリ
 					std::vector<TCHAR> dir(MAX_PATHW);
 
 					::GetWindowText(getDlgItem(LOWORD(wparam)),
 									&dir[0],
 									dir.size());
-					m_config_list[0]->cfg().general.spi_dir.assign(&dir[0]);
+					plugin_dir_ptr->assign(&dir[0]);
 					break;
 				}
 
@@ -248,15 +280,18 @@ void OtherTab::setCurrentSettings(){
 	}
 
 
-	//Susie Plug-inのあるディレクトリ
-	if(!m_config_list[0]->cfg().general.spi_dir.empty()){
-		setCheck(IDC_CHECKBOX_OTHER_SPI_DIR,true);
+	//プラグインディレクトリ
+	plugin_dir_ptr=(susie_plugin())?
+		&m_config_list[0]->cfg().general.spi_dir:
+		&m_config_list[0]->cfg().general.wcx_dir;
+	if(!plugin_dir_ptr->empty()){
+		setCheck(IDC_CHECKBOX_OTHER_PLUGIN_DIR,true);
 
-		::SetWindowText(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),m_config_list[0]->cfg().general.spi_dir.c_str());
+		::SetWindowText(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),plugin_dir_ptr->c_str());
 	}else{
-		setCheck(IDC_CHECKBOX_OTHER_SPI_DIR,false);
+		setCheck(IDC_CHECKBOX_OTHER_PLUGIN_DIR,false);
 	}
-	::EnableWindow(getDlgItem(IDC_EDIT_OTHER_SPI_DIR),sendItemMessage(IDC_CHECKBOX_OTHER_SPI_DIR,BM_GETCHECK,0,0));
+	::EnableWindow(getDlgItem(IDC_EDIT_OTHER_PLUGIN_DIR),sendItemMessage(IDC_CHECKBOX_OTHER_PLUGIN_DIR,BM_GETCHECK,0,0));
 
 	//追加するパラメータ
 	if(!m_config_list[0]->cfg().general.custom_param.empty()){

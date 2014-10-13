@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -121,8 +121,8 @@ private:
 	//リストビューより下に存在するコントロール対象
 	std::vector<SIZE_INFO> m_wnd_size_list;
 
-	int m_wnd_width;
 	int m_wnd_height;
+	int m_wnd_width;
 
 private:
 	void setCurrentSettings();

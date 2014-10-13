@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -161,8 +161,10 @@ struct GENERAL{
 	tstring custom_param;
 	//spiがあるディレクトリ
 	tstring spi_dir;
-	//b2eのあるディレクトリ
+	//b2eがあるディレクトリ
 	tstring b2e_dir;
+	//wcxがあるディレクトリ
+	tstring wcx_dir;
 	//Unicodeエスケープシーケンスをデコードする
 	bool decode_uesc;
 
@@ -185,6 +187,7 @@ struct GENERAL{
 		custom_param(),
 		spi_dir(),
 		b2e_dir(),
+		wcx_dir(),
 		decode_uesc(false){}
 };
 

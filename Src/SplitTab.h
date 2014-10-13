@@ -1,7 +1,7 @@
 ﻿//SplitTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.0 by x@rgs
+//            gui4reces Ver.0.0.1.1 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -18,7 +18,9 @@
 class SplitTab:public TabBase{
 public:
 	SplitTab(std::vector<Config*>& config_list):
-		TabBase(IDD_TAB_SPLIT,config_list){}
+		TabBase(IDD_TAB_SPLIT,config_list),
+		m_size_menu(NULL),
+		m_size_sub_menu(NULL){}
 	~SplitTab(){}
 private:
 	HMENU m_size_menu,m_size_sub_menu;
