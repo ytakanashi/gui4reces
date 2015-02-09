@@ -87,12 +87,12 @@ public:
 
 	//文字を出力
 	bool write(const VOID *buffer,DWORD buffer_size,LPDWORD written_chars);
-	bool write(const TCHAR* format,const va_list argp,LPDWORD written_chars);
+	bool write(const TCHAR* fmt,const va_list argp,LPDWORD written_chars);
 
 	//文字を出力
-	DWORD outputString(const TCHAR* format,...);
+	DWORD outputString(const TCHAR* fmt,...);
 	//色付文字を出力
-	DWORD outputString(int foreground,int background,const TCHAR* format,...);
+	DWORD outputString(int foreground,int background,const TCHAR* fmt,...);
 
 	//指定した範囲をクリア
 	bool clear(DWORD fill_length,COORD begin_pos);
@@ -110,9 +110,6 @@ public:
 
 	//カーソルがある行をクリア
 	bool clearCurrentLine();
-
-	//コンソール上での文字列の幅を取得
-	int getStringWidth(const TCHAR*str);
 
 	//ハンドルを取得
 	inline HANDLE getHandle()const{return m_handle;}

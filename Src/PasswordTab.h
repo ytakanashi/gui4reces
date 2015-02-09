@@ -1,7 +1,7 @@
 ﻿//PasswordTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -26,9 +26,9 @@ private:
 	HMENU m_write_password_list_menu,m_write_password_list_sub_menu;
 private:
 	//メッセージハンドラ
-	bool onInitDialog(WPARAM wparam,LPARAM lparam);
-	bool onCommand(WPARAM wparam,LPARAM lparam);
-	bool onDestroy();
+	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
+	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
+	INT_PTR onDestroy();
 public:
 	void setCurrentSettings();
 	bool getPasswordList(std::vector<tstring>* list);

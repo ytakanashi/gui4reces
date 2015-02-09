@@ -3,7 +3,7 @@
 
 #include"../StdAfx.h"
 #include"Console.h"
-#include"VariableArgument.h"
+#include"FormatString.h"
 #include<locale.h>
 
 namespace sslib{
@@ -184,25 +184,22 @@ bool Console::write(const VOID *buffer,DWORD buffer_size,LPDWORD written_chars){
 }
 
 //文字を出力
-bool Console::write(const TCHAR* format,const va_list argp,LPDWORD written_chars){
-	VariableArgument va(format,argp);
-	const TCHAR* buffer=va.get();
+bool Console::write(const TCHAR* fmt,const va_list argp,LPDWORD written_chars){
+	tstring buffer=format(fmt,argp);
 
-	if(!buffer)return false;
-
-	return write(buffer,lstrlen(buffer),written_chars);
+	return write(buffer.c_str(),buffer.size(),written_chars);
 }
 
 //文字を出力
-DWORD Console::outputString(const TCHAR* format,...){
+DWORD Console::outputString(const TCHAR* fmt,...){
 	DWORD written_chars=0;
 
-	if(format==NULL)return written_chars;
+	if(fmt==NULL)return written_chars;
 
 	va_list argp;
-	va_start(argp,format);
+	va_start(argp,fmt);
 
-	write(format,argp,&written_chars);
+	write(fmt,argp,&written_chars);
 
 	va_end(argp);
 
@@ -210,10 +207,10 @@ DWORD Console::outputString(const TCHAR* format,...){
 }
 
 //色付文字を出力
-DWORD Console::outputString(int foreground,int background,const TCHAR* format,...){
+DWORD Console::outputString(int foreground,int background,const TCHAR* fmt,...){
 	DWORD written_chars=0;
 
-	if(format==NULL)return written_chars;
+	if(fmt==NULL)return written_chars;
 
 	int orig_colors=getColors();
 
@@ -224,9 +221,9 @@ DWORD Console::outputString(int foreground,int background,const TCHAR* format,..
 	}
 
 	va_list argp;
-	va_start(argp,format);
+	va_start(argp,fmt);
 
-	write(format,argp,&written_chars);
+	write(fmt,argp,&written_chars);
 
 	va_end(argp);
 
@@ -321,42 +318,6 @@ bool Console::clearCurrentLine(){
 		  screen_buffer_info.dwCursorPosition.Y);
 
 	return true;
-}
-
-//コンソール上での文字列の幅を取得
-int Console::getStringWidth(const TCHAR*str){
-	int result=0;
-	int length=lstrlen(str);
-	WORD* char_type=new WORD[length];
-
-	if(::GetStringTypeEx(0,CT_CTYPE3,str,length,char_type)){
-		for(int i=0;i<length;i++){
-#ifndef UNICODE
-			if(::IsDBCSLeadByte(str[i])){
-				++i;
-				continue;
-			}
-#endif
-
-			//半角であるかどうか
-			bool half_width=((char_type[i]&C3_HALFWIDTH)||(char_type[i]&C3_ALPHA)||(char_type[i]&C3_DIACRITIC))&&
-							!(char_type[i]&C3_HIRAGANA)&&!(char_type[i]&C3_IDEOGRAPH)&&!(char_type[i]&C3_FULLWIDTH)&&
-								//'Ω'などはC3_ALPHAと等しい
-								char_type[i]!=C3_ALPHA&&
-								//濁点半濁点付全角カタカナと半角カタカナの濁点半濁点判定
-								!((char_type[i]&C3_DIACRITIC)&&(char_type[i]&C3_KATAKANA)&&(char_type[i]&C3_ALPHA)&&!(char_type[i]&C3_HALFWIDTH));
-
-			if(IS_HIGH_SURROGATE(str[i])&&IS_LOW_SURROGATE(str[i+1])){
-//			wchar_t wch[]={data[i],data[++i],'\0'};
-				++i;
-			}
-			result+=(half_width)?1:2;
-		}
-	}
-
-	SAFE_DELETE_ARRAY(char_type);
-
-	return result;
 }
 
 

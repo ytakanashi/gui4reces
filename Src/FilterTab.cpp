@@ -2,7 +2,7 @@
 //除外フィルタタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -76,7 +76,7 @@ namespace{
 	}
 }
 
-bool FilterTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR FilterTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	filter_ptr=NULL;
 	filter_type=0;
 	::SetWindowText(getDlgItem(IDC_BUTTON_FILTER),filter_type_list[filter_type]);
@@ -109,12 +109,12 @@ bool FilterTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool FilterTab::onDestroy(){
+INT_PTR FilterTab::onDestroy(){
 	::DestroyMenu(m_size_menu);
 	return true;
 }
 
-bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_FILTER:
 			//フィルタの種類
@@ -347,7 +347,7 @@ bool FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool FilterTab::onNotify(WPARAM wparam,LPARAM lparam){
+INT_PTR FilterTab::onNotify(WPARAM wparam,LPARAM lparam){
 	LPNMDATETIMECHANGE dtc=reinterpret_cast<LPNMDATETIMECHANGE>(lparam);
 
 	if(dtc->nmhdr.code==DTN_DATETIMECHANGE){

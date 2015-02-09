@@ -1,7 +1,7 @@
 ﻿//SplitTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -26,10 +26,10 @@ private:
 	HMENU m_size_menu,m_size_sub_menu;
 private:
 	//メッセージハンドラ
-	bool onInitDialog(WPARAM wparam,LPARAM lparam);
-	bool onDestroy();
-	bool onCommand(WPARAM wparam,LPARAM lparam);
-	bool onNotify(WPARAM wparam,LPARAM lparam);
+	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
+	INT_PTR onDestroy();
+	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
+	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
 public:
 	void setCurrentSettings();
 };

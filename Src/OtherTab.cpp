@@ -2,7 +2,7 @@
 //その他タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -18,16 +18,22 @@ using namespace sslib;
 namespace{
 	const TCHAR* library_name_list[]={
 		_T("指定しない"),
-		_T("LMZIP32.dll"),
+#ifndef _WIN64
 		_T("7-zip32.dll"),
 		_T("Unlha32.dll"),
 		_T("unrar32.dll"),
 		_T("tar32.dll"),
 		_T("UnIso32.dll"),
 		_T("XacRett.dll"),
-		_T("amzip.spi"),
-		_T("ax7z_s.spi"),
-		_T("zip.wcx"),
+		_T("Total7zip.wcx"),
+#else
+		_T("7-zip64.dll"),
+		_T("UNBYPASS.DLL"),
+		_T("unrar64j.dll"),
+		_T("tar64.dll"),
+		_T("ZBYPASSA.SPH"),
+		_T("Total7zip.wcx64"),
+#endif
 	};
 
 	const TCHAR* plugin_type_list[]={
@@ -40,7 +46,7 @@ namespace{
 }
 
 
-bool OtherTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR OtherTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	for(size_t i=0;i<ARRAY_SIZEOF(library_name_list);i++){
 		sendItemMessage(IDC_COMBO_OTHER_LIBRARY_NAME,
 						CB_ADDSTRING,
@@ -56,7 +62,7 @@ bool OtherTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_OTHER_LIBRARY_SETTINGS:{
 			//ライブラリの設定
@@ -67,27 +73,28 @@ bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 							library_name_str.size());
 
 			if(lstrlen(&library_name_str[0])){
-				VariableArgument cmd(_T("reces.exe /mS%s%s%s"),str::containsWhiteSpace(&library_name_str[0])?_T("\""):_T(""),
-					   path::removeTailSlash(&library_name_str[0]).c_str(),
-					   (str::containsWhiteSpace(&library_name_str[0]))?_T("\""):_T(""));
+				tstring cmd(format(_T("reces.exe /mS%s%s%s"),
+								   str::containsWhiteSpace(&library_name_str[0])?_T("\""):_T(""),
+								   path::removeTailSlash(&library_name_str[0]).c_str(),
+								   (str::containsWhiteSpace(&library_name_str[0]))?_T("\""):_T("")));
 
 				if(!m_config_list[0]->cfg().general.spi_dir.empty()){
-					cmd.add(_T(" /Ds%s%s%s"),
-							(str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
-							path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
-							(str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""));
+					cmd.append(format(_T(" /Ds%s%s%s"),
+									  (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
+									  path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
+									  (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T("")));
 				}
 
 				if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
-					cmd.add(_T(" /Dw%s%s%s"),
-							(str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
-							path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
-							(str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""));
+					cmd.append(format(_T(" /Dw%s%s%s"),
+									  (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
+									  path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
+									  (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T("")));
 				}
 
-				TCHAR* cmd_buffer=new TCHAR[lstrlen(cmd.get())+1];
+				TCHAR* cmd_buffer=new TCHAR[cmd.length()+1];
 
-				lstrcpy(cmd_buffer,cmd.get());
+				lstrcpy(cmd_buffer,cmd.c_str());
 
 				STARTUPINFO startup_info={};
 				startup_info.cb=sizeof(STARTUPINFO);
@@ -96,8 +103,8 @@ bool OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 				startup_info.wShowWindow=SW_SHOWNORMAL;
 				::CreateProcess(NULL,cmd_buffer,NULL,NULL,false,0,NULL,NULL,&startup_info,&process_info);
 				::WaitForSingleObject(process_info.hProcess,INFINITE);
-				::CloseHandle(process_info.hThread);
-				::CloseHandle(process_info.hProcess);
+				SAFE_CLOSE(process_info.hThread);
+				SAFE_CLOSE(process_info.hProcess);
 			}
 			return true;
 		}

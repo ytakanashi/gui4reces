@@ -13,6 +13,8 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add option="-DDEBUG" />
+					<Add option="-D_DEBUG" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -22,6 +24,31 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="Debug | x64">
+				<Option output="..\bin\Debug\x64\gui4reces" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Debug\x64\" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_compiler_x64" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_WIN64" />
+				</Compiler>
+			</Target>
+			<Target title="Release | x64">
+				<Option output="..\bin\Release\x64\gui4reces" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj\Release\x64\" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_compiler_x64" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-D_WIN64" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -95,13 +122,14 @@
 		<Unit filename="sslib\FileSearch.h" />
 		<Unit filename="sslib\FolderDialog.cpp" />
 		<Unit filename="sslib\FolderDialog.h" />
+		<Unit filename="sslib\FormatString.cpp" />
+		<Unit filename="sslib\FormatString.h" />
 		<Unit filename="sslib\Misc.cpp" />
 		<Unit filename="sslib\Misc.h" />
 		<Unit filename="sslib\Path.cpp" />
 		<Unit filename="sslib\Path.h" />
 		<Unit filename="sslib\String.cpp" />
 		<Unit filename="sslib\String.h" />
-		<Unit filename="sslib\VariableArgument.cpp" />
 		<Unit filename="sslib\VariableArgument.h" />
 		<Unit filename="sslib\gui\Control.cpp" />
 		<Unit filename="sslib\gui\Control.h" />

@@ -2,7 +2,7 @@
 //バージョン情報ダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -45,7 +45,7 @@ LRESULT AboutDialog::Link::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	return ::CallWindowProc(default_proc(),handle(),message,wparam,lparam);
 }
 
-bool AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//アイコンの設定(タイトルバー)
 	setIcon(IDI_ICON1);
 
@@ -121,7 +121,7 @@ bool AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool AboutDialog::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR AboutDialog::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_STATIC_URL:
 			if(HIWORD(wparam)==STN_CLICKED){
@@ -138,7 +138,7 @@ bool AboutDialog::onCommand(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool AboutDialog::onPaint(){
+INT_PTR AboutDialog::onPaint(){
 	PAINTSTRUCT ps;
 	HDC dc=::BeginPaint(handle(),&ps);
 
@@ -152,7 +152,7 @@ bool AboutDialog::onPaint(){
 	return true;
 }
 
-bool AboutDialog::onSize(WPARAM wparam,LPARAM lparam){
+INT_PTR AboutDialog::onSize(WPARAM wparam,LPARAM lparam){
 	::SetWindowPos(getDlgItem(IDC_EDIT_VERSION),
 				   NULL,
 				   0,0,
@@ -162,7 +162,7 @@ bool AboutDialog::onSize(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool AboutDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
+INT_PTR AboutDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	LPMINMAXINFO info=reinterpret_cast<LPMINMAXINFO>(lparam);
 
 	info->ptMinTrackSize.x=m_wnd_width;
@@ -170,7 +170,7 @@ bool AboutDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool AboutDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+INT_PTR AboutDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
 		case WM_GETMINMAXINFO:
 			return onGetMinMaxInfo(wparam,lparam);

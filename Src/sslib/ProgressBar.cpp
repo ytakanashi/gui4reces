@@ -66,7 +66,7 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 		m_stdout.setPosition(new_pos);
 	}else{
 		//プログレスバー表示
-		int per_pos_x=_tprintf(_T("%3d%% ["),fraction_done);
+		int per_pos_x=m_stdout.outputString(_T("%3d%% ["),fraction_done);
 		if(m_first_time){
 			//']'のy座標を保存
 			m_progress_right_end_pos_x=per_pos_x+m_progress_length;
@@ -88,7 +88,7 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 			if(m_last_dots)m_stdout.clear(m_last_dots-dots);
 		}
 		m_stdout.setPosition(m_progress_right_end_pos_x,m_begin_pos.Y);
-		_tprintf(_T("]\n"));
+		m_stdout.outputString(_T("]\n"));
 	}
 
 	m_last_dots=dots;
@@ -97,13 +97,22 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 		int msg_width=0;
 
 		//メッセージ表示
-		VariableArgument va(_T("   => \'%s\'"),msg);
-		msg_width=m_stdout.getStringWidth(va.get());
-		m_stdout.outputString(va.get());
+		tstring msg_str=format(_T("   => \'%s\'"),msg);
+
+		msg_width=::WideCharToMultiByte(CP_ACP,
+										0,
+										msg_str.c_str(),
+										msg_str.length(),
+										NULL,
+										0,
+										"　",
+										NULL);
+		m_stdout.outputString(msg_str.c_str());
 
 		//"   =>"がある行を探し、移動
 		static const TCHAR header[]=_T("   =>");
-		TCHAR* buffer=new TCHAR[ARRAY_SIZEOF(header)];
+		static const int buffer_size=ARRAY_SIZEOF(header);
+		static TCHAR buffer[buffer_size];
 
 		m_stdout.getPosition(&m_begin_pos);
 		m_begin_pos.X=0;
@@ -121,7 +130,6 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 				break;
 			}
 		}
-		SAFE_DELETE(buffer);
 
 		//進捗率表示行へ
 		m_begin_pos.Y--;

@@ -2,7 +2,7 @@
 //パスワードタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -16,7 +16,7 @@ using namespace sslib;
 
 
 
-bool PasswordTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR PasswordTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//メニューを読み込む
 	m_write_password_list_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_WRITE_PASSWORD_LIST));
 	m_write_password_list_sub_menu=::GetSubMenu(m_write_password_list_menu,0);
@@ -25,7 +25,7 @@ bool PasswordTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_CHECKBOX_PASSWORD_INPUT:
 			//入力
@@ -143,7 +143,7 @@ bool PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool PasswordTab::onDestroy(){
+INT_PTR PasswordTab::onDestroy(){
 	::DestroyMenu(m_write_password_list_menu);
 	return true;
 }

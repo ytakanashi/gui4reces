@@ -97,9 +97,6 @@
     <ClCompile Include="sslib\String.cpp">
       <Filter>ソース ファイル\sslib</Filter>
     </ClCompile>
-    <ClCompile Include="sslib\VariableArgument.cpp">
-      <Filter>ソース ファイル\sslib</Filter>
-    </ClCompile>
     <ClCompile Include="sslib\gui\Control.cpp">
       <Filter>ソース ファイル\sslib\gui</Filter>
     </ClCompile>
@@ -128,6 +125,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="sslib\EnvironmentVariable.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="sslib\FormatString.cpp">
       <Filter>ソース ファイル\sslib</Filter>
     </ClCompile>
   </ItemGroup>
@@ -201,9 +201,6 @@
     <ClInclude Include="sslib\String.h">
       <Filter>ヘッダー ファイル\sslib</Filter>
     </ClInclude>
-    <ClInclude Include="sslib\VariableArgument.h">
-      <Filter>ヘッダー ファイル\sslib</Filter>
-    </ClInclude>
     <ClInclude Include="sslib\gui\Control.h">
       <Filter>ヘッダー ファイル\sslib\gui</Filter>
     </ClInclude>
@@ -238,6 +235,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="sslib\EnvironmentVariable.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\FormatString.h">
       <Filter>ヘッダー ファイル\sslib</Filter>
     </ClInclude>
   </ItemGroup>

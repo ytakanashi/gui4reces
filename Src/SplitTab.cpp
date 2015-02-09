@@ -2,7 +2,7 @@
 //分割タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -48,7 +48,7 @@ namespace{
 }
 
 
-bool SplitTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR SplitTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	for(size_t i=0;i<ARRAY_SIZEOF(split_size_list);i++){
 		sendItemMessage(IDC_COMBO_SPLIT_SIZE,
 						CB_ADDSTRING,
@@ -75,12 +75,12 @@ bool SplitTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool SplitTab::onDestroy(){
+INT_PTR SplitTab::onDestroy(){
 	::DestroyMenu(m_size_menu);
 	return true;
 }
 
-bool SplitTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR SplitTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_SPLIT_SIZE:{
 			//サイズボタン
@@ -236,7 +236,7 @@ bool SplitTab::onCommand(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool SplitTab::onNotify(WPARAM wparam,LPARAM lparam){
+INT_PTR SplitTab::onNotify(WPARAM wparam,LPARAM lparam){
 	if(wparam==IDC_SPIN_SPLIT_CHUNK){
 		LPNMUPDOWN ud=reinterpret_cast<LPNMUPDOWN>(lparam);
 
@@ -249,10 +249,10 @@ bool SplitTab::onNotify(WPARAM wparam,LPARAM lparam){
 				//下が押された
 				chunk--;
 			}
-			VariableArgument va(_T("%d"),chunk);
+			tstring value(format(_T("%d"),chunk));
 
-			m_config_list[0]->cfg().compress.split_value.assign(va.get());
-			::SetWindowText(getDlgItem(IDC_EDIT_SPLIT_CHUNK),va.get());
+			m_config_list[0]->cfg().compress.split_value.assign(value);
+			::SetWindowText(getDlgItem(IDC_EDIT_SPLIT_CHUNK),value.c_str());
 		}
 	}
 	return false;

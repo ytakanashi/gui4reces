@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -127,15 +127,15 @@ private:
 private:
 	void setCurrentSettings();
 	//メッセージハンドラ
-	bool onInitDialog(WPARAM wparam,LPARAM lparam);
-	bool onDestroy();
-	bool onCommand(WPARAM wparam,LPARAM lparam);
-	bool onNotify(WPARAM wparam,LPARAM lparam);
-	bool onOk();
-	bool onDropFiles(HDROP drop_handle);
-	bool onSize(WPARAM wparam,LPARAM lparam);
-	bool onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
-	bool onMessage(UINT message,WPARAM wparam,LPARAM lparam);
+	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
+	INT_PTR onDestroy();
+	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
+	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
+	INT_PTR onOk();
+	INT_PTR onDropFiles(HDROP drop_handle);
+	INT_PTR onSize(WPARAM wparam,LPARAM lparam);
+	INT_PTR onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
+	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 };
 
 

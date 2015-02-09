@@ -1,8 +1,8 @@
 ﻿//ExtractTab.cpp
-//解凍タブ
+//再圧縮/解凍タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -22,7 +22,7 @@ namespace{
 
 
 
-bool ExtractTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR ExtractTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//スピンコントロール関係
 	//エディットコントロールを関連付ける
 	sendItemMessage(IDC_SPIN_EXTRACT_EXCLUDE_BASE_DIR,UDM_SETBUDDY,(WPARAM)getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),(LPARAM)0);
@@ -38,7 +38,7 @@ bool ExtractTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_CHECKBOX_EXTRACT_CREATE_DIR:
 			//作成する
@@ -75,6 +75,11 @@ bool ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 			m_config_list[0]->cfg().extract.create_dir_optimization.copy_timestamp=getCheck(LOWORD(wparam));
 			return true;
 
+		case IDC_CHECKBOX_EXTRACT_DIR_TIMESTAMP:
+			//ディレクトリのタイムスタンプを復元
+			m_config_list[0]->cfg().extract.directory_timestamp=getCheck(LOWORD(wparam));
+			return true;
+
 		case EN_CHANGE:
 			switch(LOWORD(wparam)){
 				case IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR:
@@ -95,9 +100,8 @@ bool ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 							//最大値
 							m_config_list[0]->cfg().compress.exclude_base_dir=maximum_exclude_base_dir;
 						}
-						VariableArgument va(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir);
 
-						::SetWindowText(getDlgItem(LOWORD(wparam)),va.get());
+						::SetWindowText(getDlgItem(LOWORD(wparam)),format(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir).c_str());
 					}
 					return true;
 			}
@@ -105,7 +109,7 @@ bool ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool ExtractTab::onNotify(WPARAM wparam,LPARAM lparam){
+INT_PTR ExtractTab::onNotify(WPARAM wparam,LPARAM lparam){
 	if(wparam==IDC_SPIN_EXTRACT_EXCLUDE_BASE_DIR){
 		LPNMUPDOWN ud=reinterpret_cast<LPNMUPDOWN>(lparam);
 
@@ -118,9 +122,8 @@ bool ExtractTab::onNotify(WPARAM wparam,LPARAM lparam){
 				//下が押された
 				m_config_list[0]->cfg().compress.exclude_base_dir--;
 			}
-			VariableArgument va(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir);
 
-			::SetWindowText(getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),va.get());
+			::SetWindowText(getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),format(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir).c_str());
 		}
 	}
 	return false;
@@ -147,7 +150,8 @@ void ExtractTab::setCurrentSettings(){
 	setCheck(IDC_CHECKBOX_EXTRACT_COPY_TIMESTAMP,m_config_list[0]->cfg().extract.create_dir_optimization.copy_timestamp);
 
 	//除外するパスの数
-	VariableArgument va(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir);
+	::SetWindowText(getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),format(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir).c_str());
 
-	::SetWindowText(getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),va.get());
+	//ディレクトリのタイムスタンプを復元
+	setCheck(IDC_CHECKBOX_EXTRACT_DIR_TIMESTAMP,m_config_list[0]->cfg().extract.directory_timestamp);
 }

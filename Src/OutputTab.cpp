@@ -2,7 +2,7 @@
 //出力タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -31,7 +31,7 @@ namespace{
 	};
 }
 
-bool OutputTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR OutputTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	for(size_t i=0;i<ARRAY_SIZEOF(combo_output_file_list);i++){
 		sendItemMessage(IDC_COMBO_OUTPUT_FILE,
 						CB_ADDSTRING,
@@ -43,7 +43,7 @@ bool OutputTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool OutputTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR OutputTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_RADIO_OUTPUT_SOURCE:
 			//対象と同じ

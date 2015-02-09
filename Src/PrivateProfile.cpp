@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -132,11 +132,8 @@ bool Config::save(bool include_gui4reces_section){
 	//処理対象フィルタ
 	if(!m_cfg.general.filefilter.empty()||
 	   !isEmptySection(_T("FileFilter"))){
-		VariableArgument min_size(_T("%I64d"),m_cfg.general.filefilter.min_size);
-		VariableArgument max_size(_T("%I64d"),m_cfg.general.filefilter.max_size);
-
-		write(_T("FileFilter"),_T("MinSize"),min_size.get(),m_cfg.general.filefilter.min_size!=m_default_cfg.general.filefilter.min_size);
-		write(_T("FileFilter"),_T("MaxSize"),max_size.get(),m_cfg.general.filefilter.max_size!=m_default_cfg.general.filefilter.max_size);
+		write(_T("FileFilter"),_T("MinSize"),format(_T("%I64d"),m_cfg.general.filefilter.min_size).c_str(),m_cfg.general.filefilter.min_size!=m_default_cfg.general.filefilter.min_size);
+		write(_T("FileFilter"),_T("MaxSize"),format(_T("%I64d"),m_cfg.general.filefilter.max_size).c_str(),m_cfg.general.filefilter.max_size!=m_default_cfg.general.filefilter.max_size);
 
 
 		if(m_cfg.general.filefilter.attr!=m_default_cfg.general.filefilter.attr||
@@ -172,11 +169,8 @@ bool Config::save(bool include_gui4reces_section){
 	//処理対象外フィルタ
 	if(!m_cfg.general.file_ex_filter.empty()||
 	   !isEmptySection(_T("FileExFilter"))){
-		VariableArgument min_size(_T("%I64d"),m_cfg.general.file_ex_filter.min_size);
-		VariableArgument max_size(_T("%I64d"),m_cfg.general.file_ex_filter.max_size);
-
-		write(_T("FileExFilter"),_T("MinSize"),min_size.get(),m_cfg.general.file_ex_filter.min_size!=m_default_cfg.general.file_ex_filter.min_size);
-		write(_T("FileExFilter"),_T("MaxSize"),max_size.get(),m_cfg.general.file_ex_filter.max_size!=m_default_cfg.general.file_ex_filter.max_size);
+		write(_T("FileExFilter"),_T("MinSize"),format(_T("%I64d"),m_cfg.general.file_ex_filter.min_size).c_str(),m_cfg.general.file_ex_filter.min_size!=m_default_cfg.general.file_ex_filter.min_size);
+		write(_T("FileExFilter"),_T("MaxSize"),format(_T("%I64d"),m_cfg.general.file_ex_filter.max_size).c_str(),m_cfg.general.file_ex_filter.max_size!=m_default_cfg.general.file_ex_filter.max_size);
 
 
 		if(m_cfg.general.file_ex_filter.attr!=m_default_cfg.general.file_ex_filter.attr||
@@ -226,6 +220,8 @@ bool Config::save(bool include_gui4reces_section){
 		write(_T("Gui4reces"),_T("Quit"),m_cfg.gui4reces.quit,m_cfg.gui4reces.quit!=m_default_cfg.gui4reces.quit);
 		//作業ディレクトリ
 		write(_T("Gui4reces"),_T("WorkDir"),m_cfg.gui4reces.work_dir.c_str(),m_cfg.gui4reces.work_dir!=m_default_cfg.gui4reces.work_dir&&!m_cfg.gui4reces.work_dir.empty());
+		//すぐに開始
+		write(_T("Gui4reces"),_T("AtOnce"),m_cfg.gui4reces.at_once,m_cfg.gui4reces.at_once!=m_default_cfg.gui4reces.at_once);
 	}
 
 	return true;
@@ -455,6 +451,8 @@ bool Config::load(bool include_gui4reces_section){
 		getDataEx(_T("Gui4reces"),_T("Quit"),&m_cfg.gui4reces.quit);
 		//作業ディレクトリ
 		getStringDataEx(_T("Gui4reces"),_T("WorkDir"),&m_cfg.gui4reces.work_dir,m_default_cfg.gui4reces.work_dir.c_str());
+		//すぐに開始
+		getDataEx(_T("Gui4reces"),_T("AtOnce"),&m_cfg.gui4reces.at_once);
 	}
 
 	return true;

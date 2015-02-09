@@ -2,7 +2,7 @@
 //処理後削除タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -16,12 +16,12 @@ using namespace sslib;
 
 
 
-bool RemoveSourceTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR RemoveSourceTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	setCurrentSettings();
 	return true;
 }
 
-bool RemoveSourceTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR RemoveSourceTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_RADIO_REMOVESOURCE_SAVE:
 			//保持する

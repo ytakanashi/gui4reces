@@ -2,7 +2,7 @@
 //共通ヘッダファイル
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -68,9 +68,9 @@ typedef std::basic_string<TCHAR>tstring;
 #endif //_tcstoll
 
 #ifdef _DEBUG
-	#define SOFTWARE_VERSION _T("0.0.1.1_Debug")
+	#define SOFTWARE_VERSION _T("0.0.1.2_Debug")
 #else
-	#define SOFTWARE_VERSION _T("0.0.1.1")
+	#define SOFTWARE_VERSION _T("0.0.1.2")
 #endif
 
 
@@ -84,9 +84,7 @@ inline void msg(const TCHAR* format,...){
 	va_list argp;
 	va_start(argp,format);
 
-	sslib::VariableArgument va(format,argp);
-
-	MessageBox(NULL,va.get(),NULL,MB_OK);
+	MessageBox(NULL,sslib::format(format,argp).c_str(),NULL,MB_OK);
 
 	va_end(argp);
 }

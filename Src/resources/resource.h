@@ -119,6 +119,8 @@
 #define IDC_EDIT_SPLIT_CHUNK                    4051
 #define IDC_SPIN_SPLIT_CHUNK                    4052
 #define IDC_RADIO_MODE_RECOMPRESS               4053
+#define IDC_CHECKBOX_AT_ONCE                    40000
+#define IDC_CHECKBOX_EXTRACT_DIR_TIMESTAMP      40000
 #define IDC_EDIT_OTHER_PLUGIN_DIR               40000
 #define IDC_RADIO_SHORTCUT_GUI4RECES            40000
 #define IDC_BUTTON_PLUGIN_DIR                   40001

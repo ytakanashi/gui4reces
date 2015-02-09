@@ -1,7 +1,7 @@
 ﻿//AboutDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -56,7 +56,7 @@ public:
 		m_height_diff(0),
 		m_wnd_width(0),
 		m_wnd_height(0){}
-	~AboutDialog(){delete m_edit;m_edit=NULL;delete m_link;m_link=NULL;}
+	~AboutDialog(){SAFE_DELETE(m_edit);SAFE_DELETE(m_link);}
 
 private:
 	HICON m_icon;
@@ -69,12 +69,12 @@ private:
 	int m_wnd_height;
 
 private:
-	bool onInitDialog(WPARAM wparam,LPARAM lparam);
-	bool onCommand(WPARAM wparam,LPARAM lparam);
-	bool onPaint();
-	bool onSize(WPARAM wparam,LPARAM lparam);
-	bool onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
-	bool onMessage(UINT message,WPARAM wparam,LPARAM lparam);
+	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
+	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
+	INT_PTR onPaint();
+	INT_PTR onSize(WPARAM wparam,LPARAM lparam);
+	INT_PTR onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
+	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 };
 
 

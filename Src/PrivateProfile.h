@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -255,7 +255,7 @@ struct EXTRACT{
 		create_dir(false),
 		password_list_path(),
 		create_dir_optimization(),
-		directory_timestamp(true){}
+		directory_timestamp(false){}
 };
 
 struct OUTPUTFILELIST{
@@ -275,10 +275,13 @@ struct GUI4RECES{
 	bool quit;
 	//作業ディレクトリ
 	tstring work_dir;
+	//すぐに開始
+	bool at_once;
 	GUI4RECES():top_most(false),
 		default_profile(),
 		quit(false),
-		work_dir(){sslib::env::get(_T("TMP"),&work_dir);}
+		work_dir(),
+		at_once(false){sslib::env::get(_T("TMP"),&work_dir);}
 };
 
 struct CONFIG{

@@ -1,6 +1,6 @@
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.1
+【バージョン】　0.0.1.2
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
@@ -32,8 +32,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  ・ヘッダ暗号化(ファイル名暗号化)の7zやrarをサポート。
 
  [書庫処理]
- ・LMZIP32.dllを使用することで、不正な書庫でファイル名の文字化けが起きにくい。
- ・zip.wcxを使用することで、UTF-8-MACで格納された書庫も文字化けしない。
+ ・ファイル名の文字化けが起きにくい。
  ・プログレスバーを自前で表示し、無駄なウインドウを表示させない。
  ・ディレクトリのタイムスタンプ復元が可能。 *2
  ・ファイルの分割/結合が出来る。
@@ -48,60 +47,74 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  ・レジストリは一切使用しない。 *3
 
 
-    *1 書庫Dllが対応している場合に限ります。
+    *1 対応している書庫ライブラリに限ります。
     *2 タイムスタンプが保持され、かつ取得出来る場合に限ります。
-       出来ない場合、配下のディレクトリやファイルから取得します。(r16より)
+       出来ない場合、配下のディレクトリやファイルから取得します。(r16より,「ディレクトリのタイムスタンプを復元」にチェックで)
     *3 ライブラリ側が使用する場合もありますのでご注意下さい。
 
 
 
 ●ファイル構成
  cfg/                    ----- プロファイル保存ディレクトリ
+ 7-zip32.dll             ----- 7-zip32.dll文字化け対策版
  gui4reces.cfg           ----- gui4reces設定ファイル(本体終了時作成されます)
- gui4reces.exe           ----- gui4reces本体
+ gui4reces.exe           ----- gui4reces本体ファイル
  gui4recesHelp.chm       ----- gui4recesヘルプファイル
  NYSL_withfaq.TXT        ----- ライセンスファイル
  Readme.txt              ----- このファイル
- reces.exe               ----- reces Ver.0.00r23
+ reces.exe               ----- reces Ver.0.00r25(32bit版)ファイル
  Src.7z                  ----- gui4recesソースファイル
  unrar32.dll             ----- RuRuRu氏によるunrar32.dll x64/ユニコード対応版
+
+ ./x64
+    cfg/                 ----- プロファイル保存ディレクトリ
+    7-zip64.dll          ----- 7-zip64.dll文字化け対策版
+    reces.exe            ----- reces Ver.0.00r25(64bit版)ファイル
+    unrar64j.dll         ----- RuRuRu氏によるunrar64j.dll x64/ユニコード対応版
 
 
 
 ●インストール
- 1.「gui4reces0011.zip」を適当なディレクトリに解凍して下さい。
+ 1.「gui4reces0012.zip」を適当なディレクトリに解凍して下さい。
  2.以下の内、必要な各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
 
-   7-zip32.dll(再圧縮、圧縮、解凍)
-   tar32.dll(再圧縮、圧縮、解凍)
-   UNLHA32.DLL(再圧縮、圧縮、解凍)
-   unrar.dll,unrar32.dll(解凍)
-   UnIso32.dll(解凍)
-   XacRett.dll(解凍)
-   LMZIP32.dll(解凍)
-   amzip.spi(解凍)
-   ax7z_s.spi+7z.dll(解凍)
-   その他*.spi(解凍)
-   zip.wcx(解凍)
-   その他*.wcx(解凍)
+    == ライブラリ ======================================================================
+   ||    32bit版    |       64bit版        ||        対応          ||      入手先      ||
+   ||-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*||-*-*-*-*-*-*-*-*-*||
+   ||  7-zip32.dll  |     7-zip64.dll      ||  再圧縮、圧縮、解凍  ||       同梱       ||
+   ||  tar32.dll    |     tar64.dll        ||  再圧縮、圧縮、解凍  ||  *1 64bit版は *2 ||
+   ||  UNLHA32.DLL  |     ------------     ||  再圧縮、圧縮、解凍  ||        *1        ||
+   ||  unrar32.dll  |     unrar64j.dll     ||  解凍                ||       同梱       ||
+   ||  UnIso32.dll  |     ------------     ||  解凍                ||        *1        ||
+   ||  XacRett.dll  |     ------------     ||  解凍                ||        *3        ||
+   ||  b2e32.dll    |     ------------     ||  直接操作のみ        ||        *1        ||
+   ||     *.spi     |        *.sph         ||  解凍                ||                  ||
+   ||               |  *.spi+ZBYPASSA.SPH  ||                      ||        *5        ||
+   ||     *.wcx     |    *.wcx,*.wcx64     ||  解凍                ||                  ||
+   ||    -------    |     UNBYPASS.DLL     ||  再圧縮、圧縮、解凍  ||        *5        ||
+    ===================================================================================
 
-   XacRett.dllとLMZIP32.dll以外の統合アーカイバライブラリは、
+   *1
       統合アーカイバプロジェクト(http://www.csdinc.co.jp/archiver/)
-   よりダウンロードすることが出来ますが、
-   Claybird氏「LhaForge」付属の「caldix」を使用するとより簡単にインストールすることが出来ます。
-   XacRett.dllは、
+   *2
+      綾川的趣味之接続集(http://homepage1.nifty.com/Ayakawa/index.html)
+   *3
       Bonty's HomePage(http://hp.vector.co.jp/authors/VA030681/index.htm)
-   LMZIP32.dllは、
+   *4
       Yanagi's Home Page(http://homepage2.nifty.com/NYanagi/index.html)
-   unrar.dllは、
-      RARLAB(http://www.rarlab.com/)
-   amzip.spiは、
-      amzip - Yet Another ZIP Extract Plug-in for Susie32(http://www.nk2.org/amzip/)
-   ax7z_s.spi+7zは、
-      物置(http://yak3.myhome.cx:8080/junks/)
-   zip.wcx(Double Commander付属、doublecmd\plugins\wcx\zip\にあります)は、
-      Double Commander home page(http://doublecmd.sourceforge.net/)
-   よりダウンロードすることが出来ます。
+   *5
+      TORO's Library(http://homepage1.nifty.com/toro/index.html)
+
+ ・ライブラリの優先順位は、
+      UNLHA32.dll / UNLHA32.dll+UNBYPASS.DLL
+      unrar32.dll / unrar64j.dll
+      tar32.dll   / tar64.dll
+      UnIso32.dll
+      7-zip32.dll / 7-zip64.dll
+      XacRett.dll
+      Susie Plug-in(*.spi / *.sph, *.spi+ZBYPASSA.SPH)
+      Total Commander Plugin(*.wcx / *.wcx64)
+   です。
 
    上記ライブラリをすべて導入すると、以下の拡張子に対応することが出来ます。
    (Susie Plug-inやTotal Commander Pluginの導入により更に対応させることが出来ます。)
@@ -136,7 +149,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  OS:Microsoft Windows 7 Home Premium 64-bit (6.1, Build 7600)
  CPU:Intel(R) Core(TM) i5 CPU M 460 @ 2.53GHz (4 CPUs), ~2.5GHz
  memory:4096MB RAM
- compiler:Microsoft Visual C++ 2010 Express/gcc version 4.7.1 (tdm-1)
+ compiler:Microsoft Visual C++ 2010 Express/gcc version 4.9.2 (tdm-1,tdm64-1)
  debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
  editor:xyzzy version 0.2.2.235/ResEdit 1.6.3 Unicode build.
 
@@ -144,7 +157,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  OS:Microsoft Windows XP Home Edition Build 2600 SP3
  CPU:Intel(R) Atom(TM) CPU N270@1.60GHz,1600MHz(4x400)
  memory:1016MB
- compiler:Microsoft Visual C++ 2010 Express/gcc version 4.7.1 (tdm-1)
+ compiler:Microsoft Visual C++ 2010 Express/gcc version 4.9.2 (tdm-1)
  debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
  editor:xyzzy version 0.2.2.235/ResEdit 1.6.3 Unicode build.
 
@@ -158,14 +171,13 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    Bonty氏(Archon2,XacRett.dll)
    高田 謙氏(undll.exe,UnIso32.dll)
    秋田 稔氏(7-zip32.dll)
+   市丸 剛氏(7-zip64.dll,tar64.dll)
    吉岡 恒夫氏/Claybird氏(tar32.dll)
    Ｍｉｃｃｏ氏(UNLHA32.dll)
-   Alexander Roshal氏(unrar.dll)
+   Alexander Roshal氏(unrar.dll/unrar64.dll)
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
-   N.Yanagi氏(LMZIP32.dll)
-   Nobuyuki Honda氏(amzip.spi)
-   Yak!氏(ax7z_s.spi,改変版7z.dll)
-   Alexander Koblov氏ほか(Double Commander,zip.wcx)
+   Total7zip氏(Total7zip.wcx)
+   TORO氏(UNBYPASS.DLL,ZBYPASSA.SPH)
  ...他多数!!!
  大変可愛らしいアイコンを提供していただいた「なつだ」氏、
  そしてユーザの皆様方に、
@@ -192,6 +204,16 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発履歴
+ 〇Ver.0.0.1.2 - 2015/02/09
+ ・reces Ver.0.00r25に対応。
+ ・64bit版を同梱するように。
+ ・7-zip32.dll/7-zip64.dll文字化け対策版を同梱するように。
+ ・ヘルプファイルの容量を削減。
+ ・アイコンファイルの容量を削減。
+ ・「バージョン情報」ボタンを「V」、「ヘルプ」ボタンを「H」に改称し移動。
+ ・「すぐに開始」オプションを追加。
+ ・リスビューのファイル名を編集できるように。
+
  〇Ver.0.0.1.1 - 2014/10/13
  ・reces Ver.0.00r23に対応。
  ・バージョン情報ダイアログにスクロールバーを表示するように。

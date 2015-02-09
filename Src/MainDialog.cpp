@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -30,7 +30,7 @@ namespace{
 		tstring& m_name;
 		bool & m_is_default;
 	private:
-		bool onInitDialog(WPARAM wparam,LPARAM lparam){
+		INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam){
 			if(!m_name.empty()){
 				::SetWindowText(getDlgItem(IDC_EDIT_PROFILE_NAME),m_name.c_str());
 
@@ -40,7 +40,7 @@ namespace{
 			}
 			return true;
 		}
-		bool onOk(){
+		INT_PTR onOk(){
 			std::vector<TCHAR> cfg_name(MAX_PATH);
 			::GetWindowText(getDlgItem(IDC_EDIT_PROFILE_NAME),&cfg_name[0],cfg_name.size());
 			m_name.assign(&cfg_name[0]);
@@ -73,7 +73,7 @@ namespace{
 		int& m_show_cmd;
 		tstring& m_description;
 	private:
-		bool onInitDialog(WPARAM wparam,LPARAM lparam){
+		INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam){
 			sendItemMessage((!m_exec_reces)?IDC_RADIO_SHORTCUT_GUI4RECES:IDC_RADIO_SHORTCUT_RECES,
 							BM_SETCHECK,
 							(WPARAM)BST_CHECKED,
@@ -86,7 +86,7 @@ namespace{
 			::SetWindowText(getDlgItem(IDC_EDIT_SHORTCUT_DESCRIPTION),m_description.c_str());
 			return true;
 		}
-		bool onCommand(WPARAM wparam,LPARAM lparam){
+		INT_PTR onCommand(WPARAM wparam,LPARAM lparam){
 			switch(LOWORD(wparam)){
 				case IDC_RADIO_SHORTCUT_GUI4RECES:{
 					m_exec_reces=false;
@@ -122,7 +122,7 @@ namespace{
 			}
 			return false;
 		}
-		bool onOk(){
+		INT_PTR onOk(){
 			m_show_cmd=shortcut::show_cmd_list[sendItemMessage(IDC_COMBO_SHORTCUT_SHOWCMD,CB_GETCURSEL,0,0)].cmd;
 			return true;
 		}
@@ -177,10 +177,10 @@ namespace{
 				}
 			}
 
-			::CloseHandle(process_info.hThread);
-			::CloseHandle(process_info.hProcess);
-			::CloseHandle(read_handle);
-			::CloseHandle(write_handle);
+			SAFE_CLOSE(process_info.hThread);
+			SAFE_CLOSE(process_info.hProcess);
+			SAFE_CLOSE(read_handle);
+			SAFE_CLOSE(write_handle);
 		}
 		return true;
 	}
@@ -316,9 +316,16 @@ void MainDialog::setCurrentSettings(){
 					(WPARAM)(m_config_list[0]->cfg().gui4reces.quit)?BST_CHECKED:BST_UNCHECKED,
 					0
 					);
+
+	//すぐに開始する
+	sendItemMessage(IDC_CHECKBOX_AT_ONCE,
+					BM_SETCHECK,
+					(WPARAM)(m_config_list[0]->cfg().gui4reces.at_once)?BST_CHECKED:BST_UNCHECKED,
+					0
+					);
 }
 
-bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//アイコンの設定(タイトルバー)
 	setIcon(IDI_ICON1);
 
@@ -358,7 +365,7 @@ bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	}
 
 	m_tab->insert(*m_tab_list[TAB_COMPRESS],_T("再圧縮/圧縮"),TAB_COMPRESS);
-	m_tab->insert(*m_tab_list[TAB_EXTRACT],_T("解凍"),TAB_EXTRACT);
+	m_tab->insert(*m_tab_list[TAB_EXTRACT],_T("再圧縮/解凍"),TAB_EXTRACT);
 	m_tab->insert(*m_tab_list[TAB_OUTPUT],_T("出力"),TAB_OUTPUT);
 	m_tab->insert(*m_tab_list[TAB_PASSWORD],_T("パスワード"),TAB_PASSWORD);
 	m_tab->insert(*m_tab_list[TAB_FILTER],_T("フィルタ"),TAB_FILTER);
@@ -397,12 +404,12 @@ bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 	::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T("処理対象: 全てのファイル"));
 
+	//サイズ変更時に場所を変更するアイテムたち
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_LIST1)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_GROUP_COMPLETE)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_RECES)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_GUI4RECES)));
-	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_VERSION)));
-	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_HELP)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_AT_ONCE)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_RUN)));
 
 	//設定をコントロールに適用
@@ -440,34 +447,37 @@ bool MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 		}
 	}
 
-	{
-		//引数で指定されたプロファイル/デフォルトプロファイルを読み込む
-		int index=sendItemMessage(IDC_COMBO_PROFILE,
-								  CB_FINDSTRINGEXACT,
-								  0,
-								  (LPARAM)((profile_opt)?
-								  profile_name.c_str():
-								  m_config_list[0]->cfg().gui4reces.default_profile.c_str()));
-			if(index!=CB_ERR){
-				sendItemMessage(IDC_COMBO_PROFILE,
-								CB_SETCURSEL,
-								(WPARAM)index,
-								0);
-				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_PROFILE,CBN_SELCHANGE),0);
-			}else{
-				if(!profile_opt){
-					m_config_list[0]->cfg().gui4reces.default_profile.clear();
-				}
-				::EnableWindow(getDlgItem(IDC_STATIC_PROFILE_DEFAULT),false);
-			}
+
+	//引数で指定されたプロファイル/デフォルトプロファイルを読み込む
+	int index=sendItemMessage(IDC_COMBO_PROFILE,
+							  CB_FINDSTRINGEXACT,
+							  0,
+							  (LPARAM)((profile_opt)?
+							  profile_name.c_str():
+							  m_config_list[0]->cfg().gui4reces.default_profile.c_str()));
+	if(index!=CB_ERR){
+		sendItemMessage(IDC_COMBO_PROFILE,
+						CB_SETCURSEL,
+						(WPARAM)index,
+						0);
+		sendMessage(WM_COMMAND,MAKEWPARAM(IDC_COMBO_PROFILE,CBN_SELCHANGE),0);
+	}else{
+		if(!profile_opt){
+			m_config_list[0]->cfg().gui4reces.default_profile.clear();
+		}
+		::EnableWindow(getDlgItem(IDC_STATIC_PROFILE_DEFAULT),false);
 	}
 
 	//ドラッグ&ドロップを許可
 	::DragAcceptFiles(handle(),true);
+
+	if(m_config_list[0]->cfg().gui4reces.at_once){
+		sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_RUN,0),0);
+	}
 	return true;
 }
 
-bool MainDialog::onDestroy(){
+INT_PTR MainDialog::onDestroy(){
 	fileoperation::deleteDirectory(m_temp_dir.c_str());
 	::DestroyMenu(m_create_shortcut_menu);
 	::DestroyMenu(m_add_item_menu);
@@ -475,7 +485,7 @@ bool MainDialog::onDestroy(){
 	return true;
 }
 
-bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_PROFILE_ADD:{
 			//プロファイルを追加
@@ -521,7 +531,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_PROFILE_SAVE:{
 			//プロファイルを保存
-			UINT current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+			int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 			if(current_sel==CB_ERR){
 				//新規作成
@@ -538,7 +548,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			//プロファイルを編集
 			if(!sendItemMessage(IDC_COMBO_PROFILE,CB_GETCOUNT,0,0))break;
 
-			UINT current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+			int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 			if(current_sel==CB_ERR)break;
 
@@ -598,7 +608,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			//プロファイルを削除
 			if(!sendItemMessage(IDC_COMBO_PROFILE,CB_GETCOUNT,0,0))break;
 
-			UINT current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+			int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 			if(current_sel==CB_ERR)break;
 
@@ -620,7 +630,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 			if(m_config_list[current_sel+1]){
 				::DeleteFile(m_config_list[current_sel+1]->filepath().c_str());
-				delete m_config_list[current_sel+1];
+				SAFE_DELETE(m_config_list[current_sel+1]);
 				m_config_list[current_sel+1]=NULL;
 
 					if(m_config_list[0]->cfg().gui4reces.default_profile==
@@ -643,7 +653,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 									   0,
 									   handle(),
 									   NULL)){
-				UINT current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+				int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 				std::vector<TCHAR> link_dir(MAX_PATH);
 				tstring link_path;
@@ -863,6 +873,10 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					m_listview->insertItem(ite->c_str());
 				}
 				::SetFocus(m_listview->handle());
+
+				if(m_config_list[0]->cfg().gui4reces.at_once){
+					sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_RUN,0),0);
+				}
 			}
 			return true;
 		}
@@ -897,28 +911,34 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			return true;
 
 
+		case IDC_CHECKBOX_AT_ONCE:
+			//すぐに開始
+			m_config_list[0]->cfg().gui4reces.at_once=getCheck(LOWORD(wparam));
+			return true;
+
+
 		case IDC_BUTTON_VERSION:{
 			//バージョン情報
 			tstring reces_version;
 			tstring library_version;
-			VariableArgument va(_T("reces.exe "));
+			tstring cmd_line(_T("reces.exe "));
 
 			if(!m_config_list[0]->cfg().general.spi_dir.empty()){
-				va.add(_T("/Ds%s%s%s "),
-					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
-					   path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
-					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""));
+				cmd_line.append(format(_T("/Ds%s%s%s "),
+									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
+									   path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
+									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T("")));
 			}
 			if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
-				va.add(_T("/Dw%s%s%s "),
-					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
-					   path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
-					   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""));
+				cmd_line.append(format(_T("/Dw%s%s%s "),
+									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
+									   path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
+									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T("")));
 			}
-			va.add(_T("/mv"));
+			cmd_line.append(_T("/mv"));
 
 			getCUIAppOutput(_T("reces.exe /mv reces.exe"),&reces_version);
-			getCUIAppOutput(va.get(),&library_version);
+			getCUIAppOutput(cmd_line.c_str(),&library_version);
 
 			AboutDialog about_dialog;
 			std::list<tstring> version_list;
@@ -933,7 +953,19 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_HELP:{
 			//ヘルプ
-			::ShellExecute(NULL,_T("open"),(path::addTailSlash(path::getExeDirectory())+_T("gui4recesHelp.chm")).c_str(),NULL,NULL,SW_SHOWNORMAL);
+			::ShellExecute(NULL,
+						   _T("open"),
+						   (path::addTailSlash(
+#ifndef _WIN64
+							   path::getExeDirectory()
+#else
+							   path::getParentDirectory(path::getExeDirectory())
+#endif
+							   )+
+							_T("gui4recesHelp.chm")).c_str(),
+						   NULL,
+						   NULL,
+						   SW_SHOWNORMAL);
 			return true;
 		}
 
@@ -966,23 +998,21 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 			m_config_list[0]->save();
 
-			VariableArgument cmd(_T("reces.exe /{%s%s%s /@%s%s%s"),
-								 (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
-								 m_config_list[0]->filepath().c_str(),
-								 (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
-								 (str::containsWhiteSpace(list_file_path))?_T("\""):_T(""),
-								 list_file_path.c_str(),
-								 (str::containsWhiteSpace(list_file_path))?_T("\""):_T("")
-								 );
+			tstring cmd(format(_T("reces.exe /{%s%s%s /@%s%s%s"),
+							   (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
+							   m_config_list[0]->filepath().c_str(),
+							   (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
+							   (str::containsWhiteSpace(list_file_path))?_T("\""):_T(""),
+							   list_file_path.c_str(),
+							   (str::containsWhiteSpace(list_file_path))?_T("\""):_T("")));
 
 			if(m_config_list[0]->cfg().compress.choose_output_file_each_time&&
 			   (m_config_list[0]->cfg().mode==MODE_RECOMPRESS||m_config_list[0]->cfg().mode==MODE_COMPRESS)){
 				//ファイル名指定のみの設定ファイル追加
-				cmd.add(_T(" /{%s%s%s"),
-						(str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T(""),
-						oF_cfg_path.c_str(),
-						(str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T("")
-						);
+				cmd.append(format(_T(" /{%s%s%s"),
+								  (str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T(""),
+								  oF_cfg_path.c_str(),
+								  (str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T("")));
 			}
 
 			//パスワードの処理
@@ -999,11 +1029,10 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 						password_list_file.writeEx(_T("%s\r\n"),ite->c_str());
 					}
 					if(password_list_file.getSize()){
-						cmd.add(_T(" /pf%s%s%s"),
-								(str::containsWhiteSpace(password_list_path))?_T("\""):_T(""),
-								password_list_path.c_str(),
-								(str::containsWhiteSpace(password_list_path))?_T("\""):_T("")
-								);
+						cmd.append(format(_T(" /pf%s%s%s"),
+										  (str::containsWhiteSpace(password_list_path))?_T("\""):_T(""),
+										  password_list_path.c_str(),
+										  (str::containsWhiteSpace(password_list_path))?_T("\""):_T("")));
 					}
 				}
 			}
@@ -1013,11 +1042,10 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				tstring new_password;
 
 				if(((PasswordTab*)m_tab_list[TAB_PASSWORD])->PasswordTab::getNewPassword(&new_password)){
-					cmd.add(_T(" /pn%s%s%s"),
-									(str::containsWhiteSpace(new_password))?_T("\""):_T(""),
-									new_password.c_str(),
-									(str::containsWhiteSpace(new_password))?_T("\""):_T("")
-							);
+					cmd.append(format(_T(" /pn%s%s%s"),
+									  (str::containsWhiteSpace(new_password))?_T("\""):_T(""),
+									  new_password.c_str(),
+									  (str::containsWhiteSpace(new_password))?_T("\""):_T("")));
 				}
 			}
 
@@ -1065,12 +1093,12 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 
 #ifdef _DEBUG
-				msg(cmd.get());
+				msg(cmd.c_str());
 #endif
 
-				TCHAR* cmd_buffer=new TCHAR[lstrlen(cmd.get())+1];
+				TCHAR* cmd_buffer=new TCHAR[cmd.length()+1];
 
-				lstrcpy(cmd_buffer,cmd.get());
+				lstrcpy(cmd_buffer,cmd.c_str());
 
 				if(m_config_list[0]->cfg().gui4reces.work_dir!=
 				   m_config_list[0]->default_cfg().gui4reces.work_dir&&
@@ -1088,10 +1116,10 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				startup_info.wShowWindow=SW_SHOWNORMAL;
 				::CreateProcess(NULL,cmd_buffer,NULL,NULL,false,0,NULL,NULL,&startup_info,&process_info);
 				::WaitForSingleObject(process_info.hProcess,INFINITE);
-				::CloseHandle(process_info.hThread);
-				::CloseHandle(process_info.hProcess);
+				SAFE_CLOSE(process_info.hThread);
+				SAFE_CLOSE(process_info.hProcess);
 
-				delete[] cmd_buffer;
+				SAFE_DELETE_ARRAY(cmd_buffer);
 
 			}while(choose_each_time);
 
@@ -1117,7 +1145,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			switch(LOWORD(wparam)){
 				case IDC_COMBO_PROFILE:{
 					//プロファイルの読み込み
-					UINT current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
+					int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 					m_config_list[0]->import(*m_config_list[current_sel+1]);
 					setCurrentSettings();
@@ -1144,7 +1172,7 @@ bool MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool MainDialog::onNotify(WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onNotify(WPARAM wparam,LPARAM lparam){
 	switch(((LPNMHDR)lparam)->idFrom){
 		case 0:
 			if(((LPNMHDR)lparam)->hwndFrom==::GetDlgItem(m_listview->handle(),0)){
@@ -1182,17 +1210,25 @@ bool MainDialog::onNotify(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool MainDialog::onOk(){
+INT_PTR MainDialog::onOk(){
 	return false;
 }
 
-bool MainDialog::onDropFiles(HDROP drop_handle){
-	//リストビューに渡す
-	::PostMessage(m_listview->handle(),WM_DROPFILES,reinterpret_cast<WPARAM>(drop_handle),(LPARAM)NULL);
+INT_PTR MainDialog::onDropFiles(HDROP drop_handle){
+	DropFiles drop_files(drop_handle);
+
+	//アイテムを追加
+	for(size_t i=0,drop_files_count=drop_files.getCount(),count=m_listview->getItemCount();i<drop_files_count;i++){
+		m_listview->insertItem(drop_files.getFile(i).c_str(),count+i);
+	}
+
+	if(m_config_list[0]->cfg().gui4reces.at_once){
+		sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_RUN,0),0);
+	}
 	return true;
 }
 
-bool MainDialog::onSize(WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onSize(WPARAM wparam,LPARAM lparam){
 	if(!m_wnd_size_list.size())return false;
 
 	DeferPos defer_pos(m_wnd_size_list.size());
@@ -1217,7 +1253,7 @@ bool MainDialog::onSize(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-bool MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	LPMINMAXINFO info=reinterpret_cast<LPMINMAXINFO>(lparam);
 
 	info->ptMinTrackSize.x=info->ptMaxTrackSize.x=m_wnd_width;
@@ -1225,7 +1261,7 @@ bool MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+INT_PTR MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
 		case WM_GETMINMAXINFO:
 			return onGetMinMaxInfo(wparam,lparam);

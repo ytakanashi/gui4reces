@@ -2,7 +2,7 @@
 //再圧縮/圧縮タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.1 by x@rgs
+//            gui4reces Ver.0.0.1.2 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -123,7 +123,7 @@ namespace{
 }
 
 
-bool CompressTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+INT_PTR CompressTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	for(size_t i=0;i<ARRAY_SIZEOF(combo_compression_list);i++){
 		sendItemMessage(IDC_COMBO_COMPRESS_COMPRESSION_TYPE,
 						CB_ADDSTRING,
@@ -150,7 +150,7 @@ bool CompressTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-bool CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
+INT_PTR CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_CHECKBOX_COMPRESS_PASSWORD:
 			//パスワード
