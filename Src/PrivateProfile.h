@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -44,9 +44,10 @@ struct FILEINFO{
 		return name<fileinfo.name;
 	}
 	//ディレクトリ若しくはサブ以下のファイル
-	bool isDirectory()const{
-		return name.rfind(_T("/"))==name.length()-1||
-				 name.rfind(_T("\\"))==name.length()-1||
+	bool isDirectory(bool delimiter_check=true)const{
+		return ((delimiter_check)?
+				 (name.find_last_of(_T("\\/"))==name.length()-1):
+				false)||
 				 attr&FILE_ATTRIBUTE_DIRECTORY;
 	}
 };
@@ -330,6 +331,12 @@ private:
 		if(isEmptySection(section)){
 			removeSection(section);
 		}
+	}
+	void write(const TCHAR* section,const TCHAR* key,const tstring value,bool diff){
+		return write(section,key,value.c_str(),diff);
+	}
+	void write(const TCHAR* section,const TCHAR* key,const long long value,bool diff){
+		return write(section,key,sslib::format(_T("%I64d"),value).c_str(),diff);
 	}
 
 public:

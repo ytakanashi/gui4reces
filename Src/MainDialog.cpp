@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -333,7 +333,7 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_config_list[0]->load(true);
 
 	//一時ディレクトリ作成
-	m_temp_dir=path::addTailSlash(fileoperation::createTempDir(_T("g4r")));
+	m_temp_dir=path::addTailSlash(tempfile::createDir(_T("g4r")));
 
 	FileSearch fs;
 
@@ -988,10 +988,10 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			working=true;
 
 			int item=-1;
-			tstring list_file_path(fileoperation::createTempFile(_T("g4r"),m_temp_dir.c_str()));
+			tstring list_file_path(tempfile::create(_T("g4r"),m_temp_dir.c_str()));
 			tstring password_list_path;
 			//実行時ファイル指定用cfgファイル
-			tstring oF_cfg_path(fileoperation::generateTempFileName(_T("g4r"),m_temp_dir.c_str()));
+			tstring oF_cfg_path(tempfile::generateName(_T("g4r"),m_temp_dir.c_str()));
 			Config oF_cfg(oF_cfg_path.c_str());
 
 
@@ -1020,7 +1020,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 			//dynamic_cast...
 			if(((PasswordTab*)m_tab_list[TAB_PASSWORD])->PasswordTab::getPasswordList(&password_list)){
-				password_list_path.assign(fileoperation::createTempFile(_T("g4r"),m_temp_dir.c_str()));
+				password_list_path.assign(tempfile::create(_T("g4r"),m_temp_dir.c_str()));
 
 				if(path::fileExists(password_list_path.c_str())){
 					File password_list_file(password_list_path.c_str(),CREATE_ALWAYS,GENERIC_READ|GENERIC_WRITE,0,File::UTF16LE);

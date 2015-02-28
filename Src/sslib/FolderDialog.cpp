@@ -148,7 +148,7 @@ bool FolderDialog::doModalOpen(tstring* file_path,HWND wnd_handle,const TCHAR* f
 		m_ofn_open.lpTemplateName=MAKEINTRESOURCE(m_template_id);
 	}
 
-	result=FileDialog::doModalOpen<std::list<tstring> >(NULL,wnd_handle,false,filter,title,init_dir);
+	result=FileDialog::doModalOpen(NULL,wnd_handle,false,filter,title,init_dir);
 	*file_path=m_dir_path;
 	return result;
 }

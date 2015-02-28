@@ -2,7 +2,7 @@
 //除外フィルタタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -150,6 +150,10 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 					(include_filter())?
 						m_def_filefilter.attr:
 						m_def_file_ex_filter.attr;
+				if(!include_filter()){
+					filter_ptr->include_empty_dir=
+						m_def_file_ex_filter.include_empty_dir;
+				}
 			}
 			break;
 
@@ -389,10 +393,12 @@ void FilterTab::setCurrentSettings(){
 	setCheck(IDC_CHECKBOX_FILTER_SYSTEM,filter_ptr->attr&FILE_ATTRIBUTE_SYSTEM);
 	setCheck(IDC_CHECKBOX_FILTER_HIDDEN,filter_ptr->attr&FILE_ATTRIBUTE_HIDDEN);
 	setCheck(IDC_CHECKBOX_FILTER_DIRECTORY,filter_ptr->attr&FILE_ATTRIBUTE_DIRECTORY);
-	if(filter_ptr->attr!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).attr||
-	   (!include_filter()&&
+	if((!include_filter()&&
 	   m_config_list[0]->cfg().general.file_ex_filter.include_empty_dir!=
 	   m_def_file_ex_filter.include_empty_dir)){
+		setCheck(IDC_CHECKBOX_FILTER_EMPTYDIR,!filter_ptr->include_empty_dir);
+		setCheck(IDC_CHECKBOX_FILTER_ATTRIBUTE,true);
+	}else if(filter_ptr->attr!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).attr){
 		setCheck(IDC_CHECKBOX_FILTER_ATTRIBUTE,true);
 	}else{
 		setCheck(IDC_CHECKBOX_FILTER_ATTRIBUTE,false);

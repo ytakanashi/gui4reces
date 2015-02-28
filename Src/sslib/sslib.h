@@ -70,6 +70,11 @@ template<typename T>bool strvalid(T str){
 #endif
 extern void createInstance();
 
+#if !defined(SSLIB_GUI)&&!defined(SSLIB_GUI_DIALOG)
+	#define IS_TERMINATED isTerminated()
+#else
+	#define IS_TERMINATED false
+#endif
 
 #include"ProgressBar.h"
 
@@ -85,6 +90,10 @@ extern void createInstance();
 #include"FileSearch.h"
 
 #include"FileOperation.h"
+
+#include"SplitFile.h"
+
+#include"TempFile.h"
 
 #include"EnvironmentVariable.h"
 
