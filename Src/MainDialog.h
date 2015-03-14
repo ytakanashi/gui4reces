@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -32,10 +32,8 @@ public:
 		m_tab(NULL),
 		m_tab_list(),
 		m_listview(NULL),
-		m_create_shortcut_menu(NULL),
-		m_create_shortcut_sub_menu(NULL),
-		m_add_item_menu(NULL),
-		m_add_item_sub_menu(NULL),
+		m_create_shortcut_menu(),
+		m_add_item_menu(),
 		m_temp_dir(),
 		m_wnd_height(0),
 		m_wnd_width(0){
@@ -112,8 +110,8 @@ private:
 
 	FileListView* m_listview;
 
-	HMENU m_create_shortcut_menu,m_create_shortcut_sub_menu;
-	HMENU m_add_item_menu,m_add_item_sub_menu;
+	sslib::Menu m_create_shortcut_menu;
+	sslib::Menu m_add_item_menu;
 
 	//リストファイル用一時ディレクトリ
 	tstring m_temp_dir;
@@ -135,6 +133,10 @@ private:
 	INT_PTR onDropFiles(HDROP drop_handle);
 	INT_PTR onSize(WPARAM wparam,LPARAM lparam);
 	INT_PTR onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
+#if 0
+	INT_PTR onMouseMove(WPARAM wparam,LPARAM lparam);
+	INT_PTR onLButtonUp(WPARAM wparam,LPARAM lparam);
+#endif
 	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 };
 

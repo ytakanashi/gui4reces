@@ -1,7 +1,7 @@
 ﻿//FilterTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -19,19 +19,19 @@ class FilterTab:public TabBase{
 public:
 	FilterTab(std::vector<Config*>& config_list):
 		TabBase(IDD_TAB_FILTER,config_list),
-		m_size_menu(NULL),
-		m_size_sub_menu(NULL),
+		m_size_menu(),
+		m_regex_menu(),
 		m_def_filefilter(config_list[0]->default_cfg().general.filefilter),
 		m_def_file_ex_filter(config_list[0]->default_cfg().general.file_ex_filter){}
 	~FilterTab(){}
 private:
-	HMENU m_size_menu,m_size_sub_menu;
+	sslib::Menu m_size_menu;
+	sslib::Menu m_regex_menu;
 	const fileinfo::FILEFILTER& m_def_filefilter;
 	const fileinfo::FILEFILTER& m_def_file_ex_filter;
 private:
 	//メッセージハンドラ
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
-	INT_PTR onDestroy();
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
 	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
 public:

@@ -81,6 +81,7 @@ split::RESULT splitFile(const TCHAR* file_name,const TCHAR* param,const TCHAR* o
 
 	TCHAR* file_buffer=new TCHAR[split_buffer_size];
 	if(file_buffer==NULL){
+		if(chunks)SAFE_DELETE_ARRAY(split_sizes);
 		return split::MALLOC_ERR;
 	}
 

@@ -2,7 +2,7 @@
 //分割タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -68,15 +68,9 @@ INT_PTR SplitTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	sendItemMessage(IDC_EDIT_SPLIT_SIZE,EM_SETLIMITTEXT,(WPARAM)20*sizeof(TCHAR),(LPARAM)0);
 
 	//サイズメニューを読み込む
-	m_size_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_FILTER_SIZE));
-	m_size_sub_menu=::GetSubMenu(m_size_menu,0);
+	m_size_menu.load(IDR_MENU_FILTER_SIZE);
 
 	setCurrentSettings();
-	return true;
-}
-
-INT_PTR SplitTab::onDestroy(){
-	::DestroyMenu(m_size_menu);
 	return true;
 }
 
@@ -84,17 +78,7 @@ INT_PTR SplitTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_BUTTON_SPLIT_SIZE:{
 			//サイズボタン
-			RECT rc={0};
-
-			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
-			if(int id=::TrackPopupMenu(m_size_sub_menu,
-									   TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-									   rc.left,
-									   rc.bottom,
-									   0,
-									   handle(),
-									   NULL)){
-
+			if(int id=m_size_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 				size_t i=0;
 
 				for(;i<ARRAY_SIZEOF(size_units_table);i++){

@@ -130,6 +130,8 @@
 		<Unit filename="sslib\Path.h" />
 		<Unit filename="sslib\String.cpp" />
 		<Unit filename="sslib\String.h" />
+		<Unit filename="sslib\TempFile.cpp" />
+		<Unit filename="sslib\TempFile.h" />
 		<Unit filename="sslib\VariableArgument.h" />
 		<Unit filename="sslib\gui\Control.cpp" />
 		<Unit filename="sslib\gui\Control.h" />
@@ -139,6 +141,8 @@
 		<Unit filename="sslib\gui\DropFiles.h" />
 		<Unit filename="sslib\gui\ListView.cpp" />
 		<Unit filename="sslib\gui\ListView.h" />
+		<Unit filename="sslib\gui\Menu.cpp" />
+		<Unit filename="sslib\gui\Menu.h" />
 		<Unit filename="sslib\gui\Tab.cpp" />
 		<Unit filename="sslib\gui\Tab.h" />
 		<Unit filename="sslib\sslib.h" />

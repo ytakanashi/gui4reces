@@ -1,5 +1,5 @@
-﻿//TabBase.cpp
-//タブ操作
+﻿//StdAfx.cpp
+//共通ヘッダファイルをincludeするだけ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 //            gui4reces Ver.0.0.1.3 by x@rgs
@@ -9,10 +9,3 @@
 
 
 #include"StdAfx.h"
-#include"TabBase.h"
-
-
-using namespace sslib;
-
-
-

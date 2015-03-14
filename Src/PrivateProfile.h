@@ -62,8 +62,9 @@ struct FILEFILTER{
 	long long newest_date;
 	std::list<tstring> pattern_list;
 	bool recursive;
+	bool regex;
 
-	FILEFILTER():min_size(0),max_size(0),attr(0),include_empty_dir(true),oldest_date(-1),newest_date(-1),pattern_list(),recursive(false){}
+	FILEFILTER():min_size(0),max_size(0),attr(0),include_empty_dir(true),oldest_date(-1),newest_date(-1),pattern_list(),recursive(true),regex(false){}
 	bool empty()const{return min_size==0&&
 							 max_size==0&&
 							 attr==0&&

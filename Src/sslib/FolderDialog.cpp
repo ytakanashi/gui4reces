@@ -31,7 +31,8 @@ LRESULT CALLBACK OpenDialogProc(HWND wnd_handle,UINT msg,WPARAM wparam,LPARAM lp
 	//インスタンスのポインタを取り出す
 	FolderDialog* folder_dialog=reinterpret_cast<FolderDialog*>(::GetWindowLongPtr(wnd_handle,GWLP_USERDATA));
 
-	if(msg==WM_COMMAND&&
+	if(folder_dialog&&
+	   msg==WM_COMMAND&&
 	   HIWORD(wparam)==BN_CLICKED&&
 	   LOWORD(wparam)==IDOK){
 		if(folder_dialog){

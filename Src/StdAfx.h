@@ -68,13 +68,13 @@ typedef std::basic_string<TCHAR>tstring;
 #endif //_tcstoll
 
 #ifdef _DEBUG
-	#define SOFTWARE_VERSION _T("0.0.1.3a_Debug")
+	#define SOFTWARE_VERSION _T("0.0.1.3_Debug")
 #else
-	#define SOFTWARE_VERSION _T("0.0.1.3a")
+	#define SOFTWARE_VERSION _T("0.0.1.3")
 #endif
 
 
-
+//#define SSLIB_GUI
 #define SSLIB_GUI_DIALOG
 #include"sslib/sslib.h"
 

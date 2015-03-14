@@ -2,7 +2,7 @@
 //パスワードタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -18,8 +18,7 @@ using namespace sslib;
 
 INT_PTR PasswordTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//メニューを読み込む
-	m_write_password_list_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_WRITE_PASSWORD_LIST));
-	m_write_password_list_sub_menu=::GetSubMenu(m_write_password_list_menu,0);
+	m_write_password_list_menu.load(IDR_MENU_WRITE_PASSWORD_LIST);
 
 	setCurrentSettings();
 	return true;
@@ -97,13 +96,7 @@ INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 			RECT rc={0};
 
 			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
-			if(int id=::TrackPopupMenu(m_write_password_list_sub_menu,
-									   TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-									   rc.left,
-									   rc.bottom,
-									   0,
-									   handle(),
-									   NULL)){
+			if(int id=m_write_password_list_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 
 				tstring password_list_path;
 				FileDialog file_dialog;
@@ -141,11 +134,6 @@ INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 		}
 	}
 	return false;
-}
-
-INT_PTR PasswordTab::onDestroy(){
-	::DestroyMenu(m_write_password_list_menu);
-	return true;
 }
 
 void PasswordTab::setCurrentSettings(){

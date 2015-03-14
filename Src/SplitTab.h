@@ -1,7 +1,7 @@
 ﻿//SplitTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.2 by x@rgs
+//            gui4reces Ver.0.0.1.3 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -19,15 +19,13 @@ class SplitTab:public TabBase{
 public:
 	SplitTab(std::vector<Config*>& config_list):
 		TabBase(IDD_TAB_SPLIT,config_list),
-		m_size_menu(NULL),
-		m_size_sub_menu(NULL){}
+		m_size_menu(){}
 	~SplitTab(){}
 private:
-	HMENU m_size_menu,m_size_sub_menu;
+	sslib::Menu m_size_menu;
 private:
 	//メッセージハンドラ
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
-	INT_PTR onDestroy();
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
 	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
 public:

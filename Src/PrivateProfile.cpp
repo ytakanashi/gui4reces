@@ -160,8 +160,10 @@ bool Config::save(bool include_gui4reces_section){
 			write(_T("FileFilter"),_T("Pattern"),pattern.c_str(),!pattern.empty());
 		}
 
-		//gui4recesでRecursiveは必ず有効にする
-		write(_T("FileFilter"),_T("Recursive"),true,true);
+		//gui4recesでRegexが無効であればRecursiveを必ず有効にする
+		if(!m_cfg.general.filefilter.regex)m_cfg.general.filefilter.recursive=true;
+		write(_T("FileFilter"),_T("Recursive"),CFG_VALUE(general.filefilter.recursive));
+		write(_T("FileFilter"),_T("Regex"),CFG_VALUE(general.filefilter.regex));
 	}
 
 
@@ -204,8 +206,10 @@ bool Config::save(bool include_gui4reces_section){
 			write(_T("FileExFilter"),_T("Pattern"),pattern.c_str(),!pattern.empty());
 		}
 
-		//gui4recesでRecursiveは必ず有効にする
-		write(_T("FileExFilter"),_T("Recursive"),true,true);
+		//gui4recesでRegexが無効であればRecursiveを必ず有効にする
+		if(!m_cfg.general.file_ex_filter.regex)m_cfg.general.file_ex_filter.recursive=true;
+		write(_T("FileExFilter"),_T("Recursive"),CFG_VALUE(general.file_ex_filter.recursive));
+		write(_T("FileExFilter"),_T("Regex"),CFG_VALUE(general.file_ex_filter.regex));
 	}
 
 
@@ -384,6 +388,7 @@ bool Config::load(bool include_gui4reces_section){
 		m_cfg.general.filefilter.pattern_list.sort();
 		m_cfg.general.filefilter.pattern_list.unique();
 		getDataEx(_T("FileFilter"),_T("Recursive"),&m_cfg.general.filefilter.recursive);
+		getDataEx(_T("FileFilter"),_T("Regex"),&m_cfg.general.filefilter.regex);
 	}
 
 	//処理対象外フィルタ
@@ -440,6 +445,7 @@ bool Config::load(bool include_gui4reces_section){
 		m_cfg.general.file_ex_filter.pattern_list.sort();
 		m_cfg.general.file_ex_filter.pattern_list.unique();
 		getDataEx(_T("FileExFilter"),_T("Recursive"),&m_cfg.general.file_ex_filter.recursive);
+		getDataEx(_T("FileExFilter"),_T("Regex"),&m_cfg.general.file_ex_filter.regex);
 	}
 
 

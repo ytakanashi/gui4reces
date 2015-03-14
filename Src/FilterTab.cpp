@@ -102,15 +102,12 @@ INT_PTR FilterTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 					   0);
 
 	//サイズメニューを読み込む
-	m_size_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_FILTER_SIZE));
-	m_size_sub_menu=::GetSubMenu(m_size_menu,0);
+	m_size_menu.load(IDR_MENU_FILTER_SIZE);
+
+	//正規表現メニューを読み込む
+	m_regex_menu.load(IDR_MENU_FILTER_REGEX);
 
 	setCurrentSettings();
-	return true;
-}
-
-INT_PTR FilterTab::onDestroy(){
-	::DestroyMenu(m_size_menu);
 	return true;
 }
 
@@ -129,13 +126,47 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 		case IDC_CHECKBOX_FILTER_STRING:
 			//文字列
 			::EnableWindow(getDlgItem(IDC_EDIT_FILTER_STRING),sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0));
+			::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_REGEX),sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0));
 
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)){
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_EDIT_FILTER_STRING,EN_CHANGE),0);
+				filter_ptr->regex=!!sendItemMessage(IDC_CHECKBOX_FILTER_REGEX,BM_GETCHECK,0,0);
 			}else{
+				::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_REGEX),false);
 				filter_ptr->pattern_list.clear();
+				filter_ptr->regex=false;
+				filter_ptr->recursive=true;
+			}
+			::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_RECURSIVE),filter_ptr->regex);
+			::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_REGEX),filter_ptr->regex);
+			break;
+
+		case IDC_CHECKBOX_FILTER_REGEX:
+			//正規表現を使用する
+			filter_ptr->regex=!!sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0);
+			if(!filter_ptr->regex)filter_ptr->recursive=true;
+			::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_RECURSIVE),filter_ptr->regex);
+			::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_REGEX),filter_ptr->regex);
+			break;
+
+		case IDC_CHECKBOX_FILTER_RECURSIVE:
+			//ファイル名のみ対象
+			filter_ptr->recursive=!sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0);
+			break;
+
+		case IDC_BUTTON_FILTER_REGEX:{
+			//正規表現ボタン
+			if(int id=m_regex_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
+				tstring menu_str(m_regex_menu.string(id));
+
+				sendItemMessage(IDC_EDIT_FILTER_STRING,
+								EM_REPLACESEL,
+								1,
+								(LPARAM)menu_str.substr(0,menu_str.find_first_of(_T("\t"))).c_str());
+				::SetFocus(getDlgItem(IDC_EDIT_FILTER_STRING));
 			}
 			break;
+		}
 
 		case IDC_CHECKBOX_FILTER_ATTRIBUTE:
 			//属性
@@ -264,16 +295,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 		case IDC_BUTTON_FILTER_SIZE_FROM:
 		case IDC_BUTTON_FILTER_SIZE_TO:{
 			//サイズボタン
-			RECT rc={0};
-
-			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
-			if(int id=::TrackPopupMenu(m_size_sub_menu,
-									   TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-									   rc.left,
-									   rc.bottom,
-									   0,
-									   handle(),
-									   NULL)){
+			if(int id=m_size_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 
 				size_t i=0;
 
@@ -387,6 +409,13 @@ void FilterTab::setCurrentSettings(){
 	::SetWindowText(getDlgItem(IDC_EDIT_FILTER_STRING),pattern.c_str());
 	setCheck(IDC_CHECKBOX_FILTER_STRING,!pattern.empty());
 	::EnableWindow(getDlgItem(IDC_EDIT_FILTER_STRING),sendItemMessage(IDC_CHECKBOX_FILTER_STRING,BM_GETCHECK,0,0));
+	if(pattern.empty())filter_ptr->regex=false;
+	setCheck(IDC_CHECKBOX_FILTER_REGEX,filter_ptr->regex);
+	::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_REGEX),sendItemMessage(IDC_CHECKBOX_FILTER_STRING,BM_GETCHECK,0,0));
+	if(!filter_ptr->regex)filter_ptr->recursive=true;
+	setCheck(IDC_CHECKBOX_FILTER_RECURSIVE,!filter_ptr->recursive);
+	::EnableWindow(getDlgItem(IDC_CHECKBOX_FILTER_RECURSIVE),sendItemMessage(IDC_CHECKBOX_FILTER_REGEX,BM_GETCHECK,0,0));
+	::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_REGEX),sendItemMessage(IDC_CHECKBOX_FILTER_REGEX,BM_GETCHECK,0,0));
 
 	//属性
 	setCheck(IDC_CHECKBOX_FILTER_READONLY,filter_ptr->attr&FILE_ATTRIBUTE_READONLY);

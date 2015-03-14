@@ -323,6 +323,9 @@ void MainDialog::setCurrentSettings(){
 					(WPARAM)(m_config_list[0]->cfg().gui4reces.at_once)?BST_CHECKED:BST_UNCHECKED,
 					0
 					);
+
+	//コンボボックス対策
+	::UpdateWindow(handle());
 }
 
 INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
@@ -397,12 +400,12 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 	//リストビューのスタイルを変更
 	m_listview->setExtendedListViewStyle(m_listview->getExtendedListViewStyle()|
-							//LVS_EX_FULLROWSELECT(行全体選択)
-							 LVS_EX_FULLROWSELECT|
-							//LVS_EX_GRIDLINES(罫線表示)
-							 LVS_EX_GRIDLINES);
-
-	::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T("処理対象: 全てのファイル"));
+										 //LVS_EX_FULLROWSELECT(行全体選択)
+										 LVS_EX_FULLROWSELECT|
+										 //LVS_EX_GRIDLINES(罫線表示)
+										 LVS_EX_GRIDLINES|
+										 //LVS_EX_CHECKBOXES(チェックボックス表示)
+										 LVS_EX_CHECKBOXES);
 
 	//サイズ変更時に場所を変更するアイテムたち
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_LIST1)));
@@ -416,10 +419,8 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	setCurrentSettings();
 
 	//メニューを読み込む
-	m_create_shortcut_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_CREATE_SHORTCUT));
-	m_create_shortcut_sub_menu=::GetSubMenu(m_create_shortcut_menu,0);
-	m_add_item_menu=::LoadMenu(inst(),MAKEINTRESOURCE(IDR_MENU_ADD_ITEM));
-	m_add_item_sub_menu=::GetSubMenu(m_add_item_menu,0);
+	m_create_shortcut_menu.load(IDR_MENU_CREATE_SHORTCUT);
+	m_add_item_menu.load(IDR_MENU_ADD_ITEM);
 
 
 
@@ -442,8 +443,8 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 		profile_opt=!profile_name.empty();
 
 		for(std::vector<tstring>::size_type i=0,size=filepaths.size();i<size;++i){
-				//ファイルをリストに追加
-				m_listview->insertItem(filepaths[i].c_str());
+			//ファイルをリストに追加
+			m_listview->setCheckState(m_listview->insertItem(filepaths[i].c_str()));
 		}
 	}
 
@@ -479,8 +480,6 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 INT_PTR MainDialog::onDestroy(){
 	fileoperation::deleteDirectory(m_temp_dir.c_str());
-	::DestroyMenu(m_create_shortcut_menu);
-	::DestroyMenu(m_add_item_menu);
 	m_config_list[0]->save(true);
 	return true;
 }
@@ -643,16 +642,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_PROFILE_SHORTCUT:{
 			//ショートカット
-			RECT rc={0};
-
-			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
-			if(int id=::TrackPopupMenu(m_create_shortcut_sub_menu,
-									   TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-									   rc.left,
-									   rc.bottom,
-									   0,
-									   handle(),
-									   NULL)){
+			if(int id=m_create_shortcut_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 				int current_sel=sendItemMessage(IDC_COMBO_PROFILE,CB_GETCURSEL,0,0);
 
 				std::vector<TCHAR> link_dir(MAX_PATH);
@@ -822,16 +812,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 		//リスト
 		case IDC_BUTTON_ADD:{
 			//開く
-			RECT rc={0};
-
-			::GetWindowRect(getDlgItem(LOWORD(wparam)),&rc);
-			if(int id=::TrackPopupMenu(m_add_item_sub_menu,
-									   TPM_LEFTALIGN|TPM_LEFTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-									   rc.left,
-									   rc.bottom,
-									   0,
-									   handle(),
-									   NULL)){
+			if(int id=m_add_item_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 				std::list<tstring> file_list;
 
 				switch(id){
@@ -870,7 +851,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				}
 
 				for(std::list<tstring>::iterator ite=file_list.begin(),end=file_list.end();ite!=end;++ite){
-					m_listview->insertItem(ite->c_str());
+					m_listview->setCheckState(m_listview->insertItem(ite->c_str()));
 				}
 				::SetFocus(m_listview->handle());
 
@@ -882,21 +863,15 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 		}
 
 
-		case IDC_BUTTON_REMOVE:{
+		case IDC_BUTTON_REMOVE:
 			//削除
-			int item=-1;
-
-			for(;;){
-				if((item=m_listview->getNextItem())==-1)break;
-				m_listview->deleteItem(item);
-			}
+			m_listview->sendMessage(WM_KEYDOWN,VK_DELETE,0);
 			return true;
-		}
 
 		case IDC_BUTTON_CLEAR:
 			//クリア
 			ListView_DeleteAllItems(m_listview->handle());
-			::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T("処理対象: 全てのファイル"));
+			::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T(""));
 			return true;
 
 
@@ -971,14 +946,18 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_RUN:{
 			//実行
-			if(!m_listview->getItemCount())break;
-			for(int i=0;i<m_listview->getItemCount();i++){
-				int item=-1;
+			{
+				bool empty=true;
+				int cnt=m_listview->getItemCount();
+				if(!cnt)break;
 
-				if((item=m_listview->getNextItem())==-1){
-					m_listview->selectAll();
-					break;
+				for(int item=0;item<cnt;++item){
+					if(m_listview->getCheckState(item)){
+						empty=false;
+						break;
+					}
 				}
+				if(empty)break;
 			}
 
 			static bool working=false;
@@ -987,7 +966,6 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 			working=true;
 
-			int item=-1;
 			tstring list_file_path(tempfile::create(_T("g4r"),m_temp_dir.c_str()));
 			tstring password_list_path;
 			//実行時ファイル指定用cfgファイル
@@ -1057,16 +1035,26 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			topMost(false);
 			showDialog(SW_HIDE);
 
+			int item=0;
+			//チェックの付いた項目の内先頭
+			int header_item=0;
+
 			do{
 				{
 					bool end=false;
 					File list_file(list_file_path.c_str(),CREATE_ALWAYS,GENERIC_READ|GENERIC_WRITE,0,File::UTF16LE);
 
-					do{
-						if((item=m_listview->getNextItem(item))==-1){end=true;break;}
-						list_file.writeEx(_T("%s\r\n"),m_listview->getItemText(item).c_str());
-					}while(!choose_each_time);
+					for(int cnt=m_listview->getItemCount();;item++){
+						if(item>=cnt){end=true;break;}
+						if(m_listview->getCheckState(item)){
+							if(!header_item)header_item=item;
+							list_file.writeEx(_T("%s\r\n"),m_listview->getItemText(item).c_str());
+							if(choose_each_time)break;
+						}
+					}
+
 					if(!list_file.getSize())break;
+
 					if(end&&choose_each_time)break;
 				}
 
@@ -1077,15 +1065,15 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					FileDialog file_dialog;
 
 					if(!file_dialog.doModalSave(&oF_cfg.cfg().compress.output_file,
-											   handle(),
+											   NULL,
 											   _T("全てのファイル (*.*)\0*.*\0\0"),
 											   _T("保存ファイル名を入力してください"),
 												path::getParentDirectory(m_listview->getItemText((choose_each_time)?
 																								 item:
-																								 m_listview->getNextItem(-1))).c_str(),
+																								 header_item)).c_str(),
 												(path::getFileName(m_listview->getItemText((choose_each_time)?
 																						  item:
-																						  m_listview->getNextItem(-1)))+ext).c_str())){
+																						  header_item))+ext).c_str())){
 						break;
 					}
 					oF_cfg.save();
@@ -1121,7 +1109,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 				SAFE_DELETE_ARRAY(cmd_buffer);
 
-			}while(choose_each_time);
+			}while(choose_each_time&&++item);
 
 			if(!m_config_list[0]->cfg().gui4reces.quit){
 				showDialog(SW_SHOWNORMAL);
@@ -1219,7 +1207,7 @@ INT_PTR MainDialog::onDropFiles(HDROP drop_handle){
 
 	//アイテムを追加
 	for(size_t i=0,drop_files_count=drop_files.getCount(),count=m_listview->getItemCount();i<drop_files_count;i++){
-		m_listview->insertItem(drop_files.getFile(i).c_str(),count+i);
+		m_listview->setCheckState(m_listview->insertItem(drop_files.getFile(i).c_str(),count+i));
 	}
 
 	if(m_config_list[0]->cfg().gui4reces.at_once){
@@ -1261,6 +1249,18 @@ INT_PTR MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
+#if 0
+INT_PTR MainDialog::onMouseMove(WPARAM wparam,LPARAM lparam){
+	if(m_listview->getCapture()==handle())::PostMessage(m_listview->handle(),WM_MOUSEMOVE,wparam,lparam);
+	return true;
+}
+
+INT_PTR MainDialog::onLButtonUp(WPARAM wparam,LPARAM lparam){
+	if(m_listview->getCapture()==handle())::PostMessage(m_listview->handle(),WM_LBUTTONUP,wparam,lparam);
+	return true;
+}
+#endif
+
 INT_PTR MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
 		case WM_GETMINMAXINFO:
@@ -1268,6 +1268,12 @@ INT_PTR MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 		case WM_SETFOCUS:
 			::SetFocus(m_listview->handle());
 			return true;
+#if 0
+		case WM_MOUSEMOVE:
+			return onMouseMove(wparam,lparam);
+		case WM_LBUTTONUP:
+			return onLButtonUp(wparam,lparam);
+#endif
 		default:
 			break;
 	}
