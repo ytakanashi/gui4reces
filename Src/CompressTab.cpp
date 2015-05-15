@@ -2,7 +2,7 @@
 //再圧縮/圧縮タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -314,6 +314,18 @@ INT_PTR CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 			}
 			break;
 
+		default:
+			break;
+	}
+	return false;
+}
+
+INT_PTR CompressTab::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+	switch(message){
+		case WM_SHOWWINDOW:
+			//圧縮タブ「基底ディレクトリを除外」と解凍タブ「共通パスを除外」を同期させる
+			if(wparam)setCurrentSettings();
+			break;
 		default:
 			break;
 	}

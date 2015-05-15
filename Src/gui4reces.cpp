@@ -2,7 +2,7 @@
 //gui4recesメイン
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -16,10 +16,8 @@
 
 using namespace sslib;
 
+MAIN_INSTANCE(Gui4reces);
 
-void createInstance(){
-	new Gui4reces;
-}
 
 bool Gui4reces::init(){
 	return true;

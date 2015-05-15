@@ -2,7 +2,7 @@
 //再圧縮/解凍タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -125,6 +125,18 @@ INT_PTR ExtractTab::onNotify(WPARAM wparam,LPARAM lparam){
 
 			::SetWindowText(getDlgItem(IDC_EDIT_EXTRACT_EXCLUDE_BASE_DIR),format(_T("%d"),m_config_list[0]->cfg().compress.exclude_base_dir).c_str());
 		}
+	}
+	return false;
+}
+
+INT_PTR ExtractTab::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+	switch(message){
+		case WM_SHOWWINDOW:
+			//圧縮タブ「基底ディレクトリを除外」と解凍タブ「共通パスを除外」を同期させる
+			if(wparam)setCurrentSettings();
+			break;
+		default:
+			break;
 	}
 	return false;
 }

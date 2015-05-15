@@ -80,6 +80,8 @@
 		<Unit filename="FilterTab.h" />
 		<Unit filename="MainDialog.cpp" />
 		<Unit filename="MainDialog.h" />
+		<Unit filename="ModeTab.cpp" />
+		<Unit filename="ModeTab.h" />
 		<Unit filename="OtherTab.cpp" />
 		<Unit filename="OtherTab.h" />
 		<Unit filename="OutputTab.cpp" />
@@ -130,6 +132,8 @@
 		<Unit filename="sslib\Path.h" />
 		<Unit filename="sslib\String.cpp" />
 		<Unit filename="sslib\String.h" />
+		<Unit filename="sslib\StringEx.cpp" />
+		<Unit filename="sslib\StringEx.h" />
 		<Unit filename="sslib\TempFile.cpp" />
 		<Unit filename="sslib\TempFile.h" />
 		<Unit filename="sslib\VariableArgument.h" />

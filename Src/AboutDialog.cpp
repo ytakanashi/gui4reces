@@ -2,7 +2,7 @@
 //バージョン情報ダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -72,19 +72,12 @@ INT_PTR AboutDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 	//各ライブラリの情報を追加
 	if(param()){
-		std::list<tstring>* library_list=reinterpret_cast<std::list<tstring>*>(param());
+		tstring* version_str=reinterpret_cast<tstring*>(param());
 		HWND edit=getDlgItem(IDC_EDIT_VERSION);
 
-		for(std::list<tstring>::iterator ite=library_list->begin(),
-			end=library_list->end();
-			ite!=end;
-			++ite){
-			int length=::GetWindowTextLength(edit);
-			::SetFocus(edit);
-			SendMessage(edit,EM_SETSEL,static_cast<WPARAM>(length),static_cast<LPARAM>(length));
-			SendMessage(edit,EM_REPLACESEL,0,reinterpret_cast<LPARAM>(ite->c_str()));
-			SendMessage(edit,EM_REPLACESEL,0,reinterpret_cast<LPARAM>(_T("\r\n")));
-		}
+		::SetFocus(edit);
+		SendMessage(edit,EM_SETSEL,-1,-1);
+		SendMessage(edit,EM_REPLACESEL,0,reinterpret_cast<LPARAM>(version_str->c_str()));
 	}
 
 	RECT wnd_rect={},edit_rect={};

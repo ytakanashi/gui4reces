@@ -1,4 +1,4 @@
-﻿//OtherTab.h
+﻿//ModeTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 //            gui4reces Ver.0.0.1.4 by x@rgs
@@ -7,19 +7,19 @@
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 
 
-#ifndef _OTHERTAB_H_14B30189_A168_4e16_BB22_D7FC72848884
-#define _OTHERTAB_H_14B30189_A168_4e16_BB22_D7FC72848884
+#ifndef _MODETAB_H_8CC3C9DD_32F2_4631_9DE0_B88046BD19F9
+#define _MODETAB_H_8CC3C9DD_32F2_4631_9DE0_B88046BD19F9
 
 
 #include"TabBase.h"
 
 
 
-class OtherTab:public TabBase{
+class ModeTab:public TabBase{
 public:
-	OtherTab(std::vector<Config*>& config_list):
-		TabBase(IDD_TAB_OTHER,config_list){}
-	~OtherTab(){}
+	ModeTab(std::vector<Config*>& config_list):
+		TabBase(IDD_TAB_MODE,config_list){}
+	~ModeTab(){}
 private:
 	//メッセージハンドラ
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
@@ -28,4 +28,4 @@ public:
 	void setCurrentSettings();
 };
 
-#endif //_OTHERTAB_H_14B30189_A168_4e16_BB22_D7FC72848884
+#endif //_MODETAB_H_8CC3C9DD_32F2_4631_9DE0_B88046BD19F9

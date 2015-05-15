@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -20,6 +20,18 @@ using namespace sslib;
 
 
 namespace{
+	class DeferPos{
+		public:
+		DeferPos(int num=1):m_hdwp(NULL){m_hdwp=::BeginDeferWindowPos(num);}
+		virtual ~DeferPos(){::EndDeferWindowPos(m_hdwp);}
+		private:
+			HDWP m_hdwp;
+		public:
+			bool move(HWND wnd,HWND insert_after,int x,int y,int cx,int cy,UINT flags){
+				return NULL!=(m_hdwp=::DeferWindowPos(m_hdwp,wnd,insert_after,x,y,cx,cy,flags));
+			}
+	};
+
 	class CfgNameDialog:public Dialog{
 	public:
 		CfgNameDialog(tstring& name,bool& is_default):
@@ -128,74 +140,327 @@ namespace{
 		}
 	};
 
-	bool getCUIAppOutput(const TCHAR* cmd,tstring* result){
-		HANDLE read_handle=NULL,write_handle=NULL;
-		SECURITY_ATTRIBUTES security_attributes={0};
-		STARTUPINFO startup_info={sizeof(STARTUPINFO)};
-		PROCESS_INFORMATION process_info={0};
+	class PipeRedirect{
+	public:
+		struct PIPE{
+			HANDLE read;
+			HANDLE write;
+			PIPE():read(NULL),write(NULL){}
+			void close(){SAFE_CLOSE(read);SAFE_CLOSE(write);}
+		};
+	public:
+		PipeRedirect():
+		m_result(),m_pipe(),m_process_info(){}
+		virtual ~PipeRedirect(){m_pipe.close();}
+		tstring& buffer(){return m_result;}
+	protected:
+		virtual void begin(){}
+		virtual void end(){}
+		virtual void processBuffer(const TCHAR* buffer){m_result.append(buffer);}
+		virtual bool messageLoop(){
+			MSG msg;
 
-		security_attributes.nLength=sizeof(SECURITY_ATTRIBUTES);
-		security_attributes.lpSecurityDescriptor=0;
-		security_attributes.bInheritHandle=true;
+			if(::PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
+				if(msg.message==WM_QUIT){
+					return false;
+				}
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
+			}
+			return true;
+		}
+	public:
+		bool launch(const TCHAR* cmd){
+			begin();
 
-		if(!::CreatePipe(&read_handle,&write_handle,&security_attributes,0))return false;
+			HANDLE read_handle=NULL;
+			STARTUPINFO startup_info={sizeof(STARTUPINFO)};
 
-		startup_info.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
-		startup_info.wShowWindow=SW_HIDE;
-		startup_info.hStdOutput=write_handle;
+			if(!::CreatePipe(&m_pipe.read,&m_pipe.write,NULL,0))return false;
 
-		std::vector<TCHAR> cmd_(lstrlen(cmd)+1);
-		lstrcpyn(&cmd_[0],cmd,cmd_.size()+1);
+			::DuplicateHandle(GetCurrentProcess(),m_pipe.write,
+							  ::GetCurrentProcess(),&read_handle,
+							  0,true,DUPLICATE_SAME_ACCESS);
+			SAFE_CLOSE(m_pipe.write);
 
-		if(::CreateProcess(NULL,&cmd_[0],NULL,NULL,true,DETACHED_PROCESS,NULL,NULL,&startup_info,&process_info)){
-			DWORD wait_result=0;
-			std::vector<TCHAR> buffer(12,'\0');
+			startup_info.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
+			startup_info.wShowWindow=SW_HIDE;
+			startup_info.hStdOutput=read_handle;
+			startup_info.hStdError=read_handle;
 
-			while((wait_result=::WaitForSingleObject(process_info.hProcess,0))!=WAIT_ABANDONED){
-				DWORD avail_bytes=0;
+			std::vector<TCHAR> cmd_(lstrlen(cmd)+1);
+			lstrcpyn(&cmd_[0],cmd,cmd_.size()+1);
 
-				if(::PeekNamedPipe(read_handle,NULL,0,NULL,&avail_bytes,NULL)&&
-				   avail_bytes){
-					DWORD read=0;
+			if(::CreateProcess(NULL,&cmd_[0],NULL,NULL,
+							   true,
+							   0//CREATE_NEW_PROCESS_GROUP/*CREATE_NO_WINDOW*/
+							   ,
+							   NULL,NULL,&startup_info,&m_process_info)){
+				DWORD wait_result=0;
+				std::vector<TCHAR> buffer(12,'\0');
 
-					buffer.assign(avail_bytes,'\0');
+				::WaitForInputIdle(m_process_info.hProcess,INFINITE);
 
-					if(::ReadFile(read_handle,&buffer[0],buffer.size(),&read,NULL)){
-						result->append(&buffer[0]);
+				while((wait_result=::WaitForSingleObject(m_process_info.hProcess,0))!=WAIT_ABANDONED){
+					DWORD avail_bytes=0;
+
+					if(::PeekNamedPipe(m_pipe.read,NULL,0,NULL,&avail_bytes,NULL)&&
+					   avail_bytes){
+						DWORD read=0;
+
+						buffer.assign(avail_bytes,'\0');
+
+						if(::ReadFile(m_pipe.read,&buffer[0],buffer.size(),&read,NULL)){
+							processBuffer(&buffer[0]);
+						}
+					}
+
+					if(!messageLoop())break;
+
+					if(wait_result==WAIT_OBJECT_0){
+						break;
 					}
 				}
 
-				MSG msg;
+				SAFE_CLOSE(m_process_info.hThread);
+				SAFE_CLOSE(m_process_info.hProcess);
+				SAFE_CLOSE(read_handle);
+				m_pipe.close();
 
-				if(::PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
+			}
+
+			end();
+			return true;
+		}
+	protected:
+		tstring m_result;
+		PIPE m_pipe;
+		PROCESS_INFORMATION m_process_info;
+	};
+
+	class PipeRedirectToTextBox:public PipeRedirect{
+	class LogDialog:public Dialog{
+	class Edit:public sslib::Control{
+	public:
+		Edit(HWND parent_handle,UINT resource_id,bool sub_class=false):
+			Control(parent_handle,resource_id,sub_class){}
+		virtual ~Edit(){}
+	private:
+		LRESULT onChar(WPARAM wparam,LPARAM lparam){
+			if(wparam==VK_ESCAPE){
+				DWORD exit_code=0;
+
+				::GetExitCodeProcess(static_cast<PROCESS_INFORMATION*>(param())->hProcess,&exit_code);
+
+				if(exit_code!=STILL_ACTIVE){
+					sendParentMessage(WM_CLOSE,0,0);
+					return true;
+				}
+			}
+			return false;
+		}
+		LRESULT onKeyDown(WPARAM wparam,LPARAM lparam){
+			if(::GetAsyncKeyState(VK_CONTROL)<0&&
+			   ::GetAsyncKeyState(VK_SHIFT)>=0&&
+			   ::GetAsyncKeyState(VK_MENU)>=0){
+				switch(wparam){
+					case 'A':{
+						//全選択
+						int length=sendMessage(WM_GETTEXTLENGTH,0,0);
+						sendMessage(EM_SETSEL,0,length);
+						return false;
+					}
+					case 'C':
+						//コピー
+						sendMessage(WM_COPY);
+						return false;
+					default:
+						break;
+				}
+			}
+			return true;
+		}
+		LRESULT onGetDlgCode(WPARAM wparam,LPARAM lparam){
+			//ダイアログ表示時、エディットボックス内文字列が全選択されるのを防ぐ
+			return ::CallWindowProc(default_proc(),handle(),WM_GETDLGCODE,wparam,lparam)&~DLGC_HASSETSEL;
+		}
+		LRESULT onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+			switch(message){
+				case WM_CHAR:
+					return onChar(wparam,lparam);
+				case WM_KEYDOWN:
+					if(!onKeyDown(wparam,lparam))return false;
+					break;
+				case WM_GETDLGCODE:
+					return onGetDlgCode(wparam,lparam);
+				default:
+					break;
+			}
+			return ::CallWindowProc(default_proc(),handle(),message,wparam,lparam);
+		}
+	};
+	public:
+		LogDialog():
+		Dialog(IDD_DIALOG_LOG),
+		m_edit(NULL),
+		m_wnd_size(NULL),
+		m_wnd_height(0),
+		m_wnd_width(0){}
+		virtual ~LogDialog(){
+			env::del(_T("PASSWORD_DIALOG"));
+			SAFE_DELETE(m_edit);
+			SAFE_DELETE(m_wnd_size);
+		}
+	private:
+		Edit* m_edit;
+		SIZE_INFO* m_wnd_size;
+		int m_wnd_height;
+		int m_wnd_width;
+	private:
+		INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam){
+			//アイコンの設定(タイトルバー)
+			setIcon(IDI_ICON1);
+			RECT rc={0};
+
+			::GetWindowRect(handle(),&rc);
+			m_wnd_width=rc.right-rc.left;
+			m_wnd_height=rc.bottom-rc.top;
+			m_wnd_size=new SIZE_INFO(handle(),getDlgItem(IDC_EDIT_LOG));
+
+			sendItemMessage(IDC_EDIT_LOG,EM_LIMITTEXT,0,2*1024*1024);
+			m_edit=new Edit(handle(),IDC_EDIT_LOG,true);
+			m_edit->setParam(param());
+
+			//reces側でダイアログを表示
+			env::set(_T("PASSWORD_DIALOG"),
+					 format(_T("%d"),handle()).c_str());
+			return true;
+		}
+		INT_PTR onClose(){
+			DWORD exit_code=0;
+
+			::GetExitCodeProcess(static_cast<PROCESS_INFORMATION*>(param())->hProcess,&exit_code);
+
+			if(exit_code==STILL_ACTIVE){
+				//一時停止
+				::DebugActiveProcess(static_cast<PROCESS_INFORMATION*>(param())->dwProcessId);
+				if(::MessageBox(handle(),_T("処理を中断しますか"),NULL,MB_YESNO|MB_ICONQUESTION)==IDYES){
+					//再開
+					::DebugActiveProcessStop(static_cast<PROCESS_INFORMATION*>(param())->dwProcessId);
+					//終了
+					return Dialog::onClose();
+				}else{
+					//再開
+					::DebugActiveProcessStop(static_cast<PROCESS_INFORMATION*>(param())->dwProcessId);
+					//終了しない
+					return true;
+				}
+			}else{
+				return Dialog::onClose();
+			}
+			return false;
+		}
+		INT_PTR onSize(WPARAM wparam,LPARAM lparam){
+			if(m_wnd_size==NULL)return false;
+
+			DeferPos defer_pos;
+
+			defer_pos.move(m_wnd_size->wnd,
+						   NULL,
+						   0,0,
+						   LOWORD(lparam)-m_wnd_size->width_diff,
+						   HIWORD(lparam)-m_wnd_size->height_diff,
+						   SWP_NOMOVE|SWP_NOZORDER);
+			return false;
+		}
+		INT_PTR onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
+			LPMINMAXINFO info=reinterpret_cast<LPMINMAXINFO>(lparam);
+
+			info->ptMinTrackSize.x=m_wnd_width;
+			info->ptMinTrackSize.y=m_wnd_height;
+			return true;
+		}
+		INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam){
+			switch(message){
+				case WM_GETMINMAXINFO:
+					return onGetMinMaxInfo(wparam,lparam);
+				default:
+					break;
+			}
+			return false;
+		}
+	};
+	public:
+		PipeRedirectToTextBox():
+		m_dialog(){}
+		~PipeRedirectToTextBox(){::TerminateProcess(m_process_info.hProcess,0);}
+	private:
+		void begin(){
+			m_dialog.setParam(&m_process_info);
+			m_dialog.doModeless();
+		}
+		void processBuffer(const TCHAR* buffer){
+			int length=m_dialog.sendItemMessage(IDC_EDIT_LOG,WM_GETTEXTLENGTH,0,0);
+
+			m_dialog.sendItemMessage(IDC_EDIT_LOG,EM_SETSEL,length,length);
+			m_dialog.sendItemMessage(IDC_EDIT_LOG,EM_REPLACESEL,0,(LPARAM)buffer);
+		}
+		bool messageLoop(){
+			MSG msg;
+
+			//reces側でパスワード入力ダイアログ表示した時のgui4recesのCPU使用率上昇を防ぐ
+			if(::GetWindow(m_dialog.handle(),GW_CHILD))Sleep(1);
+
+			if(::PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
+				if(!IsDialogMessage(m_dialog.handle(),&msg)){
+					if(msg.message==WM_QUIT){
+						::AttachConsole(m_process_info.dwProcessId);
+						::SetConsoleCtrlHandler(NULL,true);
+						::GenerateConsoleCtrlEvent(CTRL_C_EVENT,0);
+
+						m_pipe.close();
+						::WaitForSingleObject(m_process_info.hProcess,1000);
+						::FreeConsole();
+						::SetConsoleCtrlHandler(NULL,false);
+
+						::PostQuitMessage(0);
+						return false;
+					}
 					::TranslateMessage(&msg);
 					::DispatchMessage(&msg);
 				}
+			}
+			return true;
+		}
+		void end(){
+			MSG msg;
 
-				if(wait_result==WAIT_OBJECT_0){
+			processBuffer(_T("\r\n\r\n##########処理が全て終了しました。##########"));
+
+			while(::GetMessage(&msg,NULL,0,0)){
+				if(msg.message==WM_QUIT){
+					::PostQuitMessage(0);
 					break;
 				}
+				::TranslateMessage(&msg);
+				::DispatchMessage(&msg);
 			}
-
-			SAFE_CLOSE(process_info.hThread);
-			SAFE_CLOSE(process_info.hProcess);
-			SAFE_CLOSE(read_handle);
-			SAFE_CLOSE(write_handle);
 		}
-		return true;
-	}
-
-	class DeferPos{
-		public:
-		DeferPos(int num=1):m_hdwp(NULL){m_hdwp=::BeginDeferWindowPos(num);}
-		virtual ~DeferPos(){::EndDeferWindowPos(m_hdwp);}
-		private:
-			HDWP m_hdwp;
-		public:
-			bool move(HWND wnd,HWND insert_after,int x,int y,int cx,int cy,UINT flags){
-				return NULL!=(m_hdwp=::DeferWindowPos(m_hdwp,wnd,insert_after,x,y,cx,cy,flags));
-			}
+	private:
+		LogDialog m_dialog;
 	};
+
+	namespace mode{
+		//動作項目
+		UINT idc_list[]={
+			IDC_RADIO_MODE_RECOMPRESS,
+			IDC_RADIO_MODE_COMPRESS,
+			IDC_RADIO_MODE_EXTRACT,
+			IDC_RADIO_MODE_LIST,
+			IDC_RADIO_MODE_TEST,
+			IDC_RADIO_MODE_DELETE
+		};
+	}
 }
 
 void MainDialog::setCurrentSettings(){
@@ -203,97 +468,47 @@ void MainDialog::setCurrentSettings(){
 	//各タブはonInitDialog()にて
 
 	//動作
-	sendItemMessage(IDC_RADIO_MODE_RECOMPRESS,
-					BM_SETCHECK,
-					(WPARAM)BST_UNCHECKED,
-					0
-					);
-	sendItemMessage(IDC_RADIO_MODE_COMPRESS,
-					BM_SETCHECK,
-					(WPARAM)BST_UNCHECKED,
-					0
-					);
-	sendItemMessage(IDC_RADIO_MODE_EXTRACT,
-					BM_SETCHECK,
-					(WPARAM)BST_UNCHECKED,
-					0
-					);
-	sendItemMessage(IDC_RADIO_MODE_LIST,
-					BM_SETCHECK,
-					(WPARAM)BST_UNCHECKED,
-					0
-					);
+	for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+		sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+	}
 
 	switch(m_config_list[0]->cfg().mode){
 		case MODE_COMPRESS:
 			//圧縮
-			sendItemMessage(IDC_RADIO_MODE_COMPRESS,
-							BM_SETCHECK,
-							(WPARAM)BST_CHECKED,
-							0
-							);
-			m_tab->select(TAB_COMPRESS);
-			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("圧縮(&R)"));
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_COMPRESS,0),0);
 			break;
 
 		case MODE_EXTRACT:
 			//解凍
-			sendItemMessage(IDC_RADIO_MODE_EXTRACT,
-							BM_SETCHECK,
-							(WPARAM)BST_CHECKED,
-							0
-							);
-			m_tab->select(TAB_EXTRACT);
-			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("解凍(&R)"));
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_EXTRACT,0),0);
 			break;
 
 		case MODE_LIST:
 			//リスト
-			sendItemMessage(IDC_RADIO_MODE_LIST,
-							BM_SETCHECK,
-							(WPARAM)BST_CHECKED,
-							0
-							);
-			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("リスト(&R)"));
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_LIST,0),0);
+			break;
+
+		case MODE_TEST:
+			//テスト
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_TEST,0),0);
+			break;
+
+		case MODE_DELETE:
+			//削除
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_DELETE,0),0);
 			break;
 
 		case MODE_RECOMPRESS:
 			//再圧縮
-			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("再圧縮(&R)"));
-		//fall through
-
-		//その他諸々
-		case MODE_TEST:
+			//fall through
 		case MODE_SENDCOMMANDS:
 		case MODE_VERSION:
 		default:
 			//再圧縮
-			sendItemMessage(IDC_RADIO_MODE_RECOMPRESS,
-							BM_SETCHECK,
-							(WPARAM)BST_CHECKED,
-							0
-							);
-
-			//強制変更
-			m_config_list[0]->cfg().mode=MODE_RECOMPRESS;
-
-			m_tab->select(TAB_COMPRESS);
+			//その他諸々
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_RECOMPRESS,0),0);
 			break;
 	}
-	//ディレクトリ階層を無視する
-	sendItemMessage(IDC_CHECKBOX_MODE_IGNORE_DIRECTORY_STRUCTURES,
-					BM_SETCHECK,
-					(WPARAM)(m_config_list[0]->cfg().general.ignore_directory_structures)?BST_CHECKED:BST_UNCHECKED,
-					0
-					);
-
-	//バックグラウンドで動作
-	sendItemMessage(IDC_CHECKBOX_MODE_BACKGROUND,
-					BM_SETCHECK,
-					(WPARAM)(m_config_list[0]->cfg().general.background_mode)?BST_CHECKED:BST_UNCHECKED,
-					0
-					);
-
 
 	//最前面表示
 	sendItemMessage(IDC_CHECKBOX_TOPMOST,
@@ -360,6 +575,7 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_tab_list.push_back(new SplitTab(m_config_list));
 	m_tab_list.push_back(new RemoveSourceTab(m_config_list));
 	m_tab_list.push_back(new OtherTab(m_config_list));
+	m_tab_list.push_back(new ModeTab(m_config_list));
 
 	for(size_t i=0,list_size=m_tab_list.size();i<list_size;i++){
 		if(m_tab_list[i]!=NULL){
@@ -375,6 +591,7 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_tab->insert(*m_tab_list[TAB_SPLIT],_T("分割"),TAB_SPLIT);
 	m_tab->insert(*m_tab_list[TAB_REMOVESOURCE],_T("処理後削除"),TAB_REMOVESOURCE);
 	m_tab->insert(*m_tab_list[TAB_OTHER],_T("その他"),TAB_OTHER);
+	m_tab->insert(*m_tab_list[TAB_MODE],_T("動作詳細"),TAB_MODE);
 
 	//デフォルトタブ
 	m_tab_list[TAB_COMPRESS]->showDialog();
@@ -409,10 +626,16 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 	//サイズ変更時に場所を変更するアイテムたち
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_LIST1)));
+	//処理終了後
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_GROUP_COMPLETE)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_RECES)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_QUIT_GUI4RECES)));
+	//処理
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_GROUP_PROCESS)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_AT_ONCE)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_TOPMOST)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_VERSION)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_HELP)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_RUN)));
 
 	//設定をコントロールに適用
@@ -741,9 +964,9 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 		//動作
 		case IDC_RADIO_MODE_RECOMPRESS:
 			//再圧縮
-			sendItemMessage(IDC_RADIO_MODE_COMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_EXTRACT,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_LIST,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
 			sendItemMessage(LOWORD(wparam),
 							BM_SETCHECK,
 							(WPARAM)BST_CHECKED,
@@ -756,9 +979,9 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_RADIO_MODE_COMPRESS:
 			//圧縮
-			sendItemMessage(IDC_RADIO_MODE_RECOMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_EXTRACT,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_LIST,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
 			sendItemMessage(LOWORD(wparam),
 							BM_SETCHECK,
 							(WPARAM)BST_CHECKED,
@@ -771,9 +994,9 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_RADIO_MODE_EXTRACT:
 			//解凍
-			sendItemMessage(IDC_RADIO_MODE_RECOMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_COMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_LIST,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
 			sendItemMessage(LOWORD(wparam),
 							BM_SETCHECK,
 							(WPARAM)BST_CHECKED,
@@ -786,26 +1009,47 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_RADIO_MODE_LIST:
 			//リスト
-			sendItemMessage(IDC_RADIO_MODE_RECOMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_COMPRESS,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
-			sendItemMessage(IDC_RADIO_MODE_LIST,BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
 			sendItemMessage(LOWORD(wparam),
 							BM_SETCHECK,
 							(WPARAM)BST_CHECKED,
 							0
 							);
 			m_config_list[0]->cfg().mode=MODE_LIST;
+			m_tab->select(TAB_MODE);
 			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("リスト(&R)"));
 			return true;
 
-		case IDC_CHECKBOX_MODE_IGNORE_DIRECTORY_STRUCTURES:
-			//ディレクトリ階層を無視する
-			m_config_list[0]->cfg().general.ignore_directory_structures=getCheck(LOWORD(wparam));
+		case IDC_RADIO_MODE_TEST:
+			//テスト
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
+			sendItemMessage(LOWORD(wparam),
+							BM_SETCHECK,
+							(WPARAM)BST_CHECKED,
+							0
+							);
+			m_config_list[0]->cfg().mode=MODE_TEST;
+			m_tab->select(TAB_MODE);
+			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("テスト(&R)"));
 			return true;
 
-		case IDC_CHECKBOX_MODE_BACKGROUND:
-			//バックグラウンドで動作
-			m_config_list[0]->cfg().general.background_mode=getCheck(LOWORD(wparam));
+		case IDC_RADIO_MODE_DELETE:
+			//削除
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
+			sendItemMessage(LOWORD(wparam),
+							BM_SETCHECK,
+							(WPARAM)BST_CHECKED,
+							0
+							);
+			m_config_list[0]->cfg().mode=MODE_DELETE;
+			m_tab->select(TAB_FILTER);
+			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("削除(&R)"));
 			return true;
 
 
@@ -894,7 +1138,6 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 		case IDC_BUTTON_VERSION:{
 			//バージョン情報
-			tstring reces_version;
 			tstring library_version;
 			tstring cmd_line(_T("reces.exe "));
 
@@ -912,16 +1155,14 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			}
 			cmd_line.append(_T("/mv"));
 
-			getCUIAppOutput(_T("reces.exe /mv reces.exe"),&reces_version);
-			getCUIAppOutput(cmd_line.c_str(),&library_version);
+			PipeRedirect pipe;
+			pipe.launch(_T("reces.exe /mv reces.exe"));
+			pipe.launch(cmd_line.c_str());
+			library_version=pipe.buffer();
 
 			AboutDialog about_dialog;
-			std::list<tstring> version_list;
 
-			version_list.push_back(reces_version);
-			str::splitString(&version_list,library_version.c_str(),'\n');
-
-			about_dialog.setParam(&version_list);
+			about_dialog.setParam(&library_version);
 			about_dialog.doModal(handle());
 			return true;
 		}
@@ -1084,6 +1325,10 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				msg(cmd.c_str());
 #endif
 
+				if(m_config_list[0]->cfg().gui4reces.log){
+					cmd+=_T(" /q");
+				}
+
 				TCHAR* cmd_buffer=new TCHAR[cmd.length()+1];
 
 				lstrcpy(cmd_buffer,cmd.c_str());
@@ -1098,15 +1343,19 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					env::set(_T("TMP"),m_config_list[0]->default_cfg().gui4reces.work_dir.c_str());
 				}
 
-				STARTUPINFO startup_info={sizeof(STARTUPINFO)};
-				PROCESS_INFORMATION process_info={};
-				startup_info.dwFlags=STARTF_USESHOWWINDOW;
-				startup_info.wShowWindow=SW_SHOWNORMAL;
-				::CreateProcess(NULL,cmd_buffer,NULL,NULL,false,0,NULL,NULL,&startup_info,&process_info);
-				::WaitForSingleObject(process_info.hProcess,INFINITE);
-				SAFE_CLOSE(process_info.hThread);
-				SAFE_CLOSE(process_info.hProcess);
-
+				if(!m_config_list[0]->cfg().gui4reces.log){
+					STARTUPINFO startup_info={sizeof(STARTUPINFO)};
+					PROCESS_INFORMATION process_info={};
+					startup_info.dwFlags=STARTF_USESHOWWINDOW;
+					startup_info.wShowWindow=SW_SHOWNORMAL;
+					::CreateProcess(NULL,cmd_buffer,NULL,NULL,false,0,NULL,NULL,&startup_info,&process_info);
+					::WaitForSingleObject(process_info.hProcess,INFINITE);
+					SAFE_CLOSE(process_info.hThread);
+					SAFE_CLOSE(process_info.hProcess);
+				}else{
+					PipeRedirectToTextBox pipe;
+					pipe.launch(cmd_buffer);
+				}
 				SAFE_DELETE_ARRAY(cmd_buffer);
 
 			}while(choose_each_time&&++item);
@@ -1249,18 +1498,6 @@ INT_PTR MainDialog::onGetMinMaxInfo(WPARAM wparam,LPARAM lparam){
 	return true;
 }
 
-#if 0
-INT_PTR MainDialog::onMouseMove(WPARAM wparam,LPARAM lparam){
-	if(m_listview->getCapture()==handle())::PostMessage(m_listview->handle(),WM_MOUSEMOVE,wparam,lparam);
-	return true;
-}
-
-INT_PTR MainDialog::onLButtonUp(WPARAM wparam,LPARAM lparam){
-	if(m_listview->getCapture()==handle())::PostMessage(m_listview->handle(),WM_LBUTTONUP,wparam,lparam);
-	return true;
-}
-#endif
-
 INT_PTR MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
 		case WM_GETMINMAXINFO:
@@ -1268,12 +1505,6 @@ INT_PTR MainDialog::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 		case WM_SETFOCUS:
 			::SetFocus(m_listview->handle());
 			return true;
-#if 0
-		case WM_MOUSEMOVE:
-			return onMouseMove(wparam,lparam);
-		case WM_LBUTTONUP:
-			return onLButtonUp(wparam,lparam);
-#endif
 		default:
 			break;
 	}

@@ -139,6 +139,12 @@
     <ClCompile Include="StdAfx.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="sslib\StringEx.cpp">
+      <Filter>ソース ファイル\sslib</Filter>
+    </ClCompile>
+    <ClCompile Include="ModeTab.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CompressTab.h">
@@ -254,6 +260,12 @@
     </ClInclude>
     <ClInclude Include="sslib\gui\Menu.h">
       <Filter>ヘッダー ファイル\sslib\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="sslib\StringEx.h">
+      <Filter>ヘッダー ファイル\sslib</Filter>
+    </ClInclude>
+    <ClInclude Include="ModeTab.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -20,10 +20,39 @@
 #include"SplitTab.h"
 #include"RemoveSourceTab.h"
 #include"OtherTab.h"
+#include"ModeTab.h"
 #include"FileListView.h"
 #include"resources/resource.h"
 
 
+struct SIZE_INFO{
+	HWND wnd;
+	int width_diff;
+	int height_diff;
+	RECT parent_rect;
+	RECT rect;
+	POINT pt;
+	SIZE_INFO(HWND parent_handle,HWND wnd_handle):
+			wnd(NULL),
+			width_diff(0),
+			height_diff(0),
+			parent_rect(),
+			rect(),
+			pt(){
+		wnd=wnd_handle;
+
+		::GetClientRect(parent_handle,&parent_rect);
+
+		::GetWindowRect(wnd_handle,&rect);
+
+		pt.x=rect.left;
+		pt.y=rect.top;
+		::ScreenToClient(parent_handle,&pt);
+
+		width_diff=abs((parent_rect.right-parent_rect.left)-(rect.right-rect.left));
+		height_diff=abs((parent_rect.bottom-parent_rect.top)-(rect.bottom-rect.top));
+	}
+};
 
 class MainDialog:public sslib::Dialog{
 public:
@@ -72,35 +101,7 @@ private:
 		TAB_SPLIT,
 		TAB_REMOVESOURCE,
 		TAB_OTHER,
-	};
-
-	struct SIZE_INFO{
-		HWND wnd;
-		int width_diff;
-		int height_diff;
-		RECT parent_rect;
-		RECT rect;
-		POINT pt;
-		SIZE_INFO(HWND parent_handle,HWND wnd_handle):
-				wnd(NULL),
-				width_diff(0),
-				height_diff(0),
-				parent_rect(),
-				rect(),
-				pt(){
-			wnd=wnd_handle;
-
-			::GetClientRect(parent_handle,&parent_rect);
-
-			::GetWindowRect(wnd_handle,&rect);
-
-			pt.x=rect.left;
-			pt.y=rect.top;
-			::ScreenToClient(parent_handle,&pt);
-
-			width_diff=abs((parent_rect.right-parent_rect.left)-(rect.right-rect.left));
-			height_diff=abs((parent_rect.bottom-parent_rect.top)-(rect.bottom-rect.top));
-		}
+		TAB_MODE,
 	};
 
 	std::vector<Config*> m_config_list;

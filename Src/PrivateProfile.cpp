@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -50,8 +50,6 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("General"),_T("B2eDir"),CFG_VALUE(general.b2e_dir));
 	//wcxがあるディレクトリ
 	write(_T("General"),_T("WcxDir"),CFG_VALUE(general.wcx_dir));
-	//Unicodeエスケープシーケンスをデコードする
-	write(_T("General"),_T("DecodeUnicodeEscape"),CFG_VALUE(general.decode_uesc));
 
 
 	//非表示
@@ -145,8 +143,8 @@ bool Config::save(bool include_gui4reces_section){
 			write(_T("FileFilter"),_T("Attribute"),attr_str.c_str(),m_cfg.general.filefilter.attr!=m_default_cfg.general.filefilter.attr);
 		}
 
-		write(_T("FileFilter"),_T("OldestDate"),str::longlong2datetime(m_cfg.general.filefilter.oldest_date).c_str(),CFG_EQUAL(general.filefilter.oldest_date));
-		write(_T("FileFilter"),_T("NewestDate"),str::longlong2datetime(m_cfg.general.filefilter.newest_date).c_str(),CFG_EQUAL(general.filefilter.newest_date));
+		write(_T("FileFilter"),_T("OldestDate"),strex::longlong2datetime(m_cfg.general.filefilter.oldest_date).c_str(),CFG_EQUAL(general.filefilter.oldest_date));
+		write(_T("FileFilter"),_T("NewestDate"),strex::longlong2datetime(m_cfg.general.filefilter.newest_date).c_str(),CFG_EQUAL(general.filefilter.newest_date));
 
 		if(!m_cfg.general.filefilter.pattern_list.empty()||
 		   keyExists(_T("FileFilter"),_T("Pattern"))){
@@ -188,8 +186,8 @@ bool Config::save(bool include_gui4reces_section){
 
 		write(_T("FileExFilter"),_T("IncludeEmptyDir"),CFG_VALUE(general.file_ex_filter.include_empty_dir));
 
-		write(_T("FileExFilter"),_T("OldestDate"),str::longlong2datetime(m_cfg.general.file_ex_filter.oldest_date).c_str(),CFG_EQUAL(general.file_ex_filter.oldest_date));
-		write(_T("FileExFilter"),_T("NewestDate"),str::longlong2datetime(m_cfg.general.file_ex_filter.newest_date).c_str(),CFG_EQUAL(general.file_ex_filter.newest_date));
+		write(_T("FileExFilter"),_T("OldestDate"),strex::longlong2datetime(m_cfg.general.file_ex_filter.oldest_date).c_str(),CFG_EQUAL(general.file_ex_filter.oldest_date));
+		write(_T("FileExFilter"),_T("NewestDate"),strex::longlong2datetime(m_cfg.general.file_ex_filter.newest_date).c_str(),CFG_EQUAL(general.file_ex_filter.newest_date));
 
 
 		if(m_cfg.general.file_ex_filter.pattern_list!=m_default_cfg.general.file_ex_filter.pattern_list||
@@ -225,6 +223,8 @@ bool Config::save(bool include_gui4reces_section){
 		write(_T("Gui4reces"),_T("WorkDir"),CFG_VALUE(gui4reces.work_dir));
 		//すぐに開始
 		write(_T("Gui4reces"),_T("AtOnce"),CFG_VALUE(gui4reces.at_once));
+		//ログウインドウを表示
+		write(_T("Gui4reces"),_T("Log"),CFG_VALUE(gui4reces.log));
 	}
 
 	return true;
@@ -265,8 +265,6 @@ bool Config::load(bool include_gui4reces_section){
 	getStringDataEx(_T("General"),_T("B2eDir"),&m_cfg.general.b2e_dir);
 	//wcxのあるディレクトリ
 	getStringDataEx(_T("General"),_T("WcxDir"),&m_cfg.general.wcx_dir);
-	//Unicodeエスケープシーケンスをデコードする
-	getDataEx(_T("General"),_T("DecodeUnicodeEscape"),&m_cfg.general.decode_uesc);
 
 
 	//非表示
@@ -358,7 +356,7 @@ bool Config::load(bool include_gui4reces_section){
 			if(temp_str.c_str()[i]=='e'||temp_str.c_str()[i]=='E'){
 				//include_empty_dirは除外フィルタの場合のみ操作
 			}else{
-				m_cfg.general.filefilter.attr|=str::attr2DWORD(temp_str.c_str()[i]);
+				m_cfg.general.filefilter.attr|=strex::attr2DWORD(temp_str.c_str()[i]);
 			}
 			i++;
 		}
@@ -367,13 +365,13 @@ bool Config::load(bool include_gui4reces_section){
 
 	getStringDataEx(_T("FileFilter"),_T("OldestDate"),&temp_str);
 	if(!temp_str.empty()){
-		m_cfg.general.filefilter.oldest_date=str::datetime2longlong(temp_str.c_str());
+		m_cfg.general.filefilter.oldest_date=strex::datetime2longlong(temp_str.c_str());
 	}
 	temp_str.clear();
 
 	getStringDataEx(_T("FileFilter"),_T("NewestDate"),&temp_str);
 	if(!temp_str.empty()){
-		m_cfg.general.filefilter.newest_date=str::datetime2longlong(temp_str.c_str(),true);
+		m_cfg.general.filefilter.newest_date=strex::datetime2longlong(temp_str.c_str(),true);
 	}
 	temp_str.clear();
 
@@ -414,7 +412,7 @@ bool Config::load(bool include_gui4reces_section){
 				//include_empty_dirは除外フィルタの場合のみ操作
 				m_cfg.general.file_ex_filter.include_empty_dir=false;
 			}else{
-				m_cfg.general.file_ex_filter.attr|=str::attr2DWORD(temp_str.c_str()[i]);
+				m_cfg.general.file_ex_filter.attr|=strex::attr2DWORD(temp_str.c_str()[i]);
 			}
 			i++;
 		}
@@ -425,14 +423,14 @@ bool Config::load(bool include_gui4reces_section){
 
 	getStringDataEx(_T("FileExFilter"),_T("OldestDate"),&temp_str);
 	if(!temp_str.empty()){
-		m_cfg.general.file_ex_filter.oldest_date=str::datetime2longlong(temp_str.c_str());
+		m_cfg.general.file_ex_filter.oldest_date=strex::datetime2longlong(temp_str.c_str());
 	}
 
 	temp_str.clear();
 
 	getStringDataEx(_T("FileExFilter"),_T("NewestDate"),&temp_str);
 	if(!temp_str.empty()){
-		m_cfg.general.file_ex_filter.newest_date=str::datetime2longlong(temp_str.c_str(),true);
+		m_cfg.general.file_ex_filter.newest_date=strex::datetime2longlong(temp_str.c_str(),true);
 	}
 
 	temp_pattern.clear();
@@ -461,6 +459,8 @@ bool Config::load(bool include_gui4reces_section){
 		getStringDataEx(_T("Gui4reces"),_T("WorkDir"),&m_cfg.gui4reces.work_dir,m_default_cfg.gui4reces.work_dir.c_str());
 		//すぐに開始
 		getDataEx(_T("Gui4reces"),_T("AtOnce"),&m_cfg.gui4reces.at_once);
+		//ログウインドウを表示
+		getDataEx(_T("Gui4reces"),_T("Log"),&m_cfg.gui4reces.log);
 	}
 
 	return true;

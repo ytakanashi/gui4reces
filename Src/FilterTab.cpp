@@ -2,7 +2,7 @@
 //除外フィルタタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -48,7 +48,7 @@ namespace{
 	};
 
 	bool longlong2SYSTEMTIME(SYSTEMTIME* result_st,const long long date_time){
-		if(result_st&&date_time>str::min_date&&date_time<str::max_date){
+		if(result_st&&date_time>strex::min_date&&date_time<strex::max_date){
 			result_st->wYear=static_cast<WORD>(date_time/10000000000);
 			result_st->wMonth=static_cast<WORD>((date_time/100000000)%100);
 			result_st->wDay=static_cast<WORD>((date_time/1000000)%100);
@@ -224,7 +224,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				sendItemMessage(IDC_DATETIMEPICKER_FILTER_FROM,DTM_GETSYSTEMTIME,(WPARAM)NULL,(LPARAM)&st);
 				date_time=SYSTEMTIME2longlong(st);
 
-				if(date_time>=str::min_date&&date_time<=str::max_date){
+				if(date_time>=strex::min_date&&date_time<=strex::max_date){
 					filter_ptr->oldest_date=date_time;
 				}
 			}else{
@@ -247,7 +247,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				sendItemMessage(IDC_DATETIMEPICKER_FILTER_TO,DTM_GETSYSTEMTIME,(WPARAM)NULL,(LPARAM)&st);
 				date_time=SYSTEMTIME2longlong(st);
 
-				if(date_time>=str::min_date&&date_time<=str::max_date){
+				if(date_time>=strex::min_date&&date_time<=strex::max_date){
 					filter_ptr->newest_date=date_time;
 				}
 			}else{
@@ -316,7 +316,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 					((LOWORD(wparam)==IDC_BUTTON_FILTER_SIZE_FROM)?
 					 filter_ptr->min_size:
 					 filter_ptr->max_size)=
-						str::filesize2longlong((tstring(&buffer[0])+size_units_table[i].units).c_str());
+						strex::filesize2longlong((tstring(&buffer[0])+size_units_table[i].units).c_str());
 				}
 			}
 			break;
@@ -361,7 +361,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 						((LOWORD(wparam)==IDC_EDIT_FILTER_SIZE_FROM)?
 						 filter_ptr->min_size:
 						 filter_ptr->max_size)=
-							str::filesize2longlong((tstring(&size[0])+tstring(&unit[0])).c_str());
+							strex::filesize2longlong((tstring(&size[0])+tstring(&unit[0])).c_str());
 					}
 					break;
 				}
@@ -464,7 +464,7 @@ void FilterTab::setCurrentSettings(){
 
 	//サイズ
 	if(filter_ptr->min_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).min_size){
-		tstring size_str(str::longlong2filesize(filter_ptr->min_size));
+		tstring size_str(strex::longlong2filesize(filter_ptr->min_size));
 		size_t size_index=0;
 
 		while(size_index<size_str.length()&&
@@ -492,7 +492,7 @@ void FilterTab::setCurrentSettings(){
 	::EnableWindow(getDlgItem(IDC_BUTTON_FILTER_SIZE_FROM),sendItemMessage(IDC_CHECKBOX_FILTER_SIZE_FROM,BM_GETCHECK,0,0));
 
 	if(filter_ptr->max_size!=((include_filter())?m_def_filefilter:m_def_file_ex_filter).max_size){
-		tstring size_str(str::longlong2filesize(filter_ptr->max_size));
+		tstring size_str(strex::longlong2filesize(filter_ptr->max_size));
 		size_t size_index=0;
 
 		while(size_index<size_str.length()&&

@@ -1,7 +1,7 @@
 ﻿//ExtractTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -25,6 +25,7 @@ private:
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
 	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
+	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 public:
 	void setCurrentSettings();
 };

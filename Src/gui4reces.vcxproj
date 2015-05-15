@@ -138,6 +138,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>version.lib;shlwapi.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <MergeSections>.rdata=.text</MergeSections>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(SolutionDir)resources\manifest.xml</AdditionalManifestFiles>
@@ -158,6 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>version.lib;shlwapi.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <MergeSections>.rdata=.text</MergeSections>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(SolutionDir)resources\manifest.xml</AdditionalManifestFiles>
@@ -171,6 +173,7 @@
     <ClCompile Include="FilterTab.cpp" />
     <ClCompile Include="gui4reces.cpp" />
     <ClCompile Include="MainDialog.cpp" />
+    <ClCompile Include="ModeTab.cpp" />
     <ClCompile Include="OtherTab.cpp" />
     <ClCompile Include="OutputTab.cpp" />
     <ClCompile Include="PasswordTab.cpp" />
@@ -297,6 +300,12 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../StdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="sslib\StringEx.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="sslib\TempFile.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../StdAfx.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../StdAfx.h</PrecompiledHeaderFile>
@@ -319,6 +328,7 @@
     <ClInclude Include="FilterTab.h" />
     <ClInclude Include="gui4reces.h" />
     <ClInclude Include="MainDialog.h" />
+    <ClInclude Include="ModeTab.h" />
     <ClInclude Include="OtherTab.h" />
     <ClInclude Include="OutputTab.h" />
     <ClInclude Include="PasswordTab.h" />
@@ -347,6 +357,7 @@
     <ClInclude Include="sslib\Path.h" />
     <ClInclude Include="sslib\sslib.h" />
     <ClInclude Include="sslib\String.h" />
+    <ClInclude Include="sslib\StringEx.h" />
     <ClInclude Include="sslib\TempFile.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="TabBase.h" />

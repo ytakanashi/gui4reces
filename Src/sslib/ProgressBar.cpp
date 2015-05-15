@@ -5,7 +5,6 @@
 #include"sslib.h"
 
 
-
 namespace sslib{
 
 
@@ -39,12 +38,8 @@ ProgressBar::~ProgressBar(){
 bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 	if(!total||done>total)return false;
 
-	unsigned int fraction_done=static_cast<unsigned int>(done*100/total);
-	int dots=int(((float)fraction_done/100)*m_progress_length);
-
-	if(dots<0)dots=0;
-	else if(dots>m_progress_length)dots=m_progress_length;
-	fraction_done=clamp(fraction_done,static_cast<unsigned>(0),static_cast<unsigned>(100));
+	unsigned int fraction_done=std::min<unsigned int>((unsigned int)(done*100/total),100);
+	int dots=std::min<int>(int((float(fraction_done)/100)*m_progress_length),m_progress_length);
 
 	if(m_last_fraction_done==fraction_done&&
 	   fraction_done==100)return false;
@@ -58,7 +53,7 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 		m_stdout.setPosition(m_begin_pos);
 	}
 
-	if(m_last_dots==dots&&!m_first_time){
+	if(!m_first_time&&m_last_dots==dots){
 		//更新する必要が無いので次行へ
 		COORD new_pos=m_begin_pos;
 
@@ -139,9 +134,6 @@ bool ProgressBar::update(long long done,long long total,const TCHAR* msg){
 		}
 		m_last_msg_width=msg_width;
 	}
-
-	//バッファを吐き出す
-//	fflush(stdout);
 
 	if(m_first_time){
 		m_first_time=false;

@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -19,6 +19,8 @@ enum MODE{
 	MODE_TEST=1<<4,
 	MODE_SENDCOMMANDS=1<<5,
 	MODE_VERSION=1<<6,
+	MODE_SETTINGS=1<<7,
+	MODE_DELETE=1<<8,
 };
 
 enum{
@@ -64,7 +66,8 @@ struct FILEFILTER{
 	bool recursive;
 	bool regex;
 
-	FILEFILTER():min_size(0),max_size(0),attr(0),include_empty_dir(true),oldest_date(-1),newest_date(-1),pattern_list(),recursive(true),regex(false){}
+	//注意:recursiveはfalseで初期化
+	FILEFILTER():min_size(0),max_size(0),attr(0),include_empty_dir(true),oldest_date(-1),newest_date(-1),pattern_list(),recursive(false),regex(false){}
 	bool empty()const{return min_size==0&&
 							 max_size==0&&
 							 attr==0&&
@@ -167,8 +170,6 @@ struct GENERAL{
 	tstring b2e_dir;
 	//wcxがあるディレクトリ
 	tstring wcx_dir;
-	//Unicodeエスケープシーケンスをデコードする
-	bool decode_uesc;
 
 	//初期化
 	GENERAL():
@@ -189,8 +190,7 @@ struct GENERAL{
 		custom_param(),
 		spi_dir(),
 		b2e_dir(),
-		wcx_dir(),
-		decode_uesc(false){}
+		wcx_dir(){}
 };
 
 struct RECOMPRESS{
@@ -279,11 +279,14 @@ struct GUI4RECES{
 	tstring work_dir;
 	//すぐに開始
 	bool at_once;
+	//ログウインドウを表示
+	bool log;
 	GUI4RECES():top_most(false),
 		default_profile(),
 		quit(false),
 		work_dir(),
-		at_once(false){sslib::env::get(_T("TMP"),&work_dir);}
+		at_once(false),
+		log(false){sslib::env::get(_T("TMP"),&work_dir);}
 };
 
 struct CONFIG{

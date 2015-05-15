@@ -2,7 +2,7 @@
 //ファイルリストビュー
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.3 by x@rgs
+//            gui4reces Ver.0.0.1.4 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -104,29 +104,11 @@ LRESULT FileListView::onNotify(WPARAM wparam,LPARAM lparam){
 			}
 			break;
 
-#if 0
-		case LVN_BEGINDRAG:
-			m_drag_image=new DragImage(handle(),((LPNMLISTVIEW)lparam)->iItem);
-			break;
-#endif
-
 		default:
 			break;
 	}
 	return ::CallWindowProc(default_proc(),handle(),WM_NOTIFY,wparam,lparam);
 }
-
-#if 0
-INT_PTR FileListView::onMouseMove(WPARAM wparam,LPARAM lparam){
-	if(m_drag_image)m_drag_image->drag(LOWORD(lparam),HIWORD(lparam));
-	return true;
-}
-
-INT_PTR FileListView::onLButtonUp(WPARAM wparam,LPARAM lparam){
-	SAFE_DELETE(m_drag_image);
-	return true;
-}
-#endif
 
 LRESULT FileListView::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 	switch(message){
@@ -163,14 +145,6 @@ LRESULT FileListView::onMessage(UINT message,WPARAM wparam,LPARAM lparam){
 					break;
 			}
 			break;
-
-#if 0
-		case WM_MOUSEMOVE:
-			return onMouseMove(wparam,lparam);
-
-		case WM_LBUTTONUP:
-			return onLButtonUp(wparam,lparam);
-#endif
 
 		default:
 			break;
