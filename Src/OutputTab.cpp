@@ -2,7 +2,7 @@
 //出力タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -47,12 +47,14 @@ INT_PTR OutputTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
 		case IDC_RADIO_OUTPUT_SOURCE:
 			//対象と同じ
+			m_config_list[0]->cfg().general.choose_output_dir_each_time=false;
 			::EnableWindow(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),false);
 			m_config_list[0]->cfg().general.output_dir.clear();
 			return true;
 
 		case IDC_RADIO_OUTPUT_DESKTOP:{
 			//デスクトップ
+			m_config_list[0]->cfg().general.choose_output_dir_each_time=false;
 			::EnableWindow(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),false);
 			m_config_list[0]->cfg().general.output_dir.clear();
 
@@ -61,6 +63,14 @@ INT_PTR OutputTab::onCommand(WPARAM wparam,LPARAM lparam){
 			::SHGetSpecialFolderPath(NULL,&desktop_path[0],CSIDL_DESKTOP,false);
 
 			m_config_list[0]->cfg().general.output_dir.assign(&desktop_path[0]);
+			return true;
+		}
+
+		case IDC_RADIO_OUTPUT_EACH_TIME:{
+			//実行時に指定
+			m_config_list[0]->cfg().general.choose_output_dir_each_time=true;
+			::EnableWindow(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),false);
+			m_config_list[0]->cfg().general.output_dir.clear();
 			return true;
 		}
 
@@ -73,13 +83,13 @@ INT_PTR OutputTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 			if(!folder_dialog.doModalOpen(&m_config_list[0]->cfg().general.output_dir,
 										  handle(),
-										  _T("全てのディレクトリ (*.:)\0*.:\0\0"),
 										  _T("保存先ディレクトリを選択してください"),
 										  &old_dir[0])){
 				m_config_list[0]->cfg().general.output_dir.clear();
 				return false;
 			}
 			::SetWindowText(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),m_config_list[0]->cfg().general.output_dir.c_str());
+			m_config_list[0]->cfg().general.choose_output_dir_each_time=false;
 			::EnableWindow(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),true);
 			return true;
 		}
@@ -188,6 +198,11 @@ void OutputTab::setCurrentSettings(){
 					(WPARAM)BST_UNCHECKED,
 					0
 					);
+	sendItemMessage(IDC_RADIO_OUTPUT_EACH_TIME,
+					BM_SETCHECK,
+					(WPARAM)BST_UNCHECKED,
+					0
+					);
 	sendItemMessage(IDC_RADIO_OUTPUT_SPECIFIC_DIR,
 					BM_SETCHECK,
 					(WPARAM)BST_UNCHECKED,
@@ -198,7 +213,17 @@ void OutputTab::setCurrentSettings(){
 
 	::SHGetSpecialFolderPath(NULL,&desktop_path[0],CSIDL_DESKTOP,false);
 
-	if(m_config_list[0]->cfg().general.output_dir.empty()){
+	if(m_config_list[0]->cfg().general.choose_output_dir_each_time){
+		//実行時に指定
+		sendItemMessage(IDC_RADIO_OUTPUT_EACH_TIME,
+						BM_SETCHECK,
+						(WPARAM)BST_CHECKED,
+						0
+						);
+		::EnableWindow(getDlgItem(IDC_EDIT_OUTPUT_SPECIFIC_DIR),false);
+		//削除
+		m_config_list[0]->cfg().general.output_dir.clear();
+	}else if(m_config_list[0]->cfg().general.output_dir.empty()){
 		//対象と同じ
 		sendItemMessage(IDC_RADIO_OUTPUT_SOURCE,
 						BM_SETCHECK,

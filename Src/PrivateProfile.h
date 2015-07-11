@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -96,9 +96,11 @@ struct NODISPLAY{
 struct REMOVEREDUNDANTDIR{
 	//二重ディレクトリを防ぐ
 	bool double_dir;
+	//同名の二重ディレクトリを防ぐ
+	bool same_dir;
 	//ファイル単体の場合作成しない
 	bool only_file;
-	REMOVEREDUNDANTDIR():double_dir(false),only_file(false){}
+	REMOVEREDUNDANTDIR():double_dir(false),only_file(false),same_dir(false){}
 };
 
 struct OMITNUMBERANDSYMBOL{
@@ -171,6 +173,10 @@ struct GENERAL{
 	//wcxがあるディレクトリ
 	tstring wcx_dir;
 
+	//実行時に出力先ディレクトリ選択
+	//gui4reces専用項目
+	bool choose_output_dir_each_time;
+
 	//初期化
 	GENERAL():
 		background_mode(false),
@@ -190,7 +196,8 @@ struct GENERAL{
 		custom_param(),
 		spi_dir(),
 		b2e_dir(),
-		wcx_dir(){}
+		wcx_dir(),
+		choose_output_dir_each_time(false){}
 };
 
 struct RECOMPRESS{

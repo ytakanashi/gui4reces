@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -460,6 +460,13 @@ namespace{
 			IDC_RADIO_MODE_TEST,
 			IDC_RADIO_MODE_DELETE
 		};
+	}
+
+	//二重引用符でパスを囲む
+	tstring quotePath(const tstring& path){
+		return (str::containsWhiteSpace(path))?
+			_T("\"")+path+_T("\""):
+			path;
 	}
 }
 
@@ -934,9 +941,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 										   path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath())):
 										   m_config_list[current_sel+1]->filepath());
 
-					if(str::containsWhiteSpace(profile))arg+=_T("\"");
-					arg+=profile;
-					if(str::containsWhiteSpace(profile))arg+=_T("\"");
+					arg+=quotePath(profile);
 
 					fileoperation::createShortcut(link_path.c_str(),
 												  exe_path.c_str(),
@@ -1082,7 +1087,6 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 						if(!folder_dialog.doModalOpen(&file_path,
 													  handle(),
-													  _T("全てのディレクトリ (*.:)\0*.:\0\0"),
 													  _T("処理したいディレクトリを選択してください"))){
 							return false;
 						}
@@ -1142,16 +1146,12 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			tstring cmd_line(_T("reces.exe "));
 
 			if(!m_config_list[0]->cfg().general.spi_dir.empty()){
-				cmd_line.append(format(_T("/Ds%s%s%s "),
-									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T(""),
-									   path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir).c_str(),
-									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.spi_dir))?_T("\""):_T("")));
+				cmd_line.append(format(_T("/Ds%s "),
+									   quotePath(path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir)).c_str()));
 			}
 			if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
-				cmd_line.append(format(_T("/Dw%s%s%s "),
-									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T(""),
-									   path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir).c_str(),
-									   (str::containsWhiteSpace(m_config_list[0]->cfg().general.wcx_dir))?_T("\""):_T("")));
+				cmd_line.append(format(_T("/Dw%s "),
+									   quotePath(path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir)).c_str()));
 			}
 			cmd_line.append(_T("/mv"));
 
@@ -1210,28 +1210,25 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			tstring list_file_path(tempfile::create(_T("g4r"),m_temp_dir.c_str()));
 			tstring password_list_path;
 			//実行時ファイル指定用cfgファイル
-			tstring oF_cfg_path(tempfile::generateName(_T("g4r"),m_temp_dir.c_str()));
-			Config oF_cfg(oF_cfg_path.c_str());
+			tstring add_cfg_path(tempfile::generateName(_T("g4r"),m_temp_dir.c_str()));
+			Config add_cfg(add_cfg_path.c_str());
+			bool need_add_cfg=(m_config_list[0]->cfg().general.choose_output_dir_each_time&&
+							   m_config_list[0]->cfg().mode<=MODE_EXTRACT)||
+				(m_config_list[0]->cfg().compress.choose_output_file_each_time&&
+				 m_config_list[0]->cfg().mode<=MODE_COMPRESS);
 
 
 
 			m_config_list[0]->save();
 
-			tstring cmd(format(_T("reces.exe /{%s%s%s /@%s%s%s"),
-							   (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
-							   m_config_list[0]->filepath().c_str(),
-							   (str::containsWhiteSpace(m_config_list[0]->filepath()))?_T("\""):_T(""),
-							   (str::containsWhiteSpace(list_file_path))?_T("\""):_T(""),
-							   list_file_path.c_str(),
-							   (str::containsWhiteSpace(list_file_path))?_T("\""):_T("")));
+			tstring cmd(format(_T("reces.exe /{%s /@%s"),
+							   quotePath(m_config_list[0]->filepath()).c_str(),
+							   quotePath(list_file_path).c_str()));
 
-			if(m_config_list[0]->cfg().compress.choose_output_file_each_time&&
-			   (m_config_list[0]->cfg().mode==MODE_RECOMPRESS||m_config_list[0]->cfg().mode==MODE_COMPRESS)){
-				//ファイル名指定のみの設定ファイル追加
-				cmd.append(format(_T(" /{%s%s%s"),
-								  (str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T(""),
-								  oF_cfg_path.c_str(),
-								  (str::containsWhiteSpace(oF_cfg_path))?_T("\""):_T("")));
+			if(need_add_cfg){
+				//実行時指定オプション用の設定ファイル追加
+				cmd.append(format(_T(" /{%s"),
+								  quotePath(add_cfg_path).c_str()));
 			}
 
 			//パスワードの処理
@@ -1248,10 +1245,8 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 						password_list_file.writeEx(_T("%s\r\n"),ite->c_str());
 					}
 					if(password_list_file.getSize()){
-						cmd.append(format(_T(" /pf%s%s%s"),
-										  (str::containsWhiteSpace(password_list_path))?_T("\""):_T(""),
-										  password_list_path.c_str(),
-										  (str::containsWhiteSpace(password_list_path))?_T("\""):_T("")));
+						cmd.append(format(_T(" /pf%s"),
+										  quotePath(password_list_path).c_str()));
 					}
 				}
 			}
@@ -1261,16 +1256,18 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				tstring new_password;
 
 				if(((PasswordTab*)m_tab_list[TAB_PASSWORD])->PasswordTab::getNewPassword(&new_password)){
-					cmd.append(format(_T(" /pn%s%s%s"),
-									  (str::containsWhiteSpace(new_password))?_T("\""):_T(""),
-									  new_password.c_str(),
-									  (str::containsWhiteSpace(new_password))?_T("\""):_T("")));
+					cmd.append(format(_T(" /pn%s"),
+									  quotePath(new_password).c_str()));
 				}
 			}
 
-			bool choose_each_time=m_config_list[0]->cfg().compress.choose_output_file_each_time&&
-				m_config_list[0]->cfg().compress.each_file&&
-					(m_config_list[0]->cfg().mode==MODE_RECOMPRESS||m_config_list[0]->cfg().mode==MODE_COMPRESS);
+			bool choose_each_time=m_config_list[0]->cfg().compress.each_file&&
+				need_add_cfg;
+
+			if(m_config_list[0]->cfg().gui4reces.log&&
+			   choose_each_time){
+				cmd+=_T(" /q");
+			}
 
 
 			topMost(false);
@@ -1299,35 +1296,49 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					if(end&&choose_each_time)break;
 				}
 
-				if(m_config_list[0]->cfg().compress.choose_output_file_each_time&&
-				   (m_config_list[0]->cfg().mode==MODE_RECOMPRESS||m_config_list[0]->cfg().mode==MODE_COMPRESS)){
-					tstring ext(((CompressTab*)m_tab_list[TAB_COMPRESS])->CompressTab::getExtension());
+				if(need_add_cfg){
+					if(m_config_list[0]->cfg().compress.choose_output_file_each_time&&
+					   m_config_list[0]->cfg().mode<=MODE_COMPRESS){
+						tstring ext(((CompressTab*)m_tab_list[TAB_COMPRESS])->CompressTab::getExtension());
 
-					FileDialog file_dialog;
+						FileDialog file_dialog;
 
-					if(!file_dialog.doModalSave(&oF_cfg.cfg().compress.output_file,
-											   NULL,
-											   _T("全てのファイル (*.*)\0*.*\0\0"),
-											   _T("保存ファイル名を入力してください"),
-												path::getParentDirectory(m_listview->getItemText((choose_each_time)?
-																								 item:
-																								 header_item)).c_str(),
-												(path::getFileName(m_listview->getItemText((choose_each_time)?
-																						  item:
-																						  header_item))+ext).c_str())){
-						break;
+						if(!file_dialog.doModalSave(&add_cfg.cfg().compress.output_file,
+												   NULL,
+												   _T("全てのファイル (*.*)\0*.*\0\0"),
+												   _T("保存ファイル名を入力してください"),
+													path::getParentDirectory(m_listview->getItemText((choose_each_time)?
+																									 item:
+																									 header_item)).c_str(),
+													(path::getFileName(m_listview->getItemText((choose_each_time)?
+																							  item:
+																							  header_item))+ext).c_str())){
+							break;
+						}
+						add_cfg.save();
+					}else if(m_config_list[0]->cfg().general.choose_output_dir_each_time&&
+							 m_config_list[0]->cfg().compress.output_file.empty()){
+						FolderDialog folder_dialog;
+
+						if(!folder_dialog.doModalOpen(&add_cfg.cfg().general.output_dir,
+													  handle(),
+													  (choose_each_time)?format(_T("保存先ディレクトリを選択してください\n\nファイル: %s"),m_listview->getItemText(item).c_str()).c_str():
+													  _T("保存先ディレクトリを選択してください"))){
+							m_config_list[0]->cfg().general.output_dir.clear();
+							break;
+						}
+						add_cfg.save();
 					}
-					oF_cfg.save();
 				}
 
+				if(m_config_list[0]->cfg().gui4reces.log&&
+				   !choose_each_time){
+					cmd+=_T(" /q");
+				}
 
 #ifdef _DEBUG
 				msg(cmd.c_str());
 #endif
-
-				if(m_config_list[0]->cfg().gui4reces.log){
-					cmd+=_T(" /q");
-				}
 
 				TCHAR* cmd_buffer=new TCHAR[cmd.length()+1];
 

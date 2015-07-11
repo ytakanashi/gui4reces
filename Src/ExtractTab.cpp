@@ -2,7 +2,7 @@
 //再圧縮/解凍タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -44,6 +44,7 @@ INT_PTR ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 			//作成する
 			m_config_list[0]->cfg().extract.create_dir=getCheck(LOWORD(wparam));
 			::EnableWindow(getDlgItem(IDC_CHECKBOX_EXTRACT_DOUBLE_DIR),m_config_list[0]->cfg().extract.create_dir);
+			::EnableWindow(getDlgItem(IDC_CHECKBOX_EXTRACT_SAME_DIR),m_config_list[0]->cfg().extract.create_dir);
 			::EnableWindow(getDlgItem(IDC_CHECKBOX_EXTRACT_ONLY_FILE),m_config_list[0]->cfg().extract.create_dir);
 			::EnableWindow(getDlgItem(IDC_CHECKBOX_EXTRACT_OMIT_TAIL_NUMBERS),m_config_list[0]->cfg().extract.create_dir);
 			::EnableWindow(getDlgItem(IDC_CHECKBOX_EXTRACT_OMIT_TAIL_SYMBOLS),m_config_list[0]->cfg().extract.create_dir);
@@ -53,6 +54,11 @@ INT_PTR ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 		case IDC_CHECKBOX_EXTRACT_DOUBLE_DIR:
 			//二重ディレクトリを作成しない
 			m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.double_dir=getCheck(LOWORD(wparam));
+			return true;
+
+		case IDC_CHECKBOX_EXTRACT_SAME_DIR:
+			//同名の二重ディレクトリを防ぐ
+			m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.same_dir=getCheck(LOWORD(wparam));
 			return true;
 
 		case IDC_CHECKBOX_EXTRACT_ONLY_FILE:
@@ -148,6 +154,9 @@ void ExtractTab::setCurrentSettings(){
 
 	//二重ディレクトリを作成しない
 	setCheck(IDC_CHECKBOX_EXTRACT_DOUBLE_DIR,m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.double_dir);
+
+	//同名の二重ディレクトリを防ぐ
+	setCheck(IDC_CHECKBOX_EXTRACT_SAME_DIR,m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.same_dir);
 
 	//含まれるファイルが一つの時は作成しない
 	setCheck(IDC_CHECKBOX_EXTRACT_ONLY_FILE,m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.only_file);

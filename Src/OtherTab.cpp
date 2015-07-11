@@ -2,7 +2,7 @@
 //その他タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -119,7 +119,6 @@ INT_PTR OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 				if(folder_dialog.doModalOpen(plugin_dir_ptr,
 											 handle(),
-											 _T("全てのディレクトリ (*.:)\0*.:\0\0"),
 											 (susie_plugin())?
 											 _T("Susie Plug-inのあるディレクトリを選択してください"):
 											 _T("Total Commander Pluginのあるディレクトリを選択してください"),
@@ -167,7 +166,6 @@ INT_PTR OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 
 				if(folder_dialog.doModalOpen(&m_config_list[0]->cfg().gui4reces.work_dir,
 											 handle(),
-											 _T("全てのディレクトリ (*.:)\0*.:\0\0"),
 											 _T("作業ディレクトリを選択してください"),
 											 &old_dir[0])){
 					::SetWindowText(getDlgItem(IDC_EDIT_OTHER_WORK_DIR),m_config_list[0]->cfg().gui4reces.work_dir.c_str());

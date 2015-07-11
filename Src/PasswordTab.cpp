@@ -2,7 +2,7 @@
 //パスワードタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -43,6 +43,9 @@ INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 			::EnableWindow(getDlgItem(IDC_EDIT_PASSWORD_LIST),
 						   sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0));
 
+			::EnableWindow(getDlgItem(IDC_BUTTON_PASSWORD_OPEN_LIST),
+						 sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0));
+
 			FileDialog file_dialog;
 
 			if(sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0)&&
@@ -52,6 +55,7 @@ INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 				setCheck(LOWORD(wparam),false);
 				m_config_list[0]->cfg().extract.password_list_path.clear();
 				::EnableWindow(getDlgItem(IDC_EDIT_PASSWORD_LIST),false);
+				::EnableWindow(getDlgItem(IDC_BUTTON_PASSWORD_OPEN_LIST),false);
 			}
 			return true;
 		}
@@ -132,6 +136,21 @@ INT_PTR PasswordTab::onCommand(WPARAM wparam,LPARAM lparam){
 				return true;
 			}
 		}
+
+		case IDC_BUTTON_PASSWORD_OPEN_LIST:{
+			//ファイルを開く
+			std::vector<TCHAR> path(MAX_PATH);
+
+			::GetWindowText(getDlgItem(IDC_EDIT_PASSWORD_LIST),
+							&path[0],
+							path.size());
+			::ShellExecute(NULL,_T("edit"),&path[0],NULL,NULL,SW_SHOWNORMAL);
+			if(GetLastError()==ERROR_NO_ASSOCIATION){
+				//関連付けられたアプリケーションが無ければメモ帳で開く
+				::ShellExecute(NULL,_T("open"),_T("notepad"),&path[0],NULL,SW_SHOWNORMAL);
+			}
+			return true;
+		}
 	}
 	return false;
 }
@@ -144,7 +163,11 @@ void PasswordTab::setCurrentSettings(){
 	sendMessage(WM_COMMAND,MAKEWPARAM(IDC_CHECKBOX_PASSWORD_INPUT,0),0);
 	sendMessage(WM_COMMAND,MAKEWPARAM(IDC_CHECKBOX_PASSWORD_NEW,0),0);
 
+	//リスト化
 	::EnableWindow(getDlgItem(IDC_BUTTON_PASSWORD_WRITE_LIST),sendItemMessage(IDC_CHECKBOX_PASSWORD_INPUT,BM_GETCHECK,(WPARAM)0,(LPARAM)0));
+
+	//ファイルを開く
+	::EnableWindow(getDlgItem(IDC_BUTTON_PASSWORD_OPEN_LIST),sendItemMessage(IDC_CHECKBOX_PASSWORD_LIST,BM_GETCHECK,(WPARAM)0,(LPARAM)0));
 
 	setCheck(IDC_CHECKBOX_PASSWORD_MASK,m_config_list[0]->cfg().no_display.no_password);
 	sendMessage(WM_COMMAND,MAKEWPARAM(IDC_CHECKBOX_PASSWORD_MASK,0),0);

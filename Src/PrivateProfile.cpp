@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -50,6 +50,9 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("General"),_T("B2eDir"),CFG_VALUE(general.b2e_dir));
 	//wcxがあるディレクトリ
 	write(_T("General"),_T("WcxDir"),CFG_VALUE(general.wcx_dir));
+	//実行時に出力先ディレクトリ選択
+	//gui4reces専用項目
+	write(_T("General"),_T("ChooseOutputDirEachTime"),CFG_VALUE(general.choose_output_dir_each_time));
 
 
 	//非表示
@@ -89,7 +92,6 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Compress"),_T("OutputFile"),CFG_VALUE(compress.output_file));
 	//'/of'以下の引数をそのまま使用
 	//write(_T("Compress"),_T("RawFileName"),true,true);
-
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目
 	write(_T("Compress"),_T("ChooseOutputFileEachTime"),CFG_VALUE(compress.choose_output_file_each_time));
@@ -104,6 +106,8 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Extract"),_T("CreateDir"),CFG_VALUE(extract.create_dir));
 	//二重ディレクトリを防ぐ
 	write(_T("Extract"),_T("DoubleDir"),CFG_VALUE(extract.create_dir_optimization.remove_redundant_dir.double_dir));
+	//同名の二重ディレクトリを防ぐ
+	write(_T("Extract"),_T("SameDir"),CFG_VALUE(extract.create_dir_optimization.remove_redundant_dir.same_dir));
 	//ファイル単体の場合作成しない
 	write(_T("Extract"),_T("OnlyFile"),CFG_VALUE(extract.create_dir_optimization.remove_redundant_dir.only_file));
 	//ディレクトリ名末尾の数字を削除
@@ -265,6 +269,9 @@ bool Config::load(bool include_gui4reces_section){
 	getStringDataEx(_T("General"),_T("B2eDir"),&m_cfg.general.b2e_dir);
 	//wcxのあるディレクトリ
 	getStringDataEx(_T("General"),_T("WcxDir"),&m_cfg.general.wcx_dir);
+	//実行時に出力先ディレクトリ選択
+	//gui4reces専用項目
+	getDataEx(_T("General"),_T("ChooseOutputDirEachTime"),&m_cfg.general.choose_output_dir_each_time);
 
 
 	//非表示
@@ -315,6 +322,8 @@ bool Config::load(bool include_gui4reces_section){
 	getDataEx(_T("Extract"),_T("CreateDir"),&m_cfg.extract.create_dir);
 	//二重ディレクトリを防ぐ
 	getDataEx(_T("Extract"),_T("DoubleDir"),&m_cfg.extract.create_dir_optimization.remove_redundant_dir.double_dir);
+	//同名の二重ディレクトリを防ぐ
+	getDataEx(_T("Extract"),_T("SameDir"),&m_cfg.extract.create_dir_optimization.remove_redundant_dir.same_dir);
 	//ファイル単体の場合作成しない
 	getDataEx(_T("Extract"),_T("OnlyFile"),&m_cfg.extract.create_dir_optimization.remove_redundant_dir.only_file);
 	//ディレクトリ名末尾の数字を削除

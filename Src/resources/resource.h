@@ -123,6 +123,7 @@
 #define IDC_EDIT_SPLIT_CHUNK                    4051
 #define IDC_SPIN_SPLIT_CHUNK                    4052
 #define IDC_RADIO_MODE_RECOMPRESS               4053
+#define IDC_BUTTON_PASSWORD_OPEN_LIST           40000
 #define IDC_CHECKBOX_AT_ONCE                    40000
 #define IDC_CHECKBOX_EXTRACT_DIR_TIMESTAMP      40000
 #define IDC_CHECKBOX_FILTER_REGEX               40000
@@ -133,10 +134,12 @@
 #define IDM_LISTVIEW_SELECT                     40000
 #define IDM_REGEX_DOT                           40000
 #define IDC_BUTTON_PLUGIN_DIR                   40001
+#define IDC_CHECKBOX_EXTRACT_SAME_DIR           40001
 #define IDC_CHECKBOX_FILTER_RECURSIVE           40001
 #define IDC_CHECKBOX_MODE_BACKGROUND            40001
 #define IDC_EDIT_SHORTCUT_LINKPATH              40001
 #define IDC_GROUP_PROCESS                       40001
+#define IDC_RADIO_OUTPUT_EACH_TIME              40001
 #define IDM_LISTVIEW_DESELECT                   40001
 #define IDM_REGEX_ASTERISK                      40001
 #define IDC_BUTTON_FILTER_REGEX                 40002
