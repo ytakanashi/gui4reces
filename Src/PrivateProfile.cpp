@@ -42,6 +42,8 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("General"),_T("AutoRename"),CFG_VALUE(general.auto_rename));
 	//ソースを削除
 	write(_T("General"),_T("RemoveSource"),CFG_VALUE(general.remove_source));
+	//アーカイバに送る文字コード(現在7-zip32.dllのみ対象)
+	write(_T("General"),_T("ArcCodePage"),CFG_VALUE(general.arc_codepage));
 	//ユーザ独自のパラメータ
 	write(_T("General"),_T("CustomParam"),CFG_VALUE(general.custom_param));
 	//spiがあるディレクトリ
@@ -81,6 +83,8 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Compress"),_T("EachFile"),CFG_VALUE(compress.each_file));
 	//書庫新規作成
 	write(_T("Compress"),_T("CreateNew"),CFG_VALUE(compress.create_new));
+	//書庫強制新規作成
+	write(_T("Compress"),_T("ForceCreateNew"),CFG_VALUE(compress.force_create_new));
 	//基底ディレクトリを含まない
 	if(m_cfg.compress.exclude_base_dir<-1)m_cfg.compress.exclude_base_dir=-1;
 	write(_T("Compress"),_T("ExcludeBaseDir"),CFG_VALUE(compress.exclude_base_dir));
@@ -99,6 +103,14 @@ bool Config::save(bool include_gui4reces_section){
 
 	//更新日時を元書庫と同じにする
 	write(_T("Compress"),_T("CopyTimestamp"),CFG_VALUE(compress.copy_timestamp));
+	//対象ディレクトリを再帰的検索
+	write(_T("Compress"),_T("Recursive"),CFG_VALUE(compress.recursive));
+	//b2eスクリプトの圧縮形式
+	write(_T("Compress"),_T("B2eFormat"),CFG_VALUE(compress.b2e.format));
+	//b2eスクリプトの圧縮メソッド
+	write(_T("Compress"),_T("B2eMethod"),CFG_VALUE(compress.b2e.method));
+	//b2eスクリプトの自己解凍形式指定
+	write(_T("Compress"),_T("B2eSfx"),CFG_VALUE(compress.b2e.sfx));
 
 
 	//解凍
@@ -261,6 +273,8 @@ bool Config::load(bool include_gui4reces_section){
 	getDataEx(_T("General"),_T("AutoRename"),&m_cfg.general.auto_rename);
 	//ソースを削除
 	getDataEx(_T("General"),_T("RemoveSource"),&m_cfg.general.remove_source);
+	//アーカイバに送る文字コード(現在7-zip32.dllのみ対象)
+	getDataEx(_T("General"),_T("ArcCodePage"),&m_cfg.general.arc_codepage);
 	//ユーザ独自のパラメータ
 	getStringDataEx(_T("General"),_T("CustomParam"),&m_cfg.general.custom_param);
 	//spiのあるディレクトリ
@@ -297,8 +311,10 @@ bool Config::load(bool include_gui4reces_section){
 	getStringDataEx(_T("Compress"),_T("Type"),&m_cfg.compress.compression_type);
 	//個別圧縮
 	getDataEx(_T("Compress"),_T("EachFile"),&m_cfg.compress.each_file);
-	//書庫個別圧縮
+	//書庫新規作成
 	getDataEx(_T("Compress"),_T("CreateNew"),&m_cfg.compress.create_new);
+	//書庫強制新規作成
+	getDataEx(_T("Compress"),_T("ForceCreateNew"),&m_cfg.compress.force_create_new);
 	//基底ディレクトリを含まない
 	getDataEx(_T("Compress"),_T("ExcludeBaseDir"),&m_cfg.compress.exclude_base_dir);
 	if(m_cfg.compress.exclude_base_dir<-1)m_cfg.compress.exclude_base_dir=-1;
@@ -313,6 +329,14 @@ bool Config::load(bool include_gui4reces_section){
 //	getDataEx(_T("Compress"),_T("RawFileName"),&m_cfg.compress.raw_file_name);
 	//更新日時を元書庫と同じにする
 	getDataEx(_T("Compress"),_T("CopyTimestamp"),&m_cfg.compress.copy_timestamp);
+	//対象ディレクトリを再帰的検索
+	getDataEx(_T("Compress"),_T("Recursive"),&m_cfg.compress.recursive);
+	//b2eスクリプトの圧縮形式
+	getStringDataEx(_T("Compress"),_T("B2eFormat"),&m_cfg.compress.b2e.format);
+	//b2eスクリプトの圧縮メソッド
+	getStringDataEx(_T("Compress"),_T("B2eMethod"),&m_cfg.compress.b2e.method);
+	//b2eスクリプトの自己解凍形式指定
+	getDataEx(_T("Compress"),_T("B2eSfx"),&m_cfg.compress.b2e.sfx);
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目
 	getDataEx(_T("Compress"),_T("ChooseOutputFileEachTime"),&m_cfg.compress.choose_output_file_each_time);

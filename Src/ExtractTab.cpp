@@ -52,7 +52,7 @@ INT_PTR ExtractTab::onCommand(WPARAM wparam,LPARAM lparam){
 			return true;
 
 		case IDC_CHECKBOX_EXTRACT_DOUBLE_DIR:
-			//二重ディレクトリを作成しない
+			//二重ディレクトリを防ぐ
 			m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.double_dir=getCheck(LOWORD(wparam));
 			return true;
 
@@ -152,7 +152,7 @@ void ExtractTab::setCurrentSettings(){
 	setCheck(IDC_CHECKBOX_EXTRACT_CREATE_DIR,m_config_list[0]->cfg().extract.create_dir);
 	sendMessage(WM_COMMAND,MAKEWPARAM(IDC_CHECKBOX_EXTRACT_CREATE_DIR,0),0);
 
-	//二重ディレクトリを作成しない
+	//二重ディレクトリを防ぐ
 	setCheck(IDC_CHECKBOX_EXTRACT_DOUBLE_DIR,m_config_list[0]->cfg().extract.create_dir_optimization.remove_redundant_dir.double_dir);
 
 	//同名の二重ディレクトリを防ぐ

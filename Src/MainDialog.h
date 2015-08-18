@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.4 by x@rgs
+//            gui4reces Ver.0.0.1.5 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -19,6 +19,7 @@
 #include"FilterTab.h"
 #include"SplitTab.h"
 #include"RemoveSourceTab.h"
+#include"DirectoryTab.h"
 #include"OtherTab.h"
 #include"ModeTab.h"
 #include"FileListView.h"
@@ -100,6 +101,7 @@ private:
 		TAB_FILTER,
 		TAB_SPLIT,
 		TAB_REMOVESOURCE,
+		TAB_DIRECTORY,
 		TAB_OTHER,
 		TAB_MODE,
 	};

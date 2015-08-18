@@ -1,4 +1,4 @@
-﻿//CompressTab.h
+﻿//DirectoryTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 //            gui4reces Ver.0.0.1.5 by x@rgs
@@ -7,27 +7,25 @@
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 
 
-#ifndef _COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
-#define _COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
+#ifndef _DIRECTORYTAB_H_66DAB78A_DD75_4760_9EEF_153D45BDF3F0
+#define _DIRECTORYTAB_H_66DAB78A_DD75_4760_9EEF_153D45BDF3F0
 
 
 #include"TabBase.h"
 
 
 
-class CompressTab:public TabBase{
+class DirectoryTab:public TabBase{
 public:
-	CompressTab(std::vector<Config*>& config_list):
-		TabBase(IDD_TAB_COMPRESS,config_list){}
-	~CompressTab(){}
+	DirectoryTab(std::vector<Config*>& config_list):
+		TabBase(IDD_TAB_DIRECTORY,config_list){}
+	~DirectoryTab(){}
 private:
 	//メッセージハンドラ
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
-	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 public:
 	void setCurrentSettings();
-	tstring getExtension();
 };
 
-#endif //_COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
+#endif //_DIRECTORYTAB_H_66DAB78A_DD75_4760_9EEF_153D45BDF3F0

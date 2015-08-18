@@ -11,6 +11,7 @@
 #include"StdAfx.h"
 #include"MainDialog.h"
 
+#include"Utilities.h"
 #include"AboutDialog.h"
 #include<shlobj.h>
 
@@ -140,105 +141,7 @@ namespace{
 		}
 	};
 
-	class PipeRedirect{
-	public:
-		struct PIPE{
-			HANDLE read;
-			HANDLE write;
-			PIPE():read(NULL),write(NULL){}
-			void close(){SAFE_CLOSE(read);SAFE_CLOSE(write);}
-		};
-	public:
-		PipeRedirect():
-		m_result(),m_pipe(),m_process_info(){}
-		virtual ~PipeRedirect(){m_pipe.close();}
-		tstring& buffer(){return m_result;}
-	protected:
-		virtual void begin(){}
-		virtual void end(){}
-		virtual void processBuffer(const TCHAR* buffer){m_result.append(buffer);}
-		virtual bool messageLoop(){
-			MSG msg;
-
-			if(::PeekMessage(&msg,NULL,0,0,PM_REMOVE)){
-				if(msg.message==WM_QUIT){
-					return false;
-				}
-				::TranslateMessage(&msg);
-				::DispatchMessage(&msg);
-			}
-			return true;
-		}
-	public:
-		bool launch(const TCHAR* cmd){
-			begin();
-
-			HANDLE read_handle=NULL;
-			STARTUPINFO startup_info={sizeof(STARTUPINFO)};
-
-			if(!::CreatePipe(&m_pipe.read,&m_pipe.write,NULL,0))return false;
-
-			::DuplicateHandle(GetCurrentProcess(),m_pipe.write,
-							  ::GetCurrentProcess(),&read_handle,
-							  0,true,DUPLICATE_SAME_ACCESS);
-			SAFE_CLOSE(m_pipe.write);
-
-			startup_info.dwFlags=STARTF_USESHOWWINDOW|STARTF_USESTDHANDLES;
-			startup_info.wShowWindow=SW_HIDE;
-			startup_info.hStdOutput=read_handle;
-			startup_info.hStdError=read_handle;
-
-			std::vector<TCHAR> cmd_(lstrlen(cmd)+1);
-			lstrcpyn(&cmd_[0],cmd,cmd_.size()+1);
-
-			if(::CreateProcess(NULL,&cmd_[0],NULL,NULL,
-							   true,
-							   0//CREATE_NEW_PROCESS_GROUP/*CREATE_NO_WINDOW*/
-							   ,
-							   NULL,NULL,&startup_info,&m_process_info)){
-				DWORD wait_result=0;
-				std::vector<TCHAR> buffer(12,'\0');
-
-				::WaitForInputIdle(m_process_info.hProcess,INFINITE);
-
-				while((wait_result=::WaitForSingleObject(m_process_info.hProcess,0))!=WAIT_ABANDONED){
-					DWORD avail_bytes=0;
-
-					if(::PeekNamedPipe(m_pipe.read,NULL,0,NULL,&avail_bytes,NULL)&&
-					   avail_bytes){
-						DWORD read=0;
-
-						buffer.assign(avail_bytes,'\0');
-
-						if(::ReadFile(m_pipe.read,&buffer[0],buffer.size(),&read,NULL)){
-							processBuffer(&buffer[0]);
-						}
-					}
-
-					if(!messageLoop())break;
-
-					if(wait_result==WAIT_OBJECT_0){
-						break;
-					}
-				}
-
-				SAFE_CLOSE(m_process_info.hThread);
-				SAFE_CLOSE(m_process_info.hProcess);
-				SAFE_CLOSE(read_handle);
-				m_pipe.close();
-
-			}
-
-			end();
-			return true;
-		}
-	protected:
-		tstring m_result;
-		PIPE m_pipe;
-		PROCESS_INFORMATION m_process_info;
-	};
-
-	class PipeRedirectToTextBox:public PipeRedirect{
+	class PipeRedirectToTextBox:public util::PipeRedirect{
 	class LogDialog:public Dialog{
 	class Edit:public sslib::Control{
 	public:
@@ -462,11 +365,19 @@ namespace{
 		};
 	}
 
-	//二重引用符でパスを囲む
-	tstring quotePath(const tstring& path){
-		return (str::containsWhiteSpace(path))?
-			_T("\"")+path+_T("\""):
-			path;
+	void insertFileItem(const FileListView& listview,tstring& filepath,bool recursive){
+		if(recursive&&path::isDirectory(filepath.c_str())){
+			//ディレクトリを再帰的に追加
+			std::list<tstring> file_list;
+
+			path::recursiveSearch(&file_list,filepath.c_str());
+			for(std::list<tstring>::iterator ite=file_list.begin(),end=file_list.end();ite!=end;++ite){
+				listview.setCheckState(listview.insertItem(ite->c_str()));
+			}
+		}else{
+			//ファイルをリストに追加
+			listview.setCheckState(listview.insertItem(filepath.c_str()));
+		}
 	}
 }
 
@@ -511,7 +422,6 @@ void MainDialog::setCurrentSettings(){
 		case MODE_SENDCOMMANDS:
 		case MODE_VERSION:
 		default:
-			//再圧縮
 			//その他諸々
 			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_RECOMPRESS,0),0);
 			break;
@@ -524,6 +434,13 @@ void MainDialog::setCurrentSettings(){
 					0
 					);
 	topMost(m_config_list[0]->cfg().gui4reces.top_most);
+
+	//ディレクトリを再帰的に追加
+	sendItemMessage(IDC_CHECKBOX_RECURSIVE,
+					BM_SETCHECK,
+					(WPARAM)(m_config_list[0]->cfg().compress.recursive)?BST_CHECKED:BST_UNCHECKED,
+					0
+					);
 
 	//recesのウインドウを閉じる
 	sendItemMessage(IDC_CHECKBOX_QUIT_RECES,
@@ -581,6 +498,7 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_tab_list.push_back(new FilterTab(m_config_list));
 	m_tab_list.push_back(new SplitTab(m_config_list));
 	m_tab_list.push_back(new RemoveSourceTab(m_config_list));
+	m_tab_list.push_back(new DirectoryTab(m_config_list));
 	m_tab_list.push_back(new OtherTab(m_config_list));
 	m_tab_list.push_back(new ModeTab(m_config_list));
 
@@ -597,6 +515,7 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_tab->insert(*m_tab_list[TAB_FILTER],_T("フィルタ"),TAB_FILTER);
 	m_tab->insert(*m_tab_list[TAB_SPLIT],_T("分割"),TAB_SPLIT);
 	m_tab->insert(*m_tab_list[TAB_REMOVESOURCE],_T("処理後削除"),TAB_REMOVESOURCE);
+	m_tab->insert(*m_tab_list[TAB_DIRECTORY],_T("ディレクトリ"),TAB_DIRECTORY);
 	m_tab->insert(*m_tab_list[TAB_OTHER],_T("その他"),TAB_OTHER);
 	m_tab->insert(*m_tab_list[TAB_MODE],_T("動作詳細"),TAB_MODE);
 
@@ -672,9 +591,10 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 		profile_opt=!profile_name.empty();
 
+
 		for(std::vector<tstring>::size_type i=0,size=filepaths.size();i<size;++i){
 			//ファイルをリストに追加
-			m_listview->setCheckState(m_listview->insertItem(filepaths[i].c_str()));
+			insertFileItem(*m_listview,filepaths[i],m_config_list[0]->cfg().compress.recursive);
 		}
 	}
 
@@ -749,9 +669,9 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				}
 			}else if(!cfg_name.empty()){
 				if(path::isBadName(cfg_name.c_str())){
-					MessageBox(handle(),_T("ファイル名に次の文字は使えません。\n\t\\ / : , ; * ? \" < > |"),_T("プロファイルの追加"),MB_ICONSTOP);
+					::MessageBox(handle(),_T("ファイル名に次の文字は使えません。\n\t\\ / : , ; * ? \" < > |"),_T("プロファイルの追加"),MB_ICONSTOP);
 				}else if(sendItemMessage(IDC_COMBO_PROFILE,CB_FINDSTRINGEXACT,0,(LPARAM)cfg_name.c_str())!=CB_ERR){
-					MessageBox(handle(),_T("その名前は既に登録されています。"),_T("プロファイルの追加"),MB_ICONSTOP);
+					::MessageBox(handle(),_T("その名前は既に登録されています。"),_T("プロファイルの追加"),MB_ICONSTOP);
 				}
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_PROFILE_ADD,0),0);
 			}
@@ -824,10 +744,10 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 						::EnableWindow(getDlgItem(IDC_STATIC_PROFILE_DEFAULT),true);
 					}
 				}else{
-					MessageBox(handle(),_T("リネームに失敗しました"),_T("プロファイルの編集"),MB_ICONSTOP);
+					::MessageBox(handle(),_T("リネームに失敗しました"),_T("プロファイルの編集"),MB_ICONSTOP);
 				}
 			}else if(!cfg_name.empty()){
-				MessageBox(handle(),_T("ファイル名に次の文字は使えません。\n\t\\ / : , ; * ? \" < > |"),_T("プロファイルの編集"),MB_ICONSTOP);
+				::MessageBox(handle(),_T("ファイル名に次の文字は使えません。\n\t\\ / : , ; * ? \" < > |"),_T("プロファイルの編集"),MB_ICONSTOP);
 				sendMessage(WM_COMMAND,MAKEWPARAM(IDC_BUTTON_PROFILE_EDIT,0),0);
 			}
 			return true;
@@ -941,7 +861,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 										   path::removeExtension(path::getFileName(m_config_list[current_sel+1]->filepath())):
 										   m_config_list[current_sel+1]->filepath());
 
-					arg+=quotePath(profile);
+					arg+=path::quote(profile);
 
 					fileoperation::createShortcut(link_path.c_str(),
 												  exe_path.c_str(),
@@ -1099,7 +1019,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 				}
 
 				for(std::list<tstring>::iterator ite=file_list.begin(),end=file_list.end();ite!=end;++ite){
-					m_listview->setCheckState(m_listview->insertItem(ite->c_str()));
+					insertFileItem(*m_listview,*ite,m_config_list[0]->cfg().compress.recursive);
 				}
 				::SetFocus(m_listview->handle());
 
@@ -1120,6 +1040,11 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			//クリア
 			ListView_DeleteAllItems(m_listview->handle());
 			::SetWindowText(getDlgItem(IDC_STATIC_LIST),_T(""));
+			return true;
+
+		case IDC_CHECKBOX_RECURSIVE:
+			//ディレクトリを再帰的に追加
+			m_config_list[0]->cfg().compress.recursive=getCheck(LOWORD(wparam));
 			return true;
 
 
@@ -1147,15 +1072,15 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 			if(!m_config_list[0]->cfg().general.spi_dir.empty()){
 				cmd_line.append(format(_T("/Ds%s "),
-									   quotePath(path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir)).c_str()));
+									   path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir)).c_str()));
 			}
 			if(!m_config_list[0]->cfg().general.wcx_dir.empty()){
 				cmd_line.append(format(_T("/Dw%s "),
-									   quotePath(path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir)).c_str()));
+									   path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.wcx_dir)).c_str()));
 			}
 			cmd_line.append(_T("/mv"));
 
-			PipeRedirect pipe;
+			util::PipeRedirect pipe;
 			pipe.launch(_T("reces.exe /mv reces.exe"));
 			pipe.launch(cmd_line.c_str());
 			library_version=pipe.buffer();
@@ -1222,13 +1147,13 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			m_config_list[0]->save();
 
 			tstring cmd(format(_T("reces.exe /{%s /@%s"),
-							   quotePath(m_config_list[0]->filepath()).c_str(),
-							   quotePath(list_file_path).c_str()));
+							   path::quote(m_config_list[0]->filepath()).c_str(),
+							   path::quote(list_file_path).c_str()));
 
 			if(need_add_cfg){
 				//実行時指定オプション用の設定ファイル追加
 				cmd.append(format(_T(" /{%s"),
-								  quotePath(add_cfg_path).c_str()));
+								  path::quote(add_cfg_path).c_str()));
 			}
 
 			//パスワードの処理
@@ -1246,7 +1171,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 					}
 					if(password_list_file.getSize()){
 						cmd.append(format(_T(" /pf%s"),
-										  quotePath(password_list_path).c_str()));
+										  path::quote(password_list_path).c_str()));
 					}
 				}
 			}
@@ -1257,7 +1182,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 
 				if(((PasswordTab*)m_tab_list[TAB_PASSWORD])->PasswordTab::getNewPassword(&new_password)){
 					cmd.append(format(_T(" /pn%s"),
-									  quotePath(new_password).c_str()));
+									  path::quote(new_password).c_str()));
 				}
 			}
 
@@ -1274,7 +1199,7 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			showDialog(SW_HIDE);
 
 			int item=0;
-			//チェックの付いた項目の内先頭
+			//チェックの付いた項目の内先頭のアイテム
 			int header_item=0;
 
 			do{
@@ -1466,8 +1391,8 @@ INT_PTR MainDialog::onDropFiles(HDROP drop_handle){
 	DropFiles drop_files(drop_handle);
 
 	//アイテムを追加
-	for(size_t i=0,drop_files_count=drop_files.getCount(),count=m_listview->getItemCount();i<drop_files_count;i++){
-		m_listview->setCheckState(m_listview->insertItem(drop_files.getFile(i).c_str(),count+i));
+	for(size_t i=0,drop_files_count=drop_files.getCount();i<drop_files_count;i++){
+		insertFileItem(*m_listview,drop_files.getFile(i),m_config_list[0]->cfg().compress.recursive);
 	}
 
 	if(m_config_list[0]->cfg().gui4reces.at_once){

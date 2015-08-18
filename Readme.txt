@@ -1,6 +1,6 @@
 ﻿_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.4
+【バージョン】　0.0.1.5
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
@@ -29,6 +29,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  ・zip、rar、7z、lzhファイルなど主要な書庫をサポート。
  ・Susie Plug-in(*.spi)で様々な書庫に対応可能。
  ・Total Commander Plugin(*.wcx)で更に多くの書庫に対応可能。
+ ・b2eスクリプト(*.b2e)で書庫操作以外の処理も可能。
  ・UNICODE文字、4GB以上のファイルに対応。 *1
  ・ヘッダ暗号化(ファイル名暗号化)の7zやrarをサポート。
 
@@ -63,49 +64,56 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  gui4recesHelp.chm       ----- gui4recesヘルプファイル
  NYSL_withfaq.TXT        ----- ライセンスファイル
  Readme.txt              ----- このファイル
- reces.exe               ----- reces Ver.0.00r27(32bit版)ファイル
+ reces.exe               ----- reces(32bit版)ファイル
  Src.7z                  ----- gui4recesソースファイル
- unrar32.dll             ----- RuRuRu氏によるunrar32.dll x64/ユニコード対応版
 
  ./x64
     cfg/                 ----- プロファイル保存ディレクトリ
     7-zip64.dll          ----- 7-zip64.dll文字化け対策版
+    b2e64.dll            ----- b2e32.dll(64bit版)ファイル
     gui4reces.cfg        ----- gui4reces設定ファイル(本体終了時作成されます
     gui4reces.exe        ----- gui4reces本体(64bit版)ファイル
-    reces.exe            ----- reces Ver.0.00r27(64bit版)ファイル
-    unrar64j.dll         ----- RuRuRu氏によるunrar64j.dll x64/ユニコード対応版
+    reces.exe            ----- reces(64bit版)ファイル
+
+ ./b2e
+ ./x64/b2e
+    exe.msi.b2e          ----- Universal Extractorを使用し、インストーラを解凍するb2eスクリプトファイル
+    mp3.b2e              ----- LAMEを使用し、mp3ファイルのエンコード・デコードを行うb2eスクリプトファイル
 
 
 
 ●インストール
- 1.「gui4reces0014.zip」を適当なディレクトリに解凍して下さい。
+ 1.「gui4reces0015.zip」を適当なディレクトリに解凍して下さい。
  2.以下の内、必要な各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
 
-    == ライブラリ ============================================================================
-   ||    32bit版    |       64bit版        ||            対応            ||      入手先      ||
-   ||-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*||-*-*-*-*-*-*-*-*-*||
-   ||  7-zip32.dll  |     7-zip64.dll      ||  再圧縮、圧縮、解凍、削除  ||       同梱       ||
-   ||  tar32.dll    |     tar64.dll        ||  再圧縮、圧縮、解凍        ||  *1 64bit版は *2 ||
-   ||  UNLHA32.DLL  |     ------------     ||  再圧縮、圧縮、解凍、削除  ||        *1        ||
-   ||  unrar32.dll  |     unrar64j.dll     ||  解凍                      ||       同梱       ||
-   ||  UnIso32.dll  |     ------------     ||  解凍                      ||        *1        ||
-   ||  XacRett.dll  |     ------------     ||  解凍                      ||        *3        ||
-   ||     *.spi     |        *.sph         ||  解凍                      ||                  ||
-   ||               |  *.spi+ZBYPASSA.SPH  ||                            ||        *5        ||
-   ||     *.wcx     |    *.wcx,*.wcx64     ||  解凍                      ||                  ||
-   ||    -------    |     UNBYPASS.DLL     ||  再圧縮、圧縮、解凍        ||        *5        ||
-    ==========================================================================================
+    == ライブラリ ================================================================================
+   ||    32bit版        |       64bit版        ||            対応            ||      入手先      ||
+   ||-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*||-*-*-*-*-*-*-*-*-*||
+   ||    7-zip32.dll    |     7-zip64.dll      ||  再圧縮、圧縮、解凍、削除  ||       同梱       ||
+   ||    tar32.dll      |     tar64.dll        ||  再圧縮、圧縮、解凍        ||  *1 64bit版は *2 ||
+   ||    UNLHA32.DLL    |     ------------     ||  再圧縮、圧縮、解凍、削除  ||        *1        ||
+   ||    unrar32.dll    |     unrar64j.dll     ||  解凍                      ||  *1 64bit版は *6 ||
+   ||    UnIso32.dll    |     ------------     ||  解凍                      ||        *1        ||
+   ||    XacRett.dll    |     ------------     ||  解凍                      ||        *3        ||
+   ||  *.b2e+b2e32.dll  |   *.b2e+b2e64.dll    ||  再圧縮、圧縮、解凍        ||        *1        ||
+   ||       *.spi       |        *.sph         ||  解凍                      ||                  ||
+   ||                   |  *.spi+ZBYPASSA.SPH  ||                            ||        *5        ||
+   ||       *.wcx       |    *.wcx,*.wcx64     ||  解凍                      ||                  ||
+   ||      -------      |     UNBYPASS.DLL     ||  再圧縮、圧縮、解凍        ||        *5        ||
+    ==============================================================================================
 
    *1
-      統合アーカイバプロジェクト(http://www.csdinc.co.jp/archiver/)
+      統合アーカイバプロジェクト( http://www.csdinc.co.jp/archiver/ )
    *2
-      綾川的趣味之接続集(http://homepage1.nifty.com/Ayakawa/index.html)
+      綾川的趣味之接続集( http://homepage1.nifty.com/Ayakawa/index.html )
    *3
-      Bonty's HomePage(http://hp.vector.co.jp/authors/VA030681/index.htm)
+      Bonty's HomePage( http://hp.vector.co.jp/authors/VA030681/index.htm )
    *4
-      Yanagi's Home Page(http://homepage2.nifty.com/NYanagi/index.html)
+      Yanagi's Home Page( http://homepage2.nifty.com/NYanagi/index.html )
    *5
-      TORO's Library(http://homepage1.nifty.com/toro/index.html)
+      TORO's Library( http://homepage1.nifty.com/toro/index.html )
+   *6
+      Ru^3 Honpo( http://www.vesta.dti.ne.jp/~tsato/index.html )
 
  ・ライブラリの優先順位は、
       UNLHA32.dll / UNLHA32.dll+UNBYPASS.DLL
@@ -116,10 +124,11 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
       XacRett.dll
       Susie Plug-in(*.spi / *.sph, *.spi+ZBYPASSA.SPH)
       Total Commander Plugin(*.wcx / *.wcx64)
+      b2eスクリプト(*.b2e) + b2e32.dll
    です。
 
-   上記ライブラリをすべて導入すると、以下の拡張子に対応することが出来ます。
-   (Susie Plug-inやTotal Commander Pluginの導入により更に対応させることが出来ます。)
+   上記統合アーカイバライブラリをすべて導入すると、以下の拡張子に対応することが出来ます。
+   (Susie Plug-inやTotal Commander Plugin、b2eスクリプトの導入により更に対応させることが出来ます。)
      lzh,lha,lzs
      rar
      zip,7z,jar
@@ -151,16 +160,15 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  OS:Microsoft Windows 7 Home Premium 64-bit (6.1, Build 7600)
  CPU:Intel(R) Core(TM) i5 CPU M 460 @ 2.53GHz (4 CPUs), ~2.5GHz
  memory:4096MB RAM
- compiler:Microsoft Visual C++ 2010 Express/gcc version 4.9.2 (tdm-1,tdm64-1)
- debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
+ compiler/debugger:Microsoft Visual C++ 2015(Microsoft Visual Studio Community 2015)
+          Microsoft Visual C++ 2010 Express
  editor:xyzzy version 0.2.2.235/ResEdit 1.6.6 Unicode build.
 
  [Sub]
  OS:Microsoft Windows XP Home Edition Build 2600 SP3
  CPU:Intel(R) Atom(TM) CPU N270@1.60GHz,1600MHz(4x400)
  memory:1016MB
- compiler:Microsoft Visual C++ 2010 Express/gcc version 4.9.2 (tdm-1)
- debugger:Microsoft Visual C++ 2010 Express/gdb 7.3 with Code::Blocks 10.05
+ compiler/debugger:Microsoft Visual C++ 2010 Express
  editor:xyzzy version 0.2.2.235/ResEdit 1.6.6 Unicode build.
 
 
@@ -168,15 +176,16 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  本ソフト開発にあたり参考/使用させて頂いたソフトウェアや、
  各書庫操作ライブラリの作者様方...
    k.inaba氏(Noah,UnDller)
-   Claybird氏(LhaForge,b2e32.dll)
+   Claybird氏(LhaForge,b2e32.dll,tar32.dll,unrar32.dll)
    鬼束 裕之氏(Explzh)
    Bonty氏(Archon2,XacRett.dll)
    高田 謙氏(undll.exe,UnIso32.dll)
    秋田 稔氏(7-zip32.dll)
    市丸 剛氏(7-zip64.dll,tar64.dll)
-   吉岡 恒夫氏/Claybird氏(tar32.dll)
+   吉岡 恒夫氏(tar32.dll)
    Ｍｉｃｃｏ氏(UNLHA32.dll)
    Alexander Roshal氏(unrar.dll/unrar64.dll)
+   亀井 哲弥氏(unrar32.dll)
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
    Total7zip氏(Total7zip.wcx)
    TORO氏(UNBYPASS.DLL,ZBYPASSA.SPH)
@@ -191,15 +200,13 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●ライセンス
  ・本ソフトはNYSL Version 0.9982に準拠して配布されています。
    ライセンスの詳細は同梱の「NYSL_withfaq.TXT」をご覧下さい。
- ・「7-zip32.dll/7-zip64.dll文字化け対策版」(http://www16.atpages.jp/rayna/index.html)は
+ ・「7-zip32.dll/7-zip64.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )は
    GNU Lesser General Public License (LGPL)の下で配布されています。
    ライセンスの詳細は下記URLをご覧下さい。
       http://www.gnu.org/copyleft/lesser.ja.html
- ・RuRuRu氏による「unrar32.dll x64/ユニコード対応版」(http://www.vesta.dti.ne.jp/~tsato/index.html)は
-   オリジナルのunrar32.dllと同様のライセンスの下で配布されています。
-   ライセンスの詳細は下記URLをご覧下さい。
-      https://github.com/rururutan/unrar32
-      http://www.csdinc.co.jp/archiver/lib/unrar32.html
+ ・「b2e64.dll」はClaybird氏による「b2e32.dll」を64bit化したものです。
+   「b2e32.dll」はNYSL ver 0.9982が適用されています。
+   ライセンスの詳細は「b2e32.dll」に同梱されている「b2e32.txt」をご覧ください。
 
 
 ●その他
@@ -214,6 +221,20 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発履歴
+ ○Ver.0.0.1.5 - 2015/08/18
+ ・reces Ver.0.00r29に対応。
+ ・unrar32.dll/unrar64j.dllの同梱を中止。
+ ・7-zip32.dll/7-zip64.dll文字化け対策版 Ver.15.06.00.02 betaに更新。
+ ・「パスワード」に「ファイルを開く」を追加。
+ ・「出力」に「実行時に指定する」を追加。
+ ・ディレクトリ選択ダイアログをSHBrowseForFolder()に変更。
+ ・「ディレクトリを再帰的に追加」を追加。
+ ・「ディレクトリ」タブ追加。「その他」タブの項目の一部を移動。
+ ・「その他」タブに「文字コード」「b2eスクリプト」を追加。
+ ・「b2e64.dll」を同梱するように。
+ ・「b2e/exe.msi.b2e」「b2e/mp3.b2e」を同梱するように。
+ ・コンパイラをMicrosoft Visual C++ 2015に変更。
+
  ○Ver.0.0.1.4 - 2015/05/15
  ・reces Ver.0.00r27に対応。
  ・「フィルタ」でサブディレクトリ以下が検索されない不具合を修正。

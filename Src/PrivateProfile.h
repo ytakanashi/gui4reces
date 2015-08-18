@@ -162,8 +162,10 @@ struct GENERAL{
 	bool auto_rename;
 	//ソースを削除
 	RMSRC remove_source;
+	//アーカイバに送る文字コード(現在7-zip32.dllのみ対象)
+	unsigned int arc_codepage;
 	//パスワードリストファイル、リストファイルの文字コード
-	sslib::File::CODEPAGE codepage;
+	sslib::File::CODEPAGE list_codepage;
 	//ユーザ独自のパラメータ
 	tstring custom_param;
 	//spiがあるディレクトリ
@@ -192,7 +194,8 @@ struct GENERAL{
 		default_base_dir(false),
 		auto_rename(false),
 		remove_source(RMSRC_DISABLE),
-		codepage(sslib::File::SJIS),
+		arc_codepage(0),
+		list_codepage(sslib::File::SJIS),
 		custom_param(),
 		spi_dir(),
 		b2e_dir(),
@@ -208,6 +211,16 @@ struct RECOMPRESS{
 	RECOMPRESS():new_password(),run_command(){}
 };
 
+struct B2E{
+	//圧縮形式
+	tstring format;
+	//圧縮メソッド
+	tstring method;
+	//自己解凍形式指定
+	bool sfx;
+	B2E():format(),method(),sfx(false){}
+};
+
 struct COMPRESS{
 	//圧縮形式
 	tstring compression_type;
@@ -215,6 +228,9 @@ struct COMPRESS{
 	bool each_file;
 	//書庫新規作成
 	bool create_new;
+	//書庫強制新規作成
+	//上書き先を予め削除して作成
+	bool force_create_new;
 	//基底ディレクトリを含まない
 	//解凍の場合-1で共通パスをすべて除く
 	int exclude_base_dir;
@@ -228,6 +244,10 @@ struct COMPRESS{
 	bool raw_file_name;
 	//更新日時を元書庫と同じにする
 	bool copy_timestamp;
+	//対象ディレクトリを再帰的検索
+	bool recursive;
+	//圧縮用b2eスクリプト
+	B2E b2e;
 
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目
@@ -245,6 +265,8 @@ struct COMPRESS{
 		//gui4recesでは必ず有効に
 		raw_file_name(true),
 		copy_timestamp(false),
+		recursive(false),
+		b2e(),
 
 		choose_output_file_each_time(false){}
 };
@@ -293,7 +315,8 @@ struct GUI4RECES{
 		quit(false),
 		work_dir(),
 		at_once(false),
-		log(false){sslib::env::get(_T("TMP"),&work_dir);}
+		log(false)
+		{sslib::env::get(_T("TMP"),&work_dir);}
 };
 
 struct CONFIG{
