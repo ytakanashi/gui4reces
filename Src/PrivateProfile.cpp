@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.5 by x@rgs
+//            gui4reces Ver.0.0.1.6 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -111,6 +111,8 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Compress"),_T("B2eMethod"),CFG_VALUE(compress.b2e.method));
 	//b2eスクリプトの自己解凍形式指定
 	write(_T("Compress"),_T("B2eSfx"),CFG_VALUE(compress.b2e.sfx));
+	//元ファイルの拡張子を保持
+	write(_T("Compress"),_T("KeepExtension"),CFG_VALUE(compress.keep_extension));
 
 
 	//解凍
@@ -337,6 +339,8 @@ bool Config::load(bool include_gui4reces_section){
 	getStringDataEx(_T("Compress"),_T("B2eMethod"),&m_cfg.compress.b2e.method);
 	//b2eスクリプトの自己解凍形式指定
 	getDataEx(_T("Compress"),_T("B2eSfx"),&m_cfg.compress.b2e.sfx);
+	//元ファイルの拡張子を保持
+	getDataEx(_T("Compress"),_T("KeepExtension"),&m_cfg.compress.keep_extension);
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目
 	getDataEx(_T("Compress"),_T("ChooseOutputFileEachTime"),&m_cfg.compress.choose_output_file_each_time);

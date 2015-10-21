@@ -2,7 +2,7 @@
 //その他タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.5 by x@rgs
+//            gui4reces Ver.0.0.1.6 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -27,7 +27,6 @@ namespace{
 		_T("tar32.dll"),
 		_T("UnIso32.dll"),
 		_T("XacRett.dll"),
-		_T("Total7zip.wcx"),
 		_T("b2e32.dll"),
 #else
 		_T("7-zip64.dll"),
@@ -35,7 +34,6 @@ namespace{
 		_T("unrar64j.dll"),
 		_T("tar64.dll"),
 		_T("ZBYPASSA.SPH"),
-		_T("Total7zip.wcx64"),
 		_T("b2e64.dll"),
 #endif
 	};
@@ -333,14 +331,16 @@ void OtherTab::setCurrentSettings(){
 
 	str::splitString(&codepage_list,pipe.result().c_str(),_T("\r\n"));
 
-	//「自動選択」を追加
-	CODEPAGE_DATA autodetect_all(50001,tstring(_T("自動選択")));
+	{
+		//「指定しない」を追加
+		CODEPAGE_DATA no_select(0,tstring(_T("指定しない")));
 
-	codepage_table.push_back(autodetect_all);
-	sendItemMessage(IDC_COMBO_OTHER_CODEPAGE,
-					CB_ADDSTRING,
-					0,
-					(LPARAM)autodetect_all.name.c_str());
+		codepage_table.push_back(no_select);
+		sendItemMessage(IDC_COMBO_OTHER_CODEPAGE,
+						CB_ADDSTRING,
+						0,
+						(LPARAM)no_select.name.c_str());
+	}
 
 	int combo_count=1;
 
@@ -353,9 +353,6 @@ void OtherTab::setCurrentSettings(){
 
 			tstring::size_type index=ite->find(_T(":"));
 			data.codepage=_ttoi(ite->substr(0,index).c_str());
-
-			//「自動選択」は追加済み
-			if(data.codepage==50001)continue;
 
 			data.name=ite->substr(index+1);
 			data.name=data.name.substr(0,data.name.rfind(_T(":")));

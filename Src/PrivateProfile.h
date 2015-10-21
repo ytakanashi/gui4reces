@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.5 by x@rgs
+//            gui4reces Ver.0.0.1.6 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -248,6 +248,8 @@ struct COMPRESS{
 	bool recursive;
 	//圧縮用b2eスクリプト
 	B2E b2e;
+	//元ファイルの拡張子を保持
+	bool keep_extension;
 
 	//実行時に出力ファイル名選択
 	//gui4reces専用項目
@@ -267,6 +269,7 @@ struct COMPRESS{
 		copy_timestamp(false),
 		recursive(false),
 		b2e(),
+		keep_extension(false),
 
 		choose_output_file_each_time(false){}
 };

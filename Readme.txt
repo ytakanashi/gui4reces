@@ -1,6 +1,6 @@
 ﻿_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.5
+【バージョン】　0.0.1.6
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
@@ -35,6 +35,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
  [書庫処理]
  ・ファイル名の文字化けが起きにくい。
+ ・zipファイルのコードページを指定して解凍することが出来る。
  ・プログレスバーを自前で表示し、無駄なウインドウを表示させない。
  ・ディレクトリのタイムスタンプ復元が可能。 *2
  ・ファイルの分割/結合が出来る。
@@ -83,7 +84,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●インストール
- 1.「gui4reces0015.zip」を適当なディレクトリに解凍して下さい。
+ 1.「gui4reces0016.zip」を適当なディレクトリに解凍して下さい。
  2.以下の内、必要な各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
 
     == ライブラリ ================================================================================
@@ -115,12 +116,31 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    *6
       Ru^3 Honpo( http://www.vesta.dti.ne.jp/~tsato/index.html )
 
+ ・7-zip32.dllについて、現在統合アーカイバプロジェクトで配布されている9.22.00.01は、
+   一部ファイル名が文字化けしてしまいます。
+   そこでgui4recesでは、「7-zip32.dll/7-zip64.dll文字化け対策版」を同梱しています。
+   最新版はFrost Moon Project( http://www16.atpages.jp/rayna/index.html )にて入手することが出来ます。
+
+ ・rar書庫を取り扱うにあたり、必ず「unrar.dll」「unrar64.dll」を最新版にバージョンアップしてください。
+   RARLAB( http://www.rarlab.com/ )の「RAR」->「Extras」->「UNRAR.dll」からダウンロードすることが出来ます。
+
+ ・「7z.dll対応版7-zip32.dll/7-zip64.dll」( http://www16.atpages.jp/rayna/index.html )に対応しています。
+   gui4reces x64版ではUNLHA32.DLLやXacRett.dllが使用できないため、導入をお勧めします。
+   1.「7-Zip x64版」( http://www.7-zip.org/ )をインストール。
+   2.「7-zip32.dll/7-zip64.dll/7z.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )をダウンロード。
+   3.「x64\7z.dll」を7-Zipインストールディレクトリにコピー。
+   4.「7-zip32-full\7-zip64.dll」をパスの通ったディレクトリにコピー。
+   以下の形式に対応しています。
+      7z, XZ, BZIP2, GZIP, TAR, ZIP
+      AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS,
+      QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR, Z
+
  ・ライブラリの優先順位は、
       UNLHA32.dll / UNLHA32.dll+UNBYPASS.DLL
       unrar32.dll / unrar64j.dll
       tar32.dll   / tar64.dll
-      UnIso32.dll
       7-zip32.dll / 7-zip64.dll
+      UnIso32.dll
       XacRett.dll
       Susie Plug-in(*.spi / *.sph, *.spi+ZBYPASSA.SPH)
       Total Commander Plugin(*.wcx / *.wcx64)
@@ -161,7 +181,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  CPU:Intel(R) Core(TM) i5 CPU M 460 @ 2.53GHz (4 CPUs), ~2.5GHz
  memory:4096MB RAM
  compiler/debugger:Microsoft Visual C++ 2015(Microsoft Visual Studio Community 2015)
-          Microsoft Visual C++ 2010 Express
+                   Microsoft Visual C++ 2010 Express
  editor:xyzzy version 0.2.2.235/ResEdit 1.6.6 Unicode build.
 
  [Sub]
@@ -187,7 +207,6 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    Alexander Roshal氏(unrar.dll/unrar64.dll)
    亀井 哲弥氏(unrar32.dll)
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
-   Total7zip氏(Total7zip.wcx)
    TORO氏(UNBYPASS.DLL,ZBYPASSA.SPH)
    Nozomu Katô氏(SRELL)
    Kuro氏(Mery)
@@ -200,6 +219,8 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●ライセンス
  ・本ソフトはNYSL Version 0.9982に準拠して配布されています。
    ライセンスの詳細は同梱の「NYSL_withfaq.TXT」をご覧下さい。
+ ・「reces」( http://www16.atpages.jp/rayna/index.html )はNYSL Version 0.9982に準拠して配布されています。
+   ライセンスの詳細は「reces」に同梱されている「NYSL_withfaq.TXT」をご覧ください。
  ・「7-zip32.dll/7-zip64.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )は
    GNU Lesser General Public License (LGPL)の下で配布されています。
    ライセンスの詳細は下記URLをご覧下さい。
@@ -221,6 +242,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発履歴
+ ○Ver.0.0.1.6 - 2015/10/21
+ ・reces Ver.0.00r30に対応。
+ ・「その他」タブ「文字コード」の「自動選択」を「指定しない」に変更。
+ ・「再圧縮/圧縮」タブ「書庫作成」に「拡張子を保持」を追加。
+ ・マルチスレッド(/MT)でビルドするように。
+
  ○Ver.0.0.1.5 - 2015/08/18
  ・reces Ver.0.00r29に対応。
  ・unrar32.dll/unrar64j.dllの同梱を中止。

@@ -2,7 +2,7 @@
 //再圧縮/圧縮タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.5 by x@rgs
+//            gui4reces Ver.0.0.1.6 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -193,6 +193,10 @@ INT_PTR CompressTab::onCommand(WPARAM wparam,LPARAM lparam){
 		case IDC_CHECKBOX_COMPRESS_AUTO_RENAME:
 			//自動リネーム
 			m_config_list[0]->cfg().general.auto_rename=getCheck(LOWORD(wparam));
+
+		case IDC_CHECKBOX_COMPRESS_KEEP_EXTENSION:
+			//拡張子を保持
+			m_config_list[0]->cfg().compress.keep_extension=getCheck(LOWORD(wparam));
 	}
 
 	switch(HIWORD(wparam)){
@@ -409,6 +413,9 @@ void CompressTab::setCurrentSettings(){
 
 	//自動リネーム
 	setCheck(IDC_CHECKBOX_COMPRESS_AUTO_RENAME,m_config_list[0]->cfg().general.auto_rename);
+
+	//拡張子を保持
+	setCheck(IDC_CHECKBOX_COMPRESS_KEEP_EXTENSION,m_config_list[0]->cfg().compress.keep_extension);
 
 	//コマンドを実行
 	sendItemMessage(IDC_COMBO_COMPRESS_RUN_COMMAND,
