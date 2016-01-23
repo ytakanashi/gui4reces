@@ -1,4 +1,4 @@
-﻿//CompressTab.h
+﻿//RenameTab.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 //            gui4reces Ver.0.0.1.7 by x@rgs
@@ -7,27 +7,28 @@
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 
 
-#ifndef _COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
-#define _COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
+#ifndef _RENAMETAB_H_B2D4389D_A81E_417f_87FE_306FAF253EA5
+#define _RENAMETAB_H_B2D4389D_A81E_417f_87FE_306FAF253EA5
 
 
 #include"TabBase.h"
 
 
 
-class CompressTab:public TabBase{
+class RenameTab:public TabBase{
 public:
-	CompressTab(std::vector<Config*>& config_list):
-		TabBase(IDD_TAB_COMPRESS,config_list){}
-	~CompressTab(){}
+	RenameTab(std::vector<Config*>& config_list):
+		TabBase(IDD_TAB_RENAME,config_list),
+		m_regex_menu(){}
+	~RenameTab(){}
+private:
+	sslib::Menu m_regex_menu;
 private:
 	//メッセージハンドラ
 	INT_PTR onInitDialog(WPARAM wparam,LPARAM lparam);
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
-	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 public:
 	void setCurrentSettings();
-	tstring getExtension();
 };
 
-#endif //_COMPRESSTAB_H_B2E99FCD_CC2A_4fd5_B529_DC132A49A1C0
+#endif //_RENAMETAB_H_B2D4389D_A81E_417f_87FE_306FAF253EA5

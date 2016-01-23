@@ -2,7 +2,7 @@
 //除外フィルタタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.6 by x@rgs
+//            gui4reces Ver.0.0.1.7 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -154,7 +154,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 			filter_ptr->recursive=!sendItemMessage(LOWORD(wparam),BM_GETCHECK,0,0);
 			break;
 
-		case IDC_BUTTON_FILTER_REGEX:{
+		case IDC_BUTTON_FILTER_REGEX:
 			//正規表現ボタン
 			if(int id=m_regex_menu.popup(handle(),getDlgItem(LOWORD(wparam)))){
 				tstring menu_str(m_regex_menu.string(id));
@@ -166,7 +166,6 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				::SetFocus(getDlgItem(IDC_EDIT_FILTER_STRING));
 			}
 			break;
-		}
 
 		case IDC_CHECKBOX_FILTER_ATTRIBUTE:
 			//属性
@@ -339,8 +338,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 						//';'で分割
 						str::splitString(&filter_ptr->pattern_list,&buffer[0],';');
 						//重複を削除
-						filter_ptr->pattern_list.sort();
-						filter_ptr->pattern_list.unique();
+						misc::undupList(&filter_ptr->pattern_list);
 					}
 					break;
 				}
@@ -369,6 +367,7 @@ INT_PTR FilterTab::onCommand(WPARAM wparam,LPARAM lparam){
 				default:
 					break;
 			}
+			break;
 	}
 	return false;
 }

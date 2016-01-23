@@ -1,7 +1,7 @@
 ﻿//MainDialog.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.6 by x@rgs
+//            gui4reces Ver.0.0.1.7 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -17,6 +17,7 @@
 #include"OutputTab.h"
 #include"PasswordTab.h"
 #include"FilterTab.h"
+#include"RenameTab.h"
 #include"SplitTab.h"
 #include"RemoveSourceTab.h"
 #include"DirectoryTab.h"
@@ -99,6 +100,7 @@ private:
 		TAB_OUTPUT,
 		TAB_PASSWORD,
 		TAB_FILTER,
+		TAB_RENAME,
 		TAB_SPLIT,
 		TAB_REMOVESOURCE,
 		TAB_DIRECTORY,
@@ -132,14 +134,10 @@ private:
 	INT_PTR onDestroy();
 	INT_PTR onCommand(WPARAM wparam,LPARAM lparam);
 	INT_PTR onNotify(WPARAM wparam,LPARAM lparam);
-	INT_PTR onOk();
+	INT_PTR onOk(WPARAM wparam,LPARAM lparam);
 	INT_PTR onDropFiles(HDROP drop_handle);
 	INT_PTR onSize(WPARAM wparam,LPARAM lparam);
 	INT_PTR onGetMinMaxInfo(WPARAM wparam,LPARAM lparam);
-#if 0
-	INT_PTR onMouseMove(WPARAM wparam,LPARAM lparam);
-	INT_PTR onLButtonUp(WPARAM wparam,LPARAM lparam);
-#endif
 	INT_PTR onMessage(UINT message,WPARAM wparam,LPARAM lparam);
 };
 

@@ -150,22 +150,38 @@ CommandArgument::CommandArgument(DWORD opt):
 		}
 	}
 
+#ifndef DISABLE_CONSOLE
+	Console input_file(STD_INPUT_HANDLE);
 	DWORD mode=0;
 
-	if(!GetConsoleMode(GetStdHandle(STD_INPUT_HANDLE),&mode)){
+	if(!input_file.getConsoleMode(&mode)){
 		if(opt&READ_STDIN){
 			//標準入力から取得
-			std::vector<TCHAR> buffer(MAX_PATHW);
+			DWORD read=0;
+			std::vector<char> buffer;
+			char c;
 
-			while(_fgetts(&buffer[0],buffer.size(),stdin)!=NULL){
-				if(TCHAR* p=_tcschr(&buffer[0],'\n'))*p='\0';
-				else while(getchar()!='\n');
-				stdinput().push_back(&buffer[0]);
-				dprintf(_T("stdinput:%s\n"),&buffer[0]);
+			while(!IS_TERMINATED&&
+				  input_file.read((LPVOID)&c,sizeof(char),&read)){
+				if(c=='\r')continue;
+				if(c=='\n'){
+					buffer.push_back('\0');
+					stdinput().push_back(str::toUtf16(GetConsoleCP(),&buffer[0]));
+					dprintf(_T("stdinput:%s\n"),stdinput().back().c_str());
+					buffer.clear();
+				}else{
+					buffer.push_back(c);
+				}
 			}
 		}
 
 		//標準入力をコンソールに戻す(キーボードからの入力を可能にする)
+#if 1
+		//コンソールからの読み取りはReadFile()/ReadConsole()で行うのでfreopen()は必要なし
+		CloseHandle(GetStdHandle(STD_INPUT_HANDLE));
+		SetStdHandle(STD_INPUT_HANDLE,CreateFile(_T("CONIN$"),GENERIC_READ,FILE_SHARE_READ,NULL,CREATE_ALWAYS,0,0));
+#else
+		//fgets()を使うならfreopen()が必要
 #ifdef _tfreopen_s
 		FILE*dummy;
 		_tfreopen_s(&dummy,
@@ -173,7 +189,10 @@ CommandArgument::CommandArgument(DWORD opt):
 		_tfreopen(
 #endif
 			_T("CON"),_T("r"),stdin);
+#endif
+
 	}
+#endif
 }
 
 //namespace sslib

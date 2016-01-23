@@ -24,6 +24,7 @@
 #define IDD_TAB_MODE                            163
 #define IDD_DIALOG_LOG                          165
 #define IDD_TAB_DIRECTORY                       167
+#define IDD_TAB_RENAME                          170
 #define IDC_EDIT_PROFILE_NAME                   1000
 #define IDC_RADIO_OUTPUT_SPECIFIC_DIR           1001
 #define IDC_BUTTON_PROFILE_ADD                  1002
@@ -131,6 +132,7 @@
 #define IDC_CHECKBOX_MODE_IGNORE_DIRECTORY_STRUCTURES 40000
 #define IDC_COMBO_OTHER_CODEPAGE                40000
 #define IDC_EDIT_LOG                            40000
+#define IDC_EDIT_RENAME_STRING                  40000
 #define IDC_RADIO_SHORTCUT_GUI4RECES            40000
 #define IDM_LISTVIEW_SELECT                     40000
 #define IDM_REGEX_DOT                           40000
@@ -148,6 +150,7 @@
 #define IDC_CHECKBOX_DIRECTORY_B2E              40002
 #define IDC_CHECKBOX_MODE_LOG                   40002
 #define IDC_CHECKBOX_OTHER_SFX                  40002
+#define IDC_CHECKBOX_RENAME_REGEX               40002
 #define IDC_RADIO_MODE_DELETE                   40002
 #define IDM_LISTVIEW_ALLSELECT                  40002
 #define IDM_REGEX_PLUS                          40002
@@ -156,15 +159,18 @@
 #define IDC_RADIO_MODE_TEST                     40003
 #define IDM_LISTVIEW_ALLDESELECT                40003
 #define IDM_REGEX_QUESTION                      40003
+#define IDC_BUTTON_RENAME_REGEX                 40004
 #define IDC_CHECKBOX_RECURSIVE                  40004
 #define IDC_COMBO_SHORTCUT_SHOWCMD              40004
 #define IDC_EDIT_DIRECTORY_WORK                 40004
 #define IDM_LISTVIEW_REMOVE                     40004
 #define IDM_REGEX_BRACE                         40004
 #define IDC_CHECKBOX_DIRECTORY_WORK             40005
+#define IDC_RADIO_MODE_RENAME                   40005
 #define IDC_RADIO_SHORTCUT_RECES                40005
 #define IDM_LISTVIEW_INVERSE                    40005
 #define IDM_REGEX_BRACK                         40005
+#define IDC_CHECKBOX_RENAME_STRING              40006
 #define IDC_EDIT_DIRECTORY_WCX                  40006
 #define IDM_REGEX_NBRACK                        40006
 #define IDC_CHECKBOX_DIRECTORY_WCX              40007

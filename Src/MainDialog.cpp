@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.6 by x@rgs
+//            gui4reces Ver.0.0.1.7 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -53,8 +53,9 @@ namespace{
 			}
 			return true;
 		}
-		INT_PTR onOk(){
+		INT_PTR onOk(WPARAM wparam,LPARAM lparam){
 			std::vector<TCHAR> cfg_name(MAX_PATH);
+
 			::GetWindowText(getDlgItem(IDC_EDIT_PROFILE_NAME),&cfg_name[0],cfg_name.size());
 			m_name.assign(&cfg_name[0]);
 			m_is_default=sendItemMessage(IDC_CHECKBOX_PROFILE_DEFAULT,BM_GETCHECK,0,0)!=0;
@@ -135,7 +136,7 @@ namespace{
 			}
 			return false;
 		}
-		INT_PTR onOk(){
+		INT_PTR onOk(WPARAM wparam,LPARAM lparam){
 			m_show_cmd=shortcut::show_cmd_list[sendItemMessage(IDC_COMBO_SHORTCUT_SHOWCMD,CB_GETCURSEL,0,0)].cmd;
 			return true;
 		}
@@ -361,7 +362,8 @@ namespace{
 			IDC_RADIO_MODE_EXTRACT,
 			IDC_RADIO_MODE_LIST,
 			IDC_RADIO_MODE_TEST,
-			IDC_RADIO_MODE_DELETE
+			IDC_RADIO_MODE_DELETE,
+			IDC_RADIO_MODE_RENAME,
 		};
 	}
 
@@ -414,6 +416,11 @@ void MainDialog::setCurrentSettings(){
 		case MODE_DELETE:
 			//削除
 			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_DELETE,0),0);
+			break;
+
+		case MODE_RENAME:
+			//リネーム
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDC_RADIO_MODE_RENAME,0),0);
 			break;
 
 		case MODE_RECOMPRESS:
@@ -491,33 +498,23 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	m_tab=new Tab(handle(),IDC_TAB1);
 	if(m_tab==NULL)return false;
 
-	m_tab_list.push_back(new CompressTab(m_config_list));
-	m_tab_list.push_back(new ExtractTab(m_config_list));
-	m_tab_list.push_back(new OutputTab(m_config_list));
-	m_tab_list.push_back(new PasswordTab(m_config_list));
-	m_tab_list.push_back(new FilterTab(m_config_list));
-	m_tab_list.push_back(new SplitTab(m_config_list));
-	m_tab_list.push_back(new RemoveSourceTab(m_config_list));
-	m_tab_list.push_back(new DirectoryTab(m_config_list));
-	m_tab_list.push_back(new OtherTab(m_config_list));
-	m_tab_list.push_back(new ModeTab(m_config_list));
+#define CREATE_TAB(name,id,title)\
+	m_tab_list.push_back(new name(m_config_list));\
+	m_tab_list.back()->doModeless(handle(),SW_HIDE);\
+	m_tab->insert(*m_tab_list[id],title,id);\
 
-	for(size_t i=0,list_size=m_tab_list.size();i<list_size;i++){
-		if(m_tab_list[i]!=NULL){
-			m_tab_list[i]->doModeless(handle(),SW_HIDE);
-		}
-	}
-
-	m_tab->insert(*m_tab_list[TAB_COMPRESS],_T("再圧縮/圧縮"),TAB_COMPRESS);
-	m_tab->insert(*m_tab_list[TAB_EXTRACT],_T("再圧縮/解凍"),TAB_EXTRACT);
-	m_tab->insert(*m_tab_list[TAB_OUTPUT],_T("出力"),TAB_OUTPUT);
-	m_tab->insert(*m_tab_list[TAB_PASSWORD],_T("パスワード"),TAB_PASSWORD);
-	m_tab->insert(*m_tab_list[TAB_FILTER],_T("フィルタ"),TAB_FILTER);
-	m_tab->insert(*m_tab_list[TAB_SPLIT],_T("分割"),TAB_SPLIT);
-	m_tab->insert(*m_tab_list[TAB_REMOVESOURCE],_T("処理後削除"),TAB_REMOVESOURCE);
-	m_tab->insert(*m_tab_list[TAB_DIRECTORY],_T("ディレクトリ"),TAB_DIRECTORY);
-	m_tab->insert(*m_tab_list[TAB_OTHER],_T("その他"),TAB_OTHER);
-	m_tab->insert(*m_tab_list[TAB_MODE],_T("動作詳細"),TAB_MODE);
+	CREATE_TAB(CompressTab,TAB_COMPRESS,_T("再圧縮/圧縮"));
+	CREATE_TAB(ExtractTab,TAB_EXTRACT,_T("再圧縮/解凍"));
+	CREATE_TAB(OutputTab,TAB_OUTPUT,_T("出力"));
+	CREATE_TAB(PasswordTab,TAB_PASSWORD,_T("パスワード"));
+	CREATE_TAB(FilterTab,TAB_FILTER,_T("フィルタ"));
+	CREATE_TAB(RenameTab,TAB_RENAME,_T("リネーム"));
+	CREATE_TAB(SplitTab,TAB_SPLIT,_T("分割"));
+	CREATE_TAB(RemoveSourceTab,TAB_REMOVESOURCE,_T("処理後削除"));
+	CREATE_TAB(DirectoryTab,TAB_DIRECTORY,_T("ディレクトリ"));
+	CREATE_TAB(OtherTab,TAB_OTHER,_T("その他"));
+	CREATE_TAB(ModeTab,TAB_MODE,_T("動作詳細"));
+#undef CREATE_TAB
 
 	//デフォルトタブ
 	m_tab_list[TAB_COMPRESS]->showDialog();
@@ -977,6 +974,21 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("削除(&R)"));
 			return true;
 
+		case IDC_RADIO_MODE_RENAME:
+			//リネーム
+			for(int i=0;i<ARRAY_SIZEOF(mode::idc_list);i++){
+				sendItemMessage(mode::idc_list[i],BM_SETCHECK,(WPARAM)BST_UNCHECKED,0);
+			}
+			sendItemMessage(LOWORD(wparam),
+							BM_SETCHECK,
+							(WPARAM)BST_CHECKED,
+							0
+							);
+			m_config_list[0]->cfg().mode=MODE_RENAME;
+			m_tab->select(TAB_RENAME);
+			::SetWindowText(getDlgItem(IDC_BUTTON_RUN),_T("リネーム(&R)"));
+			return true;
+
 
 		//リスト
 		case IDC_BUTTON_ADD:{
@@ -1383,7 +1395,7 @@ INT_PTR MainDialog::onNotify(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 
-INT_PTR MainDialog::onOk(){
+INT_PTR MainDialog::onOk(WPARAM wparam,LPARAM lparam){
 	return false;
 }
 

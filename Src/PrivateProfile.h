@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.6 by x@rgs
+//            gui4reces Ver.0.0.1.7 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -21,6 +21,7 @@ enum MODE{
 	MODE_VERSION=1<<6,
 	MODE_SETTINGS=1<<7,
 	MODE_DELETE=1<<8,
+	MODE_RENAME=1<<9,
 };
 
 enum{
@@ -166,6 +167,8 @@ struct GENERAL{
 	unsigned int arc_codepage;
 	//パスワードリストファイル、リストファイルの文字コード
 	sslib::File::CODEPAGE list_codepage;
+	//文字をANSI(sjis)で出力
+	bool ansi_stdout;
 	//ユーザ独自のパラメータ
 	tstring custom_param;
 	//spiがあるディレクトリ
@@ -196,6 +199,7 @@ struct GENERAL{
 		remove_source(RMSRC_DISABLE),
 		arc_codepage(0),
 		list_codepage(sslib::File::SJIS),
+		ansi_stdout(false),
 		custom_param(),
 		spi_dir(),
 		b2e_dir(),
@@ -259,6 +263,7 @@ struct COMPRESS{
 		compression_type(_T("zip")),
 		each_file(false),
 		create_new(false),
+		force_create_new(false),
 		exclude_base_dir(0),
 		compression_level(-1),
 		split_value(),
@@ -299,6 +304,16 @@ struct OUTPUTFILELIST{
 	OUTPUTFILELIST():api_mode(true){}
 };
 
+struct RENAME{
+	//置換パターン
+	typedef std::pair<tstring,tstring> pattern;
+	std::list<pattern> pattern_list;
+	//正規表現
+	bool regex;
+
+	RENAME():pattern_list(),regex(false){}
+};
+
 //gui4reces専用項目
 struct GUI4RECES{
 	//最前面表示
@@ -335,6 +350,8 @@ struct CONFIG{
 	EXTRACT extract;
 	//一覧出力
 	OUTPUTFILELIST output_file_list;
+	//リネーム
+	RENAME rename;
 
 	//gui4reces専用項目
 	GUI4RECES gui4reces;
@@ -347,6 +364,7 @@ struct CONFIG{
 		compress(),
 		extract(),
 		output_file_list(),
+		rename(),
 		gui4reces(){}
 };
 

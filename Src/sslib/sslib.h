@@ -1,7 +1,7 @@
 ﻿//sslib.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//                  sslib ver.1.46
+//                  sslib ver.1.49
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
 
@@ -201,6 +201,15 @@ template<typename T>bool strvalid(T str){
 // __cplusplus
 #endif
 
+
+//Ver.1.49
+//reces Ver.0.00r31/gui4reces Ver.0.0.1.7で使用
+
+//Ver.1.48
+//TimeStamp Keeper Ver.1.02で使用
+
+//Ver.1.47
+//reces Ver.0.00r31aで使用
 
 //Ver.1.46
 //reces Ver.0.00r30/gui4reces Ver.0.0.1.6で使用

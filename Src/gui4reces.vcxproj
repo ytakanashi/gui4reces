@@ -192,6 +192,12 @@
     <ClCompile Include="PasswordTab.cpp" />
     <ClCompile Include="PrivateProfile.cpp" />
     <ClCompile Include="RemoveSourceTab.cpp" />
+    <ClCompile Include="RenameTab.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">StdAfx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="SplitTab.cpp" />
     <ClCompile Include="sslib\CfgFile.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../StdAfx.h</PrecompiledHeaderFile>
@@ -349,6 +355,7 @@
     <ClInclude Include="PasswordTab.h" />
     <ClInclude Include="PrivateProfile.h" />
     <ClInclude Include="RemoveSourceTab.h" />
+    <ClInclude Include="RenameTab.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="SplitTab.h" />
     <ClInclude Include="sslib\CfgFile.h" />

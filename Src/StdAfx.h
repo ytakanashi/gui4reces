@@ -2,7 +2,7 @@
 //共通ヘッダファイル
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.6 by x@rgs
+//            gui4reces Ver.0.0.1.7 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -67,10 +67,15 @@ typedef std::basic_string<TCHAR>tstring;
 	#endif //_UNICODE
 #endif //_tcstoll
 
+#define INNER_FUNC(name,v)\
+	static struct{\
+		v\
+	}name;\
+
 #ifdef _DEBUG
-	#define SOFTWARE_VERSION _T("0.0.1.6_Debug")
+	#define SOFTWARE_VERSION _T("0.0.1.7_Debug")
 #else
-	#define SOFTWARE_VERSION _T("0.0.1.6")
+	#define SOFTWARE_VERSION _T("0.0.1.7")
 #endif
 
 //#define DISABLE_MISC
