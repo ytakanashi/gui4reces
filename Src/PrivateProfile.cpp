@@ -2,7 +2,7 @@
 //設定
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.7 by x@rgs
+//            gui4reces Ver.0.0.1.8 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -24,10 +24,14 @@ bool Config::save(bool include_gui4reces_section){
 	write(_T("Mode"),_T("Mode"),CFG_VALUE(mode));
 
 	//一般
+	//テスト
+	write(_T("General"),_T("Test"),CFG_VALUE(general.test));
 	//バックグラウンドで動作
 	write(_T("General"),_T("Background"),CFG_VALUE(general.background_mode));
 	//処理終了後ウインドウを閉じる
 	write(_T("General"),_T("Quit"),CFG_VALUE(general.quit));
+	//エラーが発生したら中断する
+	write(_T("General"),_T("PauseError"),CFG_VALUE(general.pause_error));
 	//ディレクトリ階層を無視して圧縮/解凍
 	write(_T("General"),_T("IgnoreDirectoryStructures"),CFG_VALUE(general.ignore_directory_structures));
 	//指定したライブラリ名
@@ -281,10 +285,14 @@ bool Config::load(bool include_gui4reces_section){
 
 
 	//一般
+	//テスト
+	getDataEx(_T("General"),_T("Test"),&m_cfg.general.test);
 	//バックグラウンドで動作
 	getDataEx(_T("General"),_T("Background"),&m_cfg.general.background_mode);
 	//処理終了後ウインドウを閉じる
 	getDataEx(_T("General"),_T("Quit"),&m_cfg.general.quit,true);
+	//エラーが発生したら中断する
+	getDataEx(_T("General"),_T("PauseError"),&m_cfg.general.pause_error,false);
 	//ディレクトリ階層を無視して圧縮/解凍
 	getDataEx(_T("General"),_T("IgnoreDirectoryStructures"),&m_cfg.general.ignore_directory_structures);
 	//指定したライブラリ名

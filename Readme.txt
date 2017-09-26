@@ -1,6 +1,6 @@
 ﻿_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.7
+【バージョン】　0.0.1.8
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
@@ -84,7 +84,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●インストール
- 1.「gui4reces0017.zip」を適当なディレクトリに解凍して下さい。
+ 1.「gui4reces0018.zip」を適当なディレクトリに解凍して下さい。
  2.以下の内、必要な各書庫操作ライブラリをパスの通ったディレクトリへコピーして下さい。
 
     == ライブラリ ================================================================================
@@ -116,7 +116,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    *6
       Ru^3 Honpo( http://www.vesta.dti.ne.jp/~tsato/index.html )
 
- ・7-zip32.dllについて、現在統合アーカイバプロジェクトで配布されている9.22.00.01は、
+ ・7-zip32.dllについて、現在統合アーカイバプロジェクトで配布されている9.22.00.02は、
    一部ファイル名が文字化けしてしまいます。
    そこでgui4recesでは、「7-zip32.dll/7-zip64.dll文字化け対策版」を同梱しています。
    最新版はFrost Moon Project( http://www16.atpages.jp/rayna/index.html )にて入手することが出来ます。
@@ -128,6 +128,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    gui4reces x64版ではUNLHA32.DLLやXacRett.dllが使用できないため、導入をお勧めします。
    1.「7-Zip x64版」( http://www.7-zip.org/ )をインストール。
    2.「7-zip32.dll/7-zip64.dll/7z.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )をダウンロード。
+     (以下の3,4はインストーラ版であれば不要です)
    3.「x64\7z.dll」を7-Zipインストールディレクトリにコピー。
    4.「7-zip32-full\7-zip64.dll」をパスの通ったディレクトリにコピー。
    以下の形式に対応しています。
@@ -176,20 +177,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発環境
- [Main]
- OS:Microsoft Windows 7 Home Premium 64-bit (6.1, Build 7600)
- CPU:Intel(R) Core(TM) i5 CPU M 460 @ 2.53GHz (4 CPUs), ~2.5GHz
- memory:4096MB RAM
+ OS:Microsoft Windows 10 Home Premium 64-bit
+ CPU:Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz 3.41GHz
+ memory:16.0GB RAM
  compiler/debugger:Microsoft Visual C++ 2015(Microsoft Visual Studio Community 2015)
                    Microsoft Visual C++ 2010 Express
- editor:xyzzy version 0.2.2.235/ResEdit 1.6.6 Unicode build.
-
- [Sub]
- OS:Microsoft Windows XP Home Edition Build 2600 SP3
- CPU:Intel(R) Atom(TM) CPU N270@1.60GHz,1600MHz(4x400)
- memory:1016MB
- compiler/debugger:Microsoft Visual C++ 2010 Express
- editor:xyzzy version 0.2.2.235/ResEdit 1.6.6 Unicode build.
+ editor:xyzzy version 0.2.2.235
 
 
 ●謝辞
@@ -204,12 +197,10 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    市丸 剛氏(7-zip64.dll,tar64.dll)
    吉岡 恒夫氏(tar32.dll)
    Ｍｉｃｃｏ氏(UNLHA32.dll)
-   Alexander Roshal氏(unrar.dll/unrar64.dll)
+   Alexander Roshal氏(unrar.dll,unrar64.dll)
    亀井 哲弥氏(unrar32.dll)
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
    TORO氏(UNBYPASS.DLL,ZBYPASSA.SPH)
-   Nozomu Katô氏(SRELL)
-   Kuro氏(Mery)
  ...他多数!!!
  大変可愛らしいアイコンを提供していただいた「なつだ」氏、
  そしてユーザの皆様方に、
@@ -242,6 +233,12 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
 
 ●開発履歴
+ ○Ver.0.0.1.8 - 2017/09/26
+ ・reces Ver.0.00r33に対応。
+ ・プロファイルを「編集」でリネームしても設定が以前のファイルに出力される不具合を修正。
+ ・「処理」に「エラーが発生したら中断する」を追加。
+ ・7-zip32.dll/7-zip64.dll文字化け対策版 Ver.17.01.00.01 betaに更新。
+
  ○Ver.0.0.1.7 - 2016/01/23
  ・reces Ver.0.00r31に対応。
  ・「動作」に「リネーム」を追加。

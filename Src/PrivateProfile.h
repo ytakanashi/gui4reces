@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.7 by x@rgs
+//            gui4reces Ver.0.0.1.8 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -138,10 +138,14 @@ struct RUNCOMMAND{
 };
 
 struct GENERAL{
+	//テスト
+	bool test;
 	//バックグラウンドで動作
 	bool background_mode;
 	//処理終了後ウインドウを閉じる
 	bool quit;
+	//エラーが発生したら中断する
+	bool pause_error;
 	//ディレクトリ階層を無視して圧縮/解凍
 	bool ignore_directory_structures;
 	//指定したライブラリ名

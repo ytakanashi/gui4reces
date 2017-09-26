@@ -2,7 +2,7 @@
 //リネームタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.7 by x@rgs
+//            gui4reces Ver.0.0.1.8 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -40,6 +40,7 @@ INT_PTR RenameTab::onCommand(WPARAM wparam,LPARAM lparam){
 				m_config_list[0]->cfg().rename.regex=false;
 			}
 			::EnableWindow(getDlgItem(IDC_BUTTON_RENAME_REGEX),m_config_list[0]->cfg().rename.regex);
+			::EnableWindow(getDlgItem(IDC_CHECKBOX_GENERAL_TEST),m_config_list[0]->cfg().rename.regex);
 			break;
 
 		case IDC_CHECKBOX_RENAME_REGEX:
@@ -60,6 +61,11 @@ INT_PTR RenameTab::onCommand(WPARAM wparam,LPARAM lparam){
 				::SetFocus(getDlgItem(IDC_EDIT_RENAME_STRING));
 			}
 			break;
+
+		case IDC_CHECKBOX_GENERAL_TEST:
+			//結果をテスト表示(実際にはリネームしません)
+			m_config_list[0]->cfg().general.test=getCheck(LOWORD(wparam));
+			return true;
 
 		default:
 			break;
@@ -125,6 +131,8 @@ void RenameTab::setCurrentSettings(){
 	::EnableWindow(getDlgItem(IDC_EDIT_RENAME_STRING),sendItemMessage(IDC_CHECKBOX_RENAME_STRING,BM_GETCHECK,0,0));
 	if(pattern.empty())m_config_list[0]->cfg().rename.regex=false;
 	setCheck(IDC_CHECKBOX_RENAME_REGEX,m_config_list[0]->cfg().rename.regex);
+	setCheck(IDC_CHECKBOX_GENERAL_TEST,m_config_list[0]->cfg().general.test);
 	::EnableWindow(getDlgItem(IDC_CHECKBOX_RENAME_REGEX),sendItemMessage(IDC_CHECKBOX_RENAME_STRING,BM_GETCHECK,0,0));
 	::EnableWindow(getDlgItem(IDC_BUTTON_RENAME_REGEX),sendItemMessage(IDC_CHECKBOX_RENAME_REGEX,BM_GETCHECK,0,0));
+	::EnableWindow(getDlgItem(IDC_CHECKBOX_GENERAL_TEST),sendItemMessage(IDC_CHECKBOX_RENAME_REGEX,BM_GETCHECK,0,0));
 }

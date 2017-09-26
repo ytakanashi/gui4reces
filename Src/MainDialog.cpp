@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.7 by x@rgs
+//            gui4reces Ver.0.0.1.8 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -470,6 +470,13 @@ void MainDialog::setCurrentSettings(){
 					0
 					);
 
+	//エラーが発生したら中断する
+	sendItemMessage(IDC_CHECKBOX_GENERAL_PAUSE_ERROR,
+					BM_SETCHECK,
+					(WPARAM)(m_config_list[0]->cfg().general.pause_error)?BST_CHECKED:BST_UNCHECKED,
+					0
+					);
+
 	//コンボボックス対策
 	::UpdateWindow(handle());
 }
@@ -556,9 +563,11 @@ INT_PTR MainDialog::onInitDialog(WPARAM wparam,LPARAM lparam){
 	//処理
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_GROUP_PROCESS)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_AT_ONCE)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_GENERAL_PAUSE_ERROR)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_CHECKBOX_TOPMOST)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_VERSION)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_HELP)));
+	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_CANCEL)));
 	m_wnd_size_list.push_back(SIZE_INFO(handle(),getDlgItem(IDC_BUTTON_RUN)));
 
 	//設定をコントロールに適用
@@ -715,7 +724,10 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			if(!path::isBadName(cfg_name.c_str())&&
 				!cfg_name.empty()){
 				//リネーム
-				if(::MoveFile(old_cfg_path.c_str(),(path::getExeDirectory()+_T("\\cfg\\")+cfg_name+_T(".cfg")).c_str())){
+				tstring new_cfg_path(path::getExeDirectory()+_T("\\cfg\\")+cfg_name+_T(".cfg"));
+				if(::MoveFile(old_cfg_path.c_str(),new_cfg_path.c_str())){
+					m_config_list[current_sel+1]->setFileName(new_cfg_path.c_str());
+
 					sendItemMessage(IDC_COMBO_PROFILE,
 									CB_DELETESTRING,
 									(WPARAM)current_sel,
@@ -1076,6 +1088,11 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			m_config_list[0]->cfg().gui4reces.at_once=getCheck(LOWORD(wparam));
 			return true;
 
+		case IDC_CHECKBOX_GENERAL_PAUSE_ERROR:
+			//エラーが発生したら中断する
+			m_config_list[0]->cfg().general.pause_error=getCheck(LOWORD(wparam));
+			return true;
+
 
 		case IDC_BUTTON_VERSION:{
 			//バージョン情報
@@ -1121,6 +1138,11 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 						   SW_SHOWNORMAL);
 			return true;
 		}
+
+		case IDC_BUTTON_CANCEL:
+			//キャンセル
+			sendMessage(WM_COMMAND,MAKEWPARAM(IDCANCEL,0),0);
+			break;
 
 		case IDC_BUTTON_RUN:{
 			//実行

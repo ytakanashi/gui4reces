@@ -138,6 +138,7 @@
 #define IDM_REGEX_DOT                           40000
 #define IDC_CHECKBOX_EXTRACT_SAME_DIR           40001
 #define IDC_CHECKBOX_FILTER_RECURSIVE           40001
+#define IDC_CHECKBOX_GENERAL_TEST               40001
 #define IDC_CHECKBOX_MODE_BACKGROUND            40001
 #define IDC_COMBO_OTHER_METHOD                  40001
 #define IDC_EDIT_DIRECTORY_SPI                  40001
@@ -173,8 +174,10 @@
 #define IDC_CHECKBOX_RENAME_STRING              40006
 #define IDC_EDIT_DIRECTORY_WCX                  40006
 #define IDM_REGEX_NBRACK                        40006
+#define IDC_BUTTON_CANCEL                       40007
 #define IDC_CHECKBOX_DIRECTORY_WCX              40007
 #define IDM_REGEX_PIPE                          40007
+#define IDC_CHECKBOX_GENERAL_PAUSE_ERROR        40008
 #define IDM_REGEX_SPACE                         40008
 #define IDM_REGEX_DIGIT                         40009
 #define IDM_REGEX_ESCAPE                        40010
