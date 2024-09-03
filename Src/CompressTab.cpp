@@ -2,7 +2,7 @@
 //再圧縮/圧縮タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -49,7 +49,9 @@ namespace{
 		{_T("xz"),_T(".xz")},
 		{_T("tarxz"),_T(".tar.xz")},
 		{_T("lzma"),_T(".lzma")},
-		{_T("tarlzma"),_T(".tar.lzma")}
+		{_T("tarlzma"),_T(".tar.lzma")},
+		{_T("zst"),_T(".zst")},
+		{_T("tarzst"),_T(".tar.zst")}
 	};
 
 	const TCHAR* const combo_run_command_list[]={

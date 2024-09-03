@@ -1,7 +1,7 @@
 ﻿//PrivateProfile.h
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -175,6 +175,8 @@ struct GENERAL{
 	bool ansi_stdout;
 	//ユーザ独自のパラメータ
 	tstring custom_param;
+	//dllがあるディレクトリ
+	tstring dll_dir;
 	//spiがあるディレクトリ
 	tstring spi_dir;
 	//b2eがあるディレクトリ
@@ -190,6 +192,7 @@ struct GENERAL{
 	GENERAL():
 		background_mode(false),
 		quit(true),
+		pause_error(false),
 		ignore_directory_structures(false),
 		selected_library_name(),
 		selected_library_prefix(),
@@ -205,6 +208,7 @@ struct GENERAL{
 		list_codepage(sslib::File::SJIS),
 		ansi_stdout(false),
 		custom_param(),
+		dll_dir(),
 		spi_dir(),
 		b2e_dir(),
 		wcx_dir(),

@@ -2,7 +2,7 @@
 //メインダイアログ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -1099,6 +1099,10 @@ INT_PTR MainDialog::onCommand(WPARAM wparam,LPARAM lparam){
 			tstring library_version;
 			tstring cmd_line(_T("reces.exe "));
 
+			if(!m_config_list[0]->cfg().general.dll_dir.empty()){
+				cmd_line.append(format(_T("/Dd%s "),
+									   path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.dll_dir)).c_str()));
+			}
 			if(!m_config_list[0]->cfg().general.spi_dir.empty()){
 				cmd_line.append(format(_T("/Ds%s "),
 									   path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.spi_dir)).c_str()));

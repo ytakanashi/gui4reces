@@ -2,7 +2,7 @@
 //その他タブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -76,6 +76,11 @@ INT_PTR OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 				if(!m_config_list[0]->cfg().general.b2e_dir.empty()){
 					cmd.append(format(_T(" /Db%s"),
 									  path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.b2e_dir)).c_str()));
+				}
+
+				if(!m_config_list[0]->cfg().general.dll_dir.empty()){
+					cmd.append(format(_T(" /Dd%s"),
+									  path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.dll_dir)).c_str()));
 				}
 
 				if(!m_config_list[0]->cfg().general.spi_dir.empty()){
@@ -161,6 +166,11 @@ INT_PTR OtherTab::onCommand(WPARAM wparam,LPARAM lparam){
 						if(!m_config_list[0]->cfg().general.b2e_dir.empty()){
 							cmd.append(format(_T(" /Db%s "),
 											  path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.b2e_dir)).c_str()));
+						}
+
+						if(!m_config_list[0]->cfg().general.dll_dir.empty()){
+							cmd.append(format(_T(" /Dd%s "),
+											  path::quote(path::removeTailSlash(m_config_list[0]->cfg().general.dll_dir)).c_str()));
 						}
 
 						cmd.append(_T("/mv b2e"));

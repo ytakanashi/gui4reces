@@ -1,13 +1,13 @@
 ﻿_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 【 ソフト名 】　gui4reces
-【バージョン】　0.0.1.8
+【バージョン】　0.0.1.9
 【 製作者名 】　x@rgs
 【 動作環境 】　Windows XP以降
 【 製作言語 】　C++
 【ｿﾌﾄｳｪｱ種別】　フリーソフトウェア
 【 配布条件 】　NYSL Version 0.9982
 【  連絡先  】	Y.R.Takanashi@gmail.com
-【  サイト  】	http://www16.atpages.jp/rayna/index.html
+【  サイト  】	http://frostmoon.sakura.ne.jp/
 _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●はじめに
  この度は、「gui4reces」(以下、本ソフトとも)をダウンロードしていただき、ありがとうございます。
@@ -93,41 +93,40 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    ||    7-zip32.dll    |     7-zip64.dll      ||  再圧縮、圧縮、解凍、削除  ||       同梱       ||
    ||    tar32.dll      |     tar64.dll        ||  再圧縮、圧縮、解凍        ||  *1 64bit版は *2 ||
    ||    UNLHA32.DLL    |     ------------     ||  再圧縮、圧縮、解凍、削除  ||        *1        ||
-   ||    unrar32.dll    |     unrar64j.dll     ||  解凍                      ||  *1 64bit版は *6 ||
+   ||    unrar32.dll    |     unrar64j.dll     ||  解凍                      ||  *1 64bit版は *5 ||
    ||    UnIso32.dll    |     ------------     ||  解凍                      ||        *1        ||
    ||    XacRett.dll    |     ------------     ||  解凍                      ||        *3        ||
-   ||  *.b2e+b2e32.dll  |   *.b2e+b2e64.dll    ||  再圧縮、圧縮、解凍        ||        *1        ||
+   ||  *.b2e+b2e32.dll  |   *.b2e+b2e64.dll    ||  再圧縮、圧縮、解凍        || *1 64bit版は同梱 ||
    ||       *.spi       |        *.sph         ||  解凍                      ||                  ||
-   ||                   |  *.spi+ZBYPASSA.SPH  ||                            ||        *5        ||
+   ||                   |  *.spi+ZBYPASSA.SPH  ||                            ||        *4        ||
    ||       *.wcx       |    *.wcx,*.wcx64     ||  解凍                      ||                  ||
-   ||      -------      |     UNBYPASS.DLL     ||  再圧縮、圧縮、解凍        ||        *5        ||
+   ||      -------      |     UNBYPASS.DLL     ||  再圧縮、圧縮、解凍        ||        *4        ||
     ==============================================================================================
 
    *1
       統合アーカイバプロジェクト( http://www.csdinc.co.jp/archiver/ )
    *2
-      綾川的趣味之接続集( http://homepage1.nifty.com/Ayakawa/index.html )
+      綾川的趣味之接続集( https://ayakawa.x0.com/ )
+      GitHub - Claybird/tar32( https://github.com/Claybird/tar32 )
    *3
       Bonty's HomePage( http://hp.vector.co.jp/authors/VA030681/index.htm )
    *4
-      Yanagi's Home Page( http://homepage2.nifty.com/NYanagi/index.html )
+      TORO's Library( http://toro.d.dooo.jp/ )
    *5
-      TORO's Library( http://homepage1.nifty.com/toro/index.html )
-   *6
-      Ru^3 Honpo( http://www.vesta.dti.ne.jp/~tsato/index.html )
+      Ru^3 Honpo( https://rururutan.github.io/ )
 
  ・7-zip32.dllについて、現在統合アーカイバプロジェクトで配布されている9.22.00.02は、
    一部ファイル名が文字化けしてしまいます。
    そこでgui4recesでは、「7-zip32.dll/7-zip64.dll文字化け対策版」を同梱しています。
-   最新版はFrost Moon Project( http://www16.atpages.jp/rayna/index.html )にて入手することが出来ます。
+   最新版はFrost Moon Project( http://frostmoon.sakura.ne.jp/ )にて入手することが出来ます。
 
  ・rar書庫を取り扱うにあたり、必ず「unrar.dll」「unrar64.dll」を最新版にバージョンアップしてください。
    RARLAB( http://www.rarlab.com/ )の「RAR」->「Extras」->「UNRAR.dll」からダウンロードすることが出来ます。
 
- ・「7z.dll対応版7-zip32.dll/7-zip64.dll」( http://www16.atpages.jp/rayna/index.html )に対応しています。
+ ・「7z.dll対応版7-zip32.dll/7-zip64.dll」( http://frostmoon.sakura.ne.jp/ )に対応しています。
    gui4reces x64版ではUNLHA32.DLLやXacRett.dllが使用できないため、導入をお勧めします。
    1.「7-Zip x64版」( http://www.7-zip.org/ )をインストール。
-   2.「7-zip32.dll/7-zip64.dll/7z.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )をダウンロード。
+   2.「7-zip32.dll/7-zip64.dll/7z.dll文字化け対策版」( http://frostmoon.sakura.ne.jp/ )をダウンロード。
      (以下の3,4はインストーラ版であれば不要です)
    3.「x64\7z.dll」を7-Zipインストールディレクトリにコピー。
    4.「7-zip32-full\7-zip64.dll」をパスの通ったディレクトリにコピー。
@@ -150,13 +149,14 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 
    上記統合アーカイバライブラリをすべて導入すると、以下の拡張子に対応することが出来ます。
    (Susie Plug-inやTotal Commander Plugin、b2eスクリプトの導入により更に対応させることが出来ます。)
-     lzh,lha,lzs
-     rar
-     zip,7z,jar
-     tar,tgz,gz,tar.gz,bz2,tbz,tbz2,tar.bz2,xz,txz,tar.xz,lzma,tlz,tlzma,tar.lzma
-     Z,taz,tz,tar.Z,cpio,cpgz,a,lib,rpm,deb
-     iso
-     ace,arc,arg,arj,asd,b2a,b64,bel,bin,boo,bza,gza,C,cab,cpt,dmg,dz,F,xF,gca,hqx,imp,ish,jak,ntx,pit,pak,wad,pff,rez,sp,spl,uue,xxe,zac,zoo
+
+      lzh,lha,lzs
+      rar
+      zip,7z,jar
+      tar,tgz,gz,tar.gz,bz2,tbz,tbz2,tar.bz2,xz,txz,tar.xz,lzma,tlz,tlzma,tar.lzma,zst,tar.zst,tzst,tzs,tzstd
+      Z,taz,tz,tar.Z,cpio,cpgz,a,lib,rpm,deb
+      iso
+      ace,arc,arg,arj,asd,b2a,b64,bel,bin,boo,bza,gza,C,cab,cpt,dmg,dz,F,xF,gca,hqx,imp,ish,jak,ntx,pit,pak,wad,pff,rez,sp,spl,uue,xxe,zac,zoo
 
  3.「gui4reces.exe」を実行、「バージョン情報」をクリックし、
    各種ライブラリが正しくインストールされているか確認します。
@@ -180,8 +180,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  OS:Microsoft Windows 10 Home Premium 64-bit
  CPU:Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz 3.41GHz
  memory:16.0GB RAM
- compiler/debugger:Microsoft Visual C++ 2015(Microsoft Visual Studio Community 2015)
-                   Microsoft Visual C++ 2010 Express
+ compiler/debugger:Microsoft Visual Studio Community 2022 (64 ビット) - Current Version 17.3.1
  editor:xyzzy version 0.2.2.235
 
 
@@ -189,7 +188,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  本ソフト開発にあたり参考/使用させて頂いたソフトウェアや、
  各書庫操作ライブラリの作者様方...
    k.inaba氏(Noah,UnDller)
-   Claybird氏(LhaForge,b2e32.dll,tar32.dll,unrar32.dll)
+   Claybird氏(LhaForge,b2e32.dll,tar32.dll,tar64.dll,unrar32.dll)
    鬼束 裕之氏(Explzh)
    Bonty氏(Archon2,XacRett.dll)
    高田 謙氏(undll.exe,UnIso32.dll)
@@ -201,6 +200,7 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
    亀井 哲弥氏(unrar32.dll)
    RuRuRu氏(unrar32.dll x64/ユニコード対応版)
    TORO氏(UNBYPASS.DLL,ZBYPASSA.SPH)
+   textex氏(SpeedHelpPad)
  ...他多数!!!
  大変可愛らしいアイコンを提供していただいた「なつだ」氏、
  そしてユーザの皆様方に、
@@ -210,9 +210,9 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 ●ライセンス
  ・本ソフトはNYSL Version 0.9982に準拠して配布されています。
    ライセンスの詳細は同梱の「NYSL_withfaq.TXT」をご覧下さい。
- ・「reces」( http://www16.atpages.jp/rayna/index.html )はNYSL Version 0.9982に準拠して配布されています。
+ ・「reces」( http://frostmoon.sakura.ne.jp/ )はNYSL Version 0.9982に準拠して配布されています。
    ライセンスの詳細は「reces」に同梱されている「NYSL_withfaq.TXT」をご覧ください。
- ・「7-zip32.dll/7-zip64.dll文字化け対策版」( http://www16.atpages.jp/rayna/index.html )は
+ ・「7-zip32.dll/7-zip64.dll文字化け対策版」( http://frostmoon.sakura.ne.jp/ )は
    GNU Lesser General Public License (LGPL)の下で配布されています。
    ライセンスの詳細は下記URLをご覧下さい。
       http://www.gnu.org/copyleft/lesser.ja.html
@@ -228,11 +228,15 @@ _/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
  BBS(以下URLよりアクセス可能)にて、
 
  最新版は
- http://www16.atpages.jp/rayna/index.html
+ http://frostmoon.sakura.ne.jp/
  でお願いします。
 
 
 ●開発履歴
+ ○Ver.0.0.1.9 - 2024/09/03
+ ・reces Ver.0.00r34に対応。
+ ・7-zip32.dll/7-zip64.dll文字化け対策版 Ver.24.08.00.01に更新。
+
  ○Ver.0.0.1.8 - 2017/09/26
  ・reces Ver.0.00r33に対応。
  ・プロファイルを「編集」でリネームしても設定が以前のファイルに出力される不具合を修正。

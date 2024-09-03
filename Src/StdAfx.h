@@ -2,7 +2,7 @@
 //共通ヘッダファイル
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -73,9 +73,9 @@ typedef std::basic_string<TCHAR>tstring;
 	}name;\
 
 #ifdef _DEBUG
-	#define SOFTWARE_VERSION _T("0.0.1.8_Debug")
+	#define SOFTWARE_VERSION _T("0.0.1.9_Debug")
 #else
-	#define SOFTWARE_VERSION _T("0.0.1.8")
+	#define SOFTWARE_VERSION _T("0.0.1.9")
 #endif
 
 //#define DISABLE_MISC

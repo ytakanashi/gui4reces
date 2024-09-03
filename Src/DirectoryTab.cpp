@@ -2,7 +2,7 @@
 //ディレクトリタブ
 
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
-//            gui4reces Ver.0.0.1.8 by x@rgs
+//            gui4reces Ver.0.0.1.9 by x@rgs
 //              under NYSL Version 0.9982
 //
 //`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`~^`
@@ -20,13 +20,14 @@ using namespace sslib;
 
 namespace dir_ctrl{
 	enum{
-		B2E,SPI,WCX
+		DLL,B2E,SPI,WCX
 	};
 	struct ID_TABLE{
 		const unsigned int chkbox_id;
 		const unsigned int edit_id;
 		tstring* dir;
 	}table[]={
+		{IDC_CHECKBOX_DIRECTORY_DLL,IDC_EDIT_DIRECTORY_DLL,NULL},
 		{IDC_CHECKBOX_DIRECTORY_B2E,IDC_EDIT_DIRECTORY_B2E,NULL},
 		{IDC_CHECKBOX_DIRECTORY_SPI,IDC_EDIT_DIRECTORY_SPI,NULL},
 		{IDC_CHECKBOX_DIRECTORY_WCX,IDC_EDIT_DIRECTORY_WCX,NULL},
@@ -49,6 +50,7 @@ namespace dir_ctrl{
 }
 
 INT_PTR DirectoryTab::onInitDialog(WPARAM wparam,LPARAM lparam){
+	dir_ctrl::table[dir_ctrl::DLL].dir=&m_config_list[0]->cfg().general.dll_dir;
 	dir_ctrl::table[dir_ctrl::B2E].dir=&m_config_list[0]->cfg().general.b2e_dir;
 	dir_ctrl::table[dir_ctrl::SPI].dir=&m_config_list[0]->cfg().general.spi_dir;
 	dir_ctrl::table[dir_ctrl::WCX].dir=&m_config_list[0]->cfg().general.wcx_dir;
@@ -58,6 +60,7 @@ INT_PTR DirectoryTab::onInitDialog(WPARAM wparam,LPARAM lparam){
 
 INT_PTR DirectoryTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(LOWORD(wparam)){
+		case IDC_CHECKBOX_DIRECTORY_DLL:
 		case IDC_CHECKBOX_DIRECTORY_B2E:
 		case IDC_CHECKBOX_DIRECTORY_SPI:
 		case IDC_CHECKBOX_DIRECTORY_WCX:{
@@ -78,6 +81,8 @@ INT_PTR DirectoryTab::onCommand(WPARAM wparam,LPARAM lparam){
 				if(folder_dialog.doModalOpen(dir_ctrl::table[control_id].dir,
 											 handle(),
 											 (tstring(
+													 (control_id==dir_ctrl::DLL)?
+													 _T("統合アーカイバライブラリ (*.dll)"):
 													 (control_id==dir_ctrl::B2E)?
 													 _T("B2E Script (*.b2e)"):
 													 (control_id==dir_ctrl::SPI)?
@@ -131,6 +136,7 @@ INT_PTR DirectoryTab::onCommand(WPARAM wparam,LPARAM lparam){
 	switch(HIWORD(wparam)){
 		case EN_CHANGE:
 			switch(LOWORD(wparam)){
+				case IDC_EDIT_DIRECTORY_DLL:
 				case IDC_EDIT_DIRECTORY_B2E:
 				case IDC_EDIT_DIRECTORY_SPI:
 				case IDC_EDIT_DIRECTORY_WCX:{
